@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f0f0f">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <title>León de Judá — Ingresar</title>
+  <style>
+    :root { --bg:#fafaf8; --text:#0f0f0f; --text-muted:#7a7570; --accent:#b07d4a; --border:#e2ddd8; --white:#ffffff; --red:#c94040; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Karla',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .card-login{background:var(--white);border:1px solid var(--border);border-radius:16px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.08);}
+    .card-top{background:var(--text);padding:2.5rem 2rem 2rem;text-align:center;}
+    .card-logo{font-family:'Playfair Display',serif;font-size:2rem;color:var(--white);margin-bottom:.25rem;}
+    .card-subtitle{font-size:.85rem;color:rgba(255,255,255,.5);}
+    .tabs{display:flex;border-bottom:1px solid var(--border);}
+    .tab{flex:1;padding:1rem;background:none;border:none;cursor:pointer;font-family:'Karla',sans-serif;font-size:.875rem;font-weight:600;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+    .tab:hover{color:var(--text);}
+    .tab.active{color:var(--text);border-bottom-color:var(--text);}
+    .panel{display:none;padding:2rem;}
+    .panel.active{display:block;}
+    .form-group{margin-bottom:1.25rem;}
+    label{display:block;font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.4rem;}
+    input{width:100%;padding:.75rem 1rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Karla',sans-serif;font-size:.95rem;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s;}
+    input:focus{border-color:var(--text);background:var(--white);}
+    .input-wrap{position:relative;}
+    .toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1rem;padding:.25rem;}
+    .btn-submit{width:100%;padding:.875rem;background:var(--text);color:white;border:none;border-radius:8px;font-family:'Karla',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s,transform .15s;display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:.5rem;}
+    .btn-submit:hover{background:#333;transform:translateY(-1px);}
+    .btn-submit:disabled{background:var(--border);color:var(--text-muted);cursor:wait;transform:none;}
+    .forgot-link{display:block;text-align:right;font-size:.8rem;color:var(--text-muted);text-decoration:none;margin-top:-.5rem;margin-bottom:1rem;}
+    .forgot-link:hover{color:var(--text);}
+    .alert-box{padding:.75rem 1rem;border-radius:8px;font-size:.875rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:.6rem;}
+    .alert-error{background:#fef2f2;border:1px solid #fecaca;color:var(--red);}
+    .alert-success{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem;}
+    .volver{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--text-muted);text-decoration:none;padding:1.25rem 2rem 0;transition:color .2s;}
+    .volver:hover{color:var(--text);}
+    a{color:inherit;}
+  </style>
+</head>
+<body>
+  <div style="width:100%">
+    <a href="/index.html" class="volver"><i class="bi bi-arrow-left"></i> Volver a la tienda</a>
+    <div class="card-login" style="margin:1rem auto">
+      <div class="card-top">
+        <div class="card-logo">León de Judá</div>
+        <p class="card-subtitle">Tu tienda de moda favorita</p>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-tab="login">Ingresar</button>
+        <button class="tab" data-tab="registro">Crear cuenta</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="panel active" id="panel-login">
+        <div class="alert-box alert-error" id="login-error" style="display:none">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span id="login-error-msg"></span>
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="login-email" placeholder="tu@correo.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <div class="input-wrap">
+            <input type="password" id="login-password" placeholder="Tu contraseña" autocomplete="current-password">
+            <button class="toggle-pass" onclick="togglePass('login-password',this)"><i class="bi bi-eye"></i></button>
+          </div>
+        </div>
+        <a href="#" class="forgot-link" id="forgot-link">¿Olvidaste tu contraseña?</a>
+        <button class="btn-submit" id="btn-login" onclick="handleLogin()">
+          <i class="bi bi-box-arrow-in-right"></i> Ingresar
+        </button>
+      </div>
+
+      <!-- REGISTRO -->
+      <div class="panel" id="panel-registro">
+        <div class="alert-box alert-error" id="reg-error" style="display:none">
+          <i class="bi bi-exclamation-circle-fill"></i><span id="reg-error-msg"></span>
+        </div>
+        <div class="alert-box alert-success" id="reg-ok" style="display:none">
+          <i class="bi bi-check-circle-fill"></i><span>¡Cuenta creada! Revisá tu correo para confirmar.</span>
+        </div>
+        <div class="grid-2">
+          <div class="form-group"><label>Nombre</label><input type="text" id="reg-nombre" placeholder="Ana"></div>
+          <div class="form-group"><label>Apellido</label><input type="text" id="reg-apellido" placeholder="García"></div>
+        </div>
+        <div class="form-group"><label>Correo electrónico</label><input type="email" id="reg-email" placeholder="tu@correo.com"></div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <div class="input-wrap">
+            <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres">
+            <button class="toggle-pass" onclick="togglePass('reg-password',this)"><i class="bi bi-eye"></i></button>
+          </div>
+        </div>
+        <div class="form-group"><label>Teléfono (opcional)</label><input type="tel" id="reg-tel" placeholder="+54 9 11 1234 5678"></div>
+        <button class="btn-submit" id="btn-registro" onclick="handleRegistro()">
+          <i class="bi bi-person-plus"></i> Crear mi cuenta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js"></script>
+  <script>
+    // Tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Redirigir si ya está logueado
+    (async () => {
+      const user = await getUsuario();
+      if (!user) return;
+      if (user.email === ADMIN_EMAIL) {
+        window.location.href = '/pages/admin/panel.html';
+      } else {
+        window.location.href = '/index.html';
+      }
+    })();
+
+    async function handleLogin() {
+      const email    = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const btn      = document.getElementById('btn-login');
+      const errBox   = document.getElementById('login-error');
+      const errMsg   = document.getElementById('login-error-msg');
+      errBox.style.display = 'none';
+      if (!email || !password) { errMsg.textContent = 'Completá todos los campos.'; errBox.style.display = 'flex'; return; }
+      btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Ingresando…';
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        errMsg.textContent = traducirError(error.message); errBox.style.display = 'flex';
+        btn.disabled = false; btn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Ingresar'; return;
+      }
+      // Redirigir según rol
+      if (data.user.email === ADMIN_EMAIL) {
+        window.location.href = '/pages/admin/panel.html';
+      } else {
+        const dest = new URLSearchParams(location.search).get('redirect') || '/index.html';
+        window.location.href = dest;
+      }
+    }
+
+    async function handleRegistro() {
+      const nombre    = document.getElementById('reg-nombre').value.trim();
+      const apellido  = document.getElementById('reg-apellido').value.trim();
+      const email     = document.getElementById('reg-email').value.trim();
+      const password  = document.getElementById('reg-password').value;
+      const tel       = document.getElementById('reg-tel').value.trim();
+      const provincia = document.getElementById('reg-provincia').value.trim();
+      const ciudad    = document.getElementById('reg-ciudad').value.trim();
+      const btn      = document.getElementById('btn-registro');
+      const errBox   = document.getElementById('reg-error');
+      const errMsg   = document.getElementById('reg-error-msg');
+      const okBox    = document.getElementById('reg-ok');
+      errBox.style.display = 'none'; okBox.style.display = 'none';
+      if (!nombre || !email || !password) { errMsg.textContent = 'Nombre, correo y contraseña son obligatorios.'; errBox.style.display = 'flex'; return; }
+      if (password.length < 6) { errMsg.textContent = 'La contraseña debe tener al menos 6 caracteres.'; errBox.style.display = 'flex'; return; }
+      btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creando cuenta…';
+      const { data, error } = await sb.auth.signUp({ email, password, options: { data: { nombre, apellido, telefono: tel, provincia, ciudad } } });
+      if (error) {
+        errMsg.textContent = traducirError(error.message); errBox.style.display = 'flex';
+        btn.disabled = false; btn.innerHTML = '<i class="bi bi-person-plus"></i> Crear mi cuenta'; return;
+      }
+      if (data.user && !data.session) { okBox.style.display = 'flex'; btn.disabled = false; btn.innerHTML = '<i class="bi bi-person-plus"></i> Crear mi cuenta'; return; }
+      if (data.user) {
+        await sb.from('perfiles').upsert({ user_id: data.user.id, nombre, apellido, telefono: tel, provincia, ciudad });
+        window.location.href = '/index.html';
+      }
+    }
+
+    document.getElementById('forgot-link').addEventListener('click', async e => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      if (!email) { alert('Escribí tu correo primero.'); return; }
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/pages/tienda/cuenta.html' });
+      if (error) alert('Error: ' + error.message);
+      else alert('Te enviamos un correo para restablecer tu contraseña.');
+    });
+
+    function togglePass(id, btn) {
+      const input = document.getElementById(id); const icon = btn.querySelector('i');
+      if (input.type === 'password') { input.type = 'text'; icon.className = 'bi bi-eye-slash'; }
+      else { input.type = 'password'; icon.className = 'bi bi-eye'; }
+    }
+
+    function traducirError(msg) {
+      const map = { 'Invalid login credentials':'Correo o contraseña incorrectos.', 'Email not confirmed':'Confirmá tu correo antes de ingresar.', 'User already registered':'Ya existe una cuenta con ese correo.' };
+      for (const [k, v] of Object.entries(map)) { if (msg.includes(k)) return v; }
+      return msg;
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      if (document.getElementById('panel-login').classList.contains('active')) handleLogin();
+      else handleRegistro();
+    });
+  </script>
+</body>
+</html>

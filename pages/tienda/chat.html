@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1c1917">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <title>León de Judá — Mis mensajes</title>
+
+  <style>
+    :root {
+      --bg:         #f5f0e8;
+      --bg2:        #ede6d6;
+      --bg3:        #e4dac8;
+      --card-bg:    #faf7f2;
+      --text:       #1c1917;
+      --text-muted: #78716c;
+      --gold:       #9a7b2e;
+      --gold-light: #c9a84c;
+      --border:     #ddd5c0;
+      --white:      #ffffff;
+      --nav-h:      56px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: var(--text); height: var(--nav-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1rem; flex-shrink: 0;
+    }
+    .navbar-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: white; font-weight: 500; }
+    .nav-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,.8); padding: .5rem; border-radius: 8px; display: flex; align-items: center; gap: .35rem; font-family: 'Jost', sans-serif; font-size: .8rem; font-weight: 500; transition: background .15s; }
+    .nav-btn:hover { background: rgba(255,255,255,.1); color: white; }
+    .nav-btn i { font-size: 1.1rem; }
+
+    /* ── Layout 2 paneles ── */
+    .chat-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    /* ── Panel izq: lista de pedidos ── */
+    .pedidos-panel {
+      width: 300px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      overflow-y: auto;
+    }
+
+    .panel-titulo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: .5rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .pedido-item {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: .85rem 1rem;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      position: relative;
+    }
+
+    .pedido-item:hover { border-color: var(--gold); }
+    .pedido-item.active { border-color: var(--text); background: var(--white); }
+
+    .pedido-item-id { font-size: .65rem; color: var(--text-muted); font-weight: 700; letter-spacing: .08em; margin-bottom: .2rem; }
+    .pedido-item-fecha { font-size: .78rem; color: var(--text-muted); margin-bottom: .3rem; }
+    .pedido-item-total { font-size: .875rem; font-weight: 700; color: var(--gold); }
+
+    .pedido-unread {
+      position: absolute;
+      top: .6rem; right: .7rem;
+      background: var(--gold);
+      color: white;
+      font-size: .6rem;
+      font-weight: 800;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── Panel der: chat ── */
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .chat-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      gap: .75rem;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .chat-empty i { font-size: 2.5rem; opacity: .3; }
+    .chat-empty p { font-size: .875rem; }
+
+    .chat-header {
+      background: var(--text);
+      color: white;
+      padding: .85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      flex-shrink: 0;
+    }
+
+    .chat-header-info { flex: 1; min-width: 0; }
+    .chat-header-id { font-size: .65rem; color: rgba(255,255,255,.5); font-weight: 700; letter-spacing: .08em; }
+    .chat-header-titulo { font-size: .9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .estado-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; }
+
+    /* Mensajes */
+    .mensajes-lista {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+      scroll-behavior: smooth;
+    }
+
+    .msg-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .msg-wrap.cliente { align-items: flex-end; }
+    .msg-wrap.admin   { align-items: flex-start; }
+
+    .msg-burbuja {
+      max-width: 75%;
+      padding: .65rem .9rem;
+      border-radius: 12px;
+      font-size: .875rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .msg-wrap.cliente .msg-burbuja {
+      background: var(--text);
+      color: white;
+      border-bottom-right-radius: 3px;
+    }
+
+    .msg-wrap.admin .msg-burbuja {
+      background: var(--bg3);
+      color: var(--text);
+      border-bottom-left-radius: 3px;
+    }
+
+    .msg-meta {
+      font-size: .65rem;
+      color: var(--text-muted);
+      margin-top: .2rem;
+      padding: 0 .25rem;
+    }
+
+    .msg-wrap.admin .msg-meta::before {
+      content: '✝ León de Judá · ';
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    /* Input de mensaje */
+    .chat-input-wrap {
+      padding: .75rem 1rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: .5rem;
+      background: var(--white);
+      flex-shrink: 0;
+    }
+
+    .chat-input {
+      flex: 1;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      padding: .6rem 1rem;
+      font-family: 'Jost', sans-serif;
+      font-size: .875rem;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      resize: none;
+      transition: border-color .2s;
+    }
+
+    .chat-input:focus { border-color: var(--text); }
+
+    .btn-send {
+      width: 40px; height: 40px;
+      background: var(--text);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      transition: background .2s, transform .15s;
+    }
+
+    .btn-send:hover    { background: #2c2520; transform: scale(1.05); }
+    .btn-send:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+
+    /* Skeleton */
+    .skel { background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%); background-size:200% 100%; animation: shimmer 1.5s infinite; border-radius:8px; }
+    @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+
+    /* Sin pedidos */
+    .empty-state { text-align: center; padding: 2rem 1rem; color: var(--text-muted); }
+    .empty-state i { font-size: 2rem; margin-bottom: .5rem; opacity: .3; }
+
+    /* Mobile: ocultar lista y mostrar solo chat */
+    @media (max-width: 650px) {
+      .chat-layout { padding: .5rem; gap: 0; }
+      .pedidos-panel { width: 100%; display: none; }
+      .pedidos-panel.show-list { display: flex; }
+      .chat-panel { display: none; }
+      .chat-panel.show-chat { display: flex; }
+      .chat-layout.vista-chat .pedidos-panel { display: none; }
+      .chat-layout.vista-chat .chat-panel { display: flex; width: 100%; }
+      .chat-layout.vista-lista .pedidos-panel { display: flex; width: 100%; }
+      .chat-layout.vista-lista .chat-panel { display: none; }
+    }
+
+    /* Popup notif */
+    .notif-popup {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      background: var(--text); color: white;
+      padding: .75rem 1.25rem; border-radius: 50px;
+      font-size: .82rem; font-weight: 500;
+      display: flex; align-items: center; gap: .6rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3);
+      z-index: 9999; white-space: nowrap;
+      animation: pop-in .3s ease;
+      cursor: pointer;
+    }
+
+    .notif-popup i { color: var(--gold-light); }
+    @keyframes pop-in { from { opacity:0; transform:translateX(-50%) translateY(10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/index.html" class="nav-btn">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <span class="navbar-logo">Mis mensajes</span>
+    <a href="/pages/tienda/cuenta.html" class="nav-btn">
+      <i class="bi bi-person"></i>
+    </a>
+  </nav>
+
+  <!-- LAYOUT -->
+  <div class="chat-layout vista-lista" id="chat-layout">
+
+    <!-- Lista de pedidos -->
+    <div class="pedidos-panel" id="pedidos-panel">
+      <p class="panel-titulo">Tus pedidos</p>
+      <div id="pedidos-lista">
+        <div class="skel" style="height:80px;border-radius:10px;margin-bottom:.5rem"></div>
+        <div class="skel" style="height:80px;border-radius:10px"></div>
+      </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-panel" id="chat-panel">
+      <div class="chat-empty" id="chat-empty">
+        <i class="bi bi-chat-dots"></i>
+        <p>Seleccioná un pedido para ver el chat con la tienda</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js"></script>
+
+  <script>
+    let usuarioActual  = null;
+    let pedidoActual   = null;
+    let suscripcion    = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Proteger página
+      const user = await getUsuario();
+      if (!user) { location.href = '/login.html?redirect=/pages/tienda/chat.html'; return; }
+      if (user.email === ADMIN_EMAIL) { location.href = '/pages/admin/panel.html'; return; }
+
+      usuarioActual = user;
+      await cargarPedidos();
+    });
+
+    // ── Cargar pedidos del usuario ───────────────────────────────
+    async function cargarPedidos() {
+      const { data: pedidos, error } = await sb
+        .from('pedidos')
+        .select('id, created_at, total, estado, pedido_items(cantidad, productos(nombre))')
+        .eq('user_id', usuarioActual.id)
+        .order('created_at', { ascending: false });
+
+      if (error || !pedidos?.length) {
+        document.getElementById('pedidos-lista').innerHTML = `
+          <div class="empty-state">
+            <i class="bi bi-bag-x"></i>
+            <p>Todavía no tenés pedidos.<br>Comprá algo para poder chatear.</p>
+          </div>`;
+        return;
+      }
+
+      // Contar no leídos por pedido
+      const { data: noLeidos } = await sb
+        .from('mensajes')
+        .select('pedido_id')
+        .in('pedido_id', pedidos.map(p => p.id))
+        .eq('remitente', 'admin')
+        .eq('leido', false);
+
+      const conteos = {};
+      (noLeidos || []).forEach(m => {
+        conteos[m.pedido_id] = (conteos[m.pedido_id] || 0) + 1;
+      });
+
+      document.getElementById('pedidos-lista').innerHTML = pedidos.map(p => {
+        const items   = p.pedido_items || [];
+        const resumen = items.slice(0,2).map(i => i.productos?.nombre || '—').join(', ');
+        const noLeid  = conteos[p.id] || 0;
+        const fecha   = new Date(p.created_at).toLocaleDateString('es-AR', { day:'2-digit', month:'short' });
+
+        return `
+          <div class="pedido-item" id="pi-${p.id}" onclick="abrirChat('${p.id}', '${resumen}', '${formatearPrecio(p.total)}', '${p.estado}')">
+            <p class="pedido-item-id"># ${p.id.substring(0,8).toUpperCase()}</p>
+            <p class="pedido-item-fecha">${fecha} · ${resumen || '—'}</p>
+            <p class="pedido-item-total">${formatearPrecio(p.total)}</p>
+            ${noLeid > 0 ? `<span class="pedido-unread">${noLeid}</span>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    // ── Abrir chat de un pedido ──────────────────────────────────
+    async function abrirChat(pedidoId, resumen, total, estado) {
+      // Marcar activo en lista
+      document.querySelectorAll('.pedido-item').forEach(el => el.classList.remove('active'));
+      const piEl = document.getElementById('pi-' + pedidoId);
+      if (piEl) {
+        piEl.classList.add('active');
+        const badge = piEl.querySelector('.pedido-unread');
+        if (badge) badge.remove();
+      }
+
+      pedidoActual = pedidoId;
+
+      // Mobile: cambiar vista
+      document.getElementById('chat-layout').classList.remove('vista-lista');
+      document.getElementById('chat-layout').classList.add('vista-chat');
+
+      // Renderizar estructura del chat
+      document.getElementById('chat-panel').innerHTML = `
+        <div class="chat-header">
+          <div class="estado-dot"></div>
+          <div class="chat-header-info">
+            <p class="chat-header-id"># ${pedidoId.substring(0,8).toUpperCase()} · ${estado}</p>
+            <p class="chat-header-titulo">${resumen} · ${total}</p>
+          </div>
+          <button class="nav-btn" onclick="volverLista()" style="color:rgba(255,255,255,.7)" title="Volver">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="mensajes-lista" id="mensajes-lista">
+          <div style="text-align:center;color:var(--text-muted);font-size:.8rem;padding:1rem">
+            <i class="bi bi-hourglass-split"></i> Cargando...
+          </div>
+        </div>
+        <div class="chat-input-wrap">
+          <input class="chat-input" id="chat-input" type="text"
+            placeholder="Escribí tu mensaje…" maxlength="500"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMensaje()}">
+          <button class="btn-send" id="btn-send" onclick="enviarMensaje()">
+            <i class="bi bi-send-fill"></i>
+          </button>
+        </div>`;
+
+      await cargarMensajes(pedidoId);
+      suscribirMensajes(pedidoId);
+
+      // Marcar mensajes del admin como leídos
+      await sb.from('mensajes')
+        .update({ leido: true })
+        .eq('pedido_id', pedidoId)
+        .eq('remitente', 'admin')
+        .eq('leido', false);
+    }
+
+    // ── Cargar mensajes ──────────────────────────────────────────
+    async function cargarMensajes(pedidoId) {
+      const { data, error } = await sb
+        .from('mensajes')
+        .select('*')
+        .eq('pedido_id', pedidoId)
+        .order('created_at', { ascending: true });
+
+      const lista = document.getElementById('mensajes-lista');
+      if (!lista) return;
+
+      if (!data?.length) {
+        lista.innerHTML = `
+          <div style="text-align:center;color:var(--text-muted);font-size:.82rem;padding:1.5rem;line-height:1.6">
+            <i class="bi bi-chat-heart" style="font-size:1.5rem;margin-bottom:.5rem;display:block;color:var(--gold);opacity:.6"></i>
+            Este es el inicio de tu chat con León de Judá.<br>
+            Podés hacer preguntas sobre tu pedido.
+          </div>`;
+        return;
+      }
+
+      lista.innerHTML = data.map(m => msgHTML(m)).join('');
+      scrollAbajo();
+    }
+
+    // ── Suscripción en tiempo real ────────────────────────────────
+    function suscribirMensajes(pedidoId) {
+      if (suscripcion) suscripcion.unsubscribe();
+
+      suscripcion = sb
+        .channel('chat-cliente-' + pedidoId)
+        .on('postgres_changes', {
+          event:  'INSERT',
+          schema: 'public',
+          table:  'mensajes',
+          filter: `pedido_id=eq.${pedidoId}`,
+        }, payload => {
+          const msg  = payload.new;
+          const lista = document.getElementById('mensajes-lista');
+          if (!lista) return;
+
+          // Quitar el placeholder si existe
+          const placeholder = lista.querySelector('[data-placeholder]');
+          if (placeholder) placeholder.remove();
+
+          lista.insertAdjacentHTML('beforeend', msgHTML(msg));
+          scrollAbajo();
+
+          // Si es del admin y el chat está abierto, marcar como leído
+          if (msg.remitente === 'admin') {
+            sb.from('mensajes').update({ leido: true }).eq('id', msg.id);
+            mostrarPopupMensaje('✝ León de Judá respondió tu mensaje');
+          }
+        })
+        .subscribe();
+    }
+
+    // ── Enviar mensaje ────────────────────────────────────────────
+    async function enviarMensaje() {
+      const input   = document.getElementById('chat-input');
+      const btnSend = document.getElementById('btn-send');
+      const texto   = input?.value.trim();
+      if (!texto || !pedidoActual) return;
+
+      input.value  = '';
+      btnSend.disabled = true;
+
+      const { error } = await sb.from('mensajes').insert({
+        pedido_id: pedidoActual,
+        user_id:   usuarioActual.id,
+        remitente: 'cliente',
+        contenido: texto,
+        leido:     false,
+      });
+
+      btnSend.disabled = false;
+      if (error) console.error('Error al enviar:', error.message);
+      input.focus();
+    }
+
+    // ── Volver a la lista (mobile) ────────────────────────────────
+    function volverLista() {
+      if (suscripcion) suscripcion.unsubscribe();
+      pedidoActual = null;
+      document.getElementById('chat-layout').classList.remove('vista-chat');
+      document.getElementById('chat-layout').classList.add('vista-lista');
+      cargarPedidos(); // refrescar badges
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────
+    function msgHTML(m) {
+      const hora = new Date(m.created_at).toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+      const tipo = m.remitente === 'cliente' ? 'cliente' : 'admin';
+      return `
+        <div class="msg-wrap ${tipo}">
+          <div class="msg-burbuja">${escHTML(m.contenido)}</div>
+          <span class="msg-meta">${hora}</span>
+        </div>`;
+    }
+
+    function escHTML(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    }
+
+    function scrollAbajo() {
+      const lista = document.getElementById('mensajes-lista');
+      if (lista) lista.scrollTop = lista.scrollHeight;
+    }
+
+    function mostrarPopupMensaje(texto) {
+      const existing = document.querySelector('.notif-popup');
+      if (existing) existing.remove();
+      const el = document.createElement('div');
+      el.className = 'notif-popup';
+      el.innerHTML = `<i class="bi bi-chat-fill"></i> ${texto}`;
+      el.onclick = () => el.remove();
+      document.body.appendChild(el);
+      setTimeout(() => el?.remove(), 4000);
+    }
+  </script>
+</body>
+</html>

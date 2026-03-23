@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="León de Judá — Tienda de ropa cristiana">
+  <meta name="theme-color" content="#1c1917">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="León de Judá">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192x192.png">
+  <link rel="icon" href="/assets/icons/icon-192x192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <title>León de Judá — Ropa Cristiana</title>
+
+  <style>
+    /* ── Variables ── */
+    :root {
+      --bg:           #f5f0e8;
+      --bg2:          #ede6d6;
+      --bg3:          #e4dac8;
+      --card-bg:      #faf7f2;
+      --text:         #1c1917;
+      --text-muted:   #78716c;
+      --gold:         #9a7b2e;
+      --gold-light:   #c9a84c;
+      --gold-pale:    rgba(154,123,46,.1);
+      --border:       #ddd5c0;
+      --white:        #ffffff;
+      --red:          #b91c1c;
+      --nav-h:        56px;
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; width: 100%; }
+    button { font-family: inherit; }
+
+    /* ── Fondo texturado ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(154,123,46,.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, rgba(154,123,46,.06) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    * { position: relative; z-index: 1; }
+
+    /* ══════════════════════════════════
+       NAVBAR
+    ══════════════════════════════════ */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      background: var(--text);
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+      gap: .75rem;
+    }
+
+    .navbar-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: .04em;
+      white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1.1;
+    }
+
+    .navbar-logo small {
+      display: block;
+      font-size: .55rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      font-family: 'Jost', sans-serif;
+      font-weight: 500;
+      font-style: normal;
+    }
+
+    /* Search — crece para llenar espacio */
+    .navbar-search {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 50px;
+      padding: .35rem .85rem;
+      gap: .4rem;
+      min-width: 0;
+    }
+
+    .navbar-search i { color: rgba(255,255,255,.45); font-size: .95rem; flex-shrink: 0; }
+
+    .navbar-search input {
+      background: none;
+      border: none;
+      outline: none;
+      color: white;
+      font-family: 'Jost', sans-serif;
+      font-size: .82rem;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .navbar-search input::placeholder { color: rgba(255,255,255,.35); }
+
+    /* Iconos de acción */
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: .1rem;
+      flex-shrink: 0;
+    }
+
+    .nav-icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: rgba(255,255,255,.85);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 1.15rem;
+      position: relative;
+      transition: background .15s, color .15s;
+    }
+
+    .nav-icon-btn:hover { background: rgba(255,255,255,.1); color: white; }
+
+    .carrito-badge {
+      position: absolute;
+      top: 5px; right: 5px;
+      width: 17px; height: 17px;
+      background: var(--gold-light);
+      color: var(--text);
+      font-size: .6rem;
+      font-weight: 800;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Badge de mensajes — clase separada para no confundirse con el carrito */
+    .msg-badge {
+      position: absolute;
+      top: 5px; right: 5px;
+      width: 17px; height: 17px;
+      background: #4ade80;
+      color: #111;
+      font-size: .6rem;
+      font-weight: 800;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Label de cuenta en desktop */
+    .nav-label-text {
+      font-size: .72rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.7);
+      display: none;
+    }
+
+    @media (min-width: 480px) {
+      .navbar { padding: 0 1.25rem; gap: 1rem; }
+      .navbar-logo { font-size: 1.35rem; }
+    }
+
+    @media (min-width: 768px) {
+      .navbar { padding: 0 1.5rem; }
+      .nav-label-text { display: inline; }
+      .nav-icon-btn { gap: .35rem; width: auto; padding: 0 .75rem; }
+    }
+
+    /* ══════════════════════════════════
+       HERO
+    ══════════════════════════════════ */
+    .hero {
+      background: var(--text);
+      color: white;
+      padding: 3rem 1.25rem 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 100%, rgba(154,123,46,.18) 0%, transparent 70%);
+    }
+
+    /* Cruz decorativa sutil */
+    .hero::after {
+      content: '✝';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18rem;
+      color: rgba(255,255,255,.02);
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .hero-eyebrow {
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: .85rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+    }
+
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--gold-light);
+      opacity: .6;
+    }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 7vw, 4rem);
+      font-weight: 500;
+      line-height: 1.1;
+      margin-bottom: .75rem;
+      position: relative;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .hero-verse {
+      font-size: .8rem;
+      color: rgba(255,255,255,.45);
+      font-style: italic;
+      font-family: 'Cormorant Garamond', serif;
+      margin-bottom: 1.75rem;
+      position: relative;
+    }
+
+    .btn-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      background: var(--gold);
+      color: white;
+      padding: .8rem 1.75rem;
+      border-radius: 3px;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      transition: background .2s, transform .2s;
+      position: relative;
+    }
+
+    .btn-hero:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+    /* ══════════════════════════════════
+       CATEGORÍAS
+    ══════════════════════════════════ */
+    .cats-wrap {
+      display: flex;
+      gap: .5rem;
+      padding: 1.25rem 1rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .cats-wrap::-webkit-scrollbar { display: none; }
+
+    .cat-btn {
+      padding: .45rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      background: var(--card-bg);
+      cursor: pointer;
+      font-family: 'Jost', sans-serif;
+      font-size: .75rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      color: var(--text-muted);
+      white-space: nowrap;
+      transition: all .18s;
+      flex-shrink: 0;
+    }
+
+    .cat-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    .cat-btn.active {
+      background: var(--text);
+      border-color: var(--text);
+      color: white;
+    }
+
+    /* ══════════════════════════════════
+       SECCIÓN PRODUCTOS
+    ══════════════════════════════════ */
+    .productos-section {
+      padding: .5rem 1rem 4rem;
+    }
+
+    .sec-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .sec-titulo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+
+    .sec-count {
+      font-size: .75rem;
+      color: var(--text-muted);
+    }
+
+    /* ══════════════════════════════════
+       GRID DE PRODUCTOS
+    ══════════════════════════════════ */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem .75rem;
+    }
+
+    @media (min-width: 600px)  { .grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 900px)  { .grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (min-width: 1200px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+
+    /* ── Tarjeta ── */
+    .prod-card {
+      cursor: pointer;
+      transition: transform .2s;
+    }
+
+    .prod-card:hover { transform: translateY(-3px); }
+
+    .prod-img {
+      aspect-ratio: 3/4;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg3);
+      position: relative;
+      margin-bottom: .6rem;
+    }
+
+    .prod-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .45s;
+    }
+
+    .prod-card:hover .prod-img img { transform: scale(1.05); }
+
+    .prod-badge {
+      position: absolute;
+      top: .5rem;
+      left: .5rem;
+      background: var(--gold);
+      color: white;
+      font-size: .58rem;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: .18rem .45rem;
+      border-radius: 3px;
+    }
+
+    .prod-badge.oferta { background: var(--red); }
+
+    .btn-add {
+      position: absolute;
+      bottom: .5rem;
+      right: .5rem;
+      width: 34px;
+      height: 34px;
+      background: white;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text);
+      opacity: 0;
+      transform: scale(.8);
+      transition: opacity .2s, transform .2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+
+    .prod-card:hover .btn-add { opacity: 1; transform: scale(1); }
+
+    .prod-nombre {
+      font-size: .82rem;
+      font-weight: 600;
+      margin-bottom: .15rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .prod-cat {
+      font-size: .7rem;
+      color: var(--text-muted);
+      margin-bottom: .25rem;
+      text-transform: capitalize;
+    }
+
+    .prod-precio {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .prod-precio-orig {
+      font-size: .75rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      margin-left: .35rem;
+    }
+
+    /* ── Skeleton ── */
+    .skel {
+      background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── Empty ── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3.5rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty i { font-size: 2.5rem; margin-bottom: .75rem; opacity: .35; }
+
+    /* ══════════════════════════════════
+       MODAL TALLA
+    ══════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 999;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal-box {
+      background: var(--card-bg);
+      border-radius: 16px 16px 0 0;
+      padding: 1.5rem 1.25rem;
+      width: 100%;
+      max-width: 480px;
+      transform: translateY(100%);
+      transition: transform .3s ease;
+    }
+
+    .modal-overlay.open .modal-box { transform: translateY(0); }
+
+    .modal-handle {
+      width: 36px; height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 1.1rem;
+    }
+
+    .modal-titulo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      padding-bottom: .75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tallas-grid {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .talla-btn {
+      min-width: 50px; height: 50px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Jost', sans-serif;
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--text);
+      transition: all .15s;
+      padding: 0 .75rem;
+    }
+
+    .talla-btn:hover  { border-color: var(--gold); color: var(--gold); }
+    .talla-btn.sel    { background: var(--text); border-color: var(--text); color: white; }
+
+    .btn-confirm {
+      width: 100%;
+      padding: .9rem;
+      background: var(--text);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Jost', sans-serif;
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: .05em;
+      transition: background .2s;
+    }
+
+    .btn-confirm:hover    { background: #2c2520; }
+    .btn-confirm:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+
+    /* ══════════════════════════════════
+       TOAST
+    ══════════════════════════════════ */
+    .toast-wrap {
+      position: fixed;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+
+    .toast {
+      background: var(--text);
+      color: white;
+      padding: .65rem 1.1rem;
+      border-radius: 50px;
+      font-size: .82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,.25);
+      animation: t-in .3s ease, t-out .3s ease 2.2s forwards;
+    }
+
+    .toast i { color: #86efac; }
+
+    @keyframes t-in  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+    @keyframes t-out { from { opacity:1; } to { opacity:0; } }
+
+    /* ══════════════════════════════════
+       FOOTER
+    ══════════════════════════════════ */
+    footer {
+      background: var(--text);
+      color: rgba(255,255,255,.5);
+      padding: 2rem 1.25rem;
+      font-size: .8rem;
+      margin-top: 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      color: white;
+      font-weight: 500;
+    }
+
+    .footer-verse {
+      font-style: italic;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: .95rem;
+      color: rgba(255,255,255,.35);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ─── NAVBAR ─── -->
+  <nav class="navbar">
+    <a class="navbar-logo" href="/index.html">
+      León de Judá
+      <small>Ropa Cristiana</small>
+    </a>
+
+    <div class="navbar-search">
+      <i class="bi bi-search"></i>
+      <input type="text" id="search-input" placeholder="Buscar…">
+    </div>
+
+    <div class="navbar-actions">
+      <a href="/pages/tienda/carrito.html" class="nav-icon-btn" title="Carrito">
+        <i class="bi bi-bag"></i>
+        <span class="carrito-badge">0</span>
+      </a>
+
+      <!-- Ícono de mensajes (solo usuarios logueados, no admin) -->
+      <a href="/pages/tienda/cuenta.html" class="nav-icon-btn" id="nav-chat" style="display:none" title="Mis mensajes">
+        <i class="bi bi-chat-dots"></i>
+        <span class="msg-badge" id="chat-badge">0</span>
+      </a>
+
+      <a href="/login.html" class="nav-icon-btn sesion-inactiva" id="nav-login" title="Ingresar">
+        <i class="bi bi-person"></i>
+        <span class="nav-label-text">Ingresar</span>
+      </a>
+
+      <!-- Usuario logueado: muestra nombre + link a cuenta o panel admin -->
+      <a href="/pages/tienda/cuenta.html" class="nav-icon-btn nav-usuario" id="nav-cuenta" style="display:none" title="Mi cuenta">
+        <i class="bi bi-person-check"></i>
+        <span class="nav-label-text nav-nombre" id="nav-nombre-usuario">Mi cuenta</span>
+      </a>
+
+      <!-- Botón panel admin (solo visible para admin) -->
+      <a href="/pages/admin/panel.html" class="nav-icon-btn nav-admin-btn" id="nav-admin" style="display:none" title="Panel admin">
+        <i class="bi bi-grid-1x2"></i>
+        <span class="nav-label-text">Panel</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <p class="hero-eyebrow">Nueva colección · Otoño 2025</p>
+    <h1>Viste tu <em>fe</em></h1>
+    <p class="hero-verse">"Revestíos de toda la armadura de Dios" — Efesios 6:11</p>
+    <a href="#productos" class="btn-hero">
+      Ver colección <i class="bi bi-arrow-down"></i>
+    </a>
+  </section>
+
+  <!-- ─── CATEGORÍAS ─── -->
+  <div class="cats-wrap" id="categorias">
+    <button class="cat-btn active" data-cat="">Todos</button>
+    <button class="cat-btn" data-cat="remeras">Remeras</button>
+    <button class="cat-btn" data-cat="pantalones">Pantalones</button>
+    <button class="cat-btn" data-cat="vestidos">Vestidos</button>
+    <button class="cat-btn" data-cat="buzos">Buzos</button>
+    <button class="cat-btn" data-cat="accesorios">Accesorios</button>
+    <button class="cat-btn" data-cat="calzado">Calzado</button>
+  </div>
+
+  <!-- ─── PRODUCTOS ─── -->
+  <section class="productos-section" id="productos">
+    <div class="sec-header">
+      <h2 class="sec-titulo">Productos</h2>
+      <span class="sec-count" id="count-label"></span>
+    </div>
+    <div class="grid" id="grid">
+      <!-- skeletons -->
+      <div><div class="skel" style="aspect-ratio:3/4"></div><div class="skel" style="height:12px;margin-top:10px;width:80%"></div><div class="skel" style="height:10px;margin-top:6px;width:50%"></div></div>
+      <div><div class="skel" style="aspect-ratio:3/4"></div><div class="skel" style="height:12px;margin-top:10px;width:80%"></div><div class="skel" style="height:10px;margin-top:6px;width:50%"></div></div>
+      <div class="d-sm-block" style="display:none"><div class="skel" style="aspect-ratio:3/4"></div><div class="skel" style="height:12px;margin-top:10px;width:80%"></div></div>
+      <div class="d-sm-block" style="display:none"><div class="skel" style="aspect-ratio:3/4"></div><div class="skel" style="height:12px;margin-top:10px;width:80%"></div></div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">León de Judá</div>
+      <p class="footer-verse">"Porque para mí el vivir es Cristo" — Filipenses 1:21</p>
+      <p>© 2025 León de Judá — Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+  <!-- ─── MODAL TALLA ─── -->
+  <div class="modal-overlay" id="modal-talla">
+    <div class="modal-box">
+      <div class="modal-handle"></div>
+      <p class="modal-titulo" id="modal-titulo-prod">Seleccioná una talla</p>
+      <div class="tallas-grid" id="modal-tallas"></div>
+      <button class="btn-confirm" id="modal-confirm" disabled>Agregar al carrito</button>
+    </div>
+  </div>
+
+  <!-- ─── TOASTS ─── -->
+  <div class="toast-wrap" id="toasts"></div>
+
+  <!-- ─── SCRIPTS ─── -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js"></script>
+
+  <script>
+    let todos = [], catActiva = '', busqueda = '';
+    let prodModal = null, tallaModal = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      Carrito.actualizarContador();
+      await actualizarNavbarConUsuario();
+      await cargar();
+      bindEventos();
+    });
+
+    async function actualizarNavbarConUsuario() {
+      const user = await getUsuario();
+      const linkLogin  = document.getElementById('nav-login');
+      const linkCuenta = document.getElementById('nav-cuenta');
+      const linkAdmin  = document.getElementById('nav-admin');
+      const nombreSpan = document.getElementById('nav-nombre-usuario');
+
+      if (!user) {
+        if (linkLogin)  {
+          linkLogin.style.display = 'flex';
+          // Ícono rojo = sin sesión
+          linkLogin.classList.add('sesion-inactiva');
+          linkLogin.classList.remove('sesion-activa');
+        }
+        if (linkCuenta) linkCuenta.style.display = 'none';
+        if (linkAdmin)  linkAdmin.style.display  = 'none';
+        return;
+      }
+
+      // Obtener nombre del perfil
+      const { data: perfil } = await sb.from('perfiles').select('nombre').eq('user_id', user.id).maybeSingle();
+      const nombre = perfil?.nombre || user.email.split('@')[0];
+
+      if (linkLogin)  linkLogin.style.display  = 'none';
+      if (linkCuenta) {
+        linkCuenta.style.display = 'flex';
+        linkCuenta.classList.add('sesion-activa');
+        linkCuenta.classList.remove('sesion-inactiva');
+      }
+      if (nombreSpan) nombreSpan.textContent = nombre;
+
+      // Mostrar ícono de chat solo para clientes (no admin)
+      const navChat = document.getElementById('nav-chat');
+      if (navChat) {
+        if (user.email !== ADMIN_EMAIL) {
+          navChat.style.display = 'flex';
+          // Contar mensajes no leídos del admin
+          contarMensajesNoLeidos(user.id);
+        }
+      }
+
+      // Si es admin: mostrar botón de panel y cambiar link de cuenta
+      if (linkAdmin) {
+        if (user.email === ADMIN_EMAIL) {
+          linkAdmin.style.display = 'flex';
+          if (linkCuenta) linkCuenta.href  = '/pages/admin/panel.html';
+          if (linkCuenta) linkCuenta.title = 'Panel admin';
+        } else {
+          linkAdmin.style.display = 'none';
+        }
+      }
+    }
+
+    // Suscripción en tiempo real para actualizar badge sin recargar
+    function suscribirMensajesIndex(userId, pedidoIds) {
+      if (!pedidoIds.length) return;
+      sb.channel('index-mensajes-' + userId.substring(0,8))
+        .on('postgres_changes', {
+          event: 'INSERT', schema: 'public', table: 'mensajes',
+        }, payload => {
+          const msg = payload.new;
+          if (msg.remitente !== 'admin') return;
+          if (!pedidoIds.includes(msg.pedido_id)) return;
+          // Actualizar badge
+          const badge = document.getElementById('chat-badge');
+          if (badge) {
+            const actual = parseInt(badge.textContent || '0') + 1;
+            badge.textContent   = actual;
+            badge.style.display = 'flex';
+          }
+          mostrarPopupMensajesNuevos(1);
+          // Sonido
+          try {
+            const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+            const osc  = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value = 880; osc.type = 'sine';
+            gain.gain.setValueAtTime(0.25, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+            osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
+          } catch(e) {}
+        })
+        .subscribe();
+    }
+
+    async function contarMensajesNoLeidos(userId) {
+      // Buscar pedidos del usuario
+      const { data: pedidos } = await sb.from('pedidos').select('id').eq('user_id', userId);
+      if (!pedidos?.length) return;
+
+      const { count } = await sb.from('mensajes')
+        .select('*', { count: 'exact', head: true })
+        .in('pedido_id', pedidos.map(p => p.id))
+        .eq('remitente', 'admin')
+        .eq('leido', false);
+
+      const badge = document.getElementById('chat-badge');
+      if (!badge) return;
+      if (count > 0) {
+        badge.textContent    = count;
+        badge.style.display  = 'flex';
+        // Popup si hay mensajes nuevos
+        mostrarPopupMensajesNuevos(count);
+      } else {
+        badge.style.display  = 'none';
+      }
+      // Suscribir para actualizaciones en tiempo real
+      suscribirMensajesIndex(userId, pedidos.map(p => p.id));
+    }
+
+    function mostrarPopupMensajesNuevos(cantidad) {
+      // Solo mostrar si no hay un popup ya visible
+      if (document.getElementById('popup-chat')) return;
+      const el = document.createElement('div');
+      el.id = 'popup-chat';
+      el.style.cssText = 'position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1c1917;color:white;padding:.75rem 1.25rem;border-radius:50px;font-size:.82rem;font-weight:500;display:flex;align-items:center;gap:.6rem;box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:9999;white-space:nowrap;animation:t-in .3s ease;cursor:pointer;font-family:Jost,sans-serif';
+      el.innerHTML = '<i class="bi bi-chat-fill" style="color:#4ade80"></i> Tenés ' + cantidad + ' mensaje' + (cantidad > 1 ? 's' : '') + ' nuevo' + (cantidad > 1 ? 's' : '') + ' de la tienda';
+      el.onclick = () => location.href = '/pages/tienda/cuenta.html';
+      document.body.appendChild(el);
+      setTimeout(() => el?.remove(), 5000);
+    }
+
+    async function cargar() {
+      try {
+        const { data, error } = await sb.from('productos').select('*').eq('activo', true).order('created_at', { ascending: false });
+        if (error) throw error;
+        todos = data || [];
+        render();
+      } catch {
+        document.getElementById('grid').innerHTML = '<div class="empty"><i class="bi bi-exclamation-circle"></i><p>No se pudieron cargar los productos.</p></div>';
+      }
+    }
+
+    function filtrar() {
+      let lista = todos;
+      if (catActiva) lista = lista.filter(p => p.categoria?.toLowerCase() === catActiva);
+      if (busqueda.trim()) {
+        const q = busqueda.toLowerCase();
+        lista = lista.filter(p => p.nombre?.toLowerCase().includes(q) || p.descripcion?.toLowerCase().includes(q));
+      }
+      return lista;
+    }
+
+    function render() {
+      const lista = filtrar();
+      document.getElementById('count-label').textContent = lista.length + ' producto' + (lista.length !== 1 ? 's' : '');
+
+      if (!lista.length) {
+        document.getElementById('grid').innerHTML = '<div class="empty"><i class="bi bi-search"></i><p>Sin resultados para esa búsqueda.</p></div>';
+        return;
+      }
+
+      document.getElementById('grid').innerHTML = lista.map(p => {
+        const img    = p.imagen_url || 'https://placehold.co/400x530/e4dac8/78716c?text=Foto';
+        const precio = formatearPrecio(p.precio);
+        const orig   = p.precio_original ? formatearPrecio(p.precio_original) : '';
+        const badge  = p.destacado ? '<span class="prod-badge">Destacado</span>'
+                      : p.precio_original ? '<span class="prod-badge oferta">Oferta</span>' : '';
+        const pdata  = JSON.stringify(p).replace(/"/g,'&quot;');
+        return `
+          <div class="prod-card" onclick="irA('${p.id}')">
+            <div class="prod-img">
+              <img src="${img}" alt="${p.nombre}" loading="lazy" onerror="this.src='https://placehold.co/400x530/e4dac8/78716c?text=Foto'">
+              ${badge}
+              <button class="btn-add" title="Agregar" onclick="event.stopPropagation();abrirModal(${pdata})">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+            <p class="prod-nombre">${p.nombre}</p>
+            <p class="prod-cat">${p.categoria || ''}</p>
+            <p>
+              <span class="prod-precio">${precio}</span>
+              ${orig ? `<span class="prod-precio-orig">${orig}</span>` : ''}
+            </p>
+          </div>`;
+      }).join('');
+    }
+
+    function irA(id) { window.location.href = `/pages/tienda/producto.html?id=${id}`; }
+
+    function abrirModal(prod) {
+      prodModal = prod; tallaModal = null;
+      document.getElementById('modal-titulo-prod').textContent = prod.nombre;
+      document.getElementById('modal-confirm').disabled = true;
+      const tallas = prod.tallas?.length ? prod.tallas : ['Única'];
+      document.getElementById('modal-tallas').innerHTML = tallas.map(t =>
+        `<button class="talla-btn" onclick="selTalla('${t}',this)">${t}</button>`).join('');
+      document.getElementById('modal-talla').classList.add('open');
+    }
+
+    function selTalla(t, btn) {
+      tallaModal = t;
+      document.querySelectorAll('.talla-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      document.getElementById('modal-confirm').disabled = false;
+    }
+
+    document.getElementById('modal-confirm').addEventListener('click', () => {
+      if (!prodModal || !tallaModal) return;
+      Carrito.agregar(prodModal, tallaModal);
+      document.getElementById('modal-talla').classList.remove('open');
+      toast(`${prodModal.nombre} agregado ✓`);
+    });
+
+    document.getElementById('modal-talla').addEventListener('click', e => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+    });
+
+    function toast(msg) {
+      const w = document.getElementById('toasts');
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${msg}`;
+      w.appendChild(el);
+      setTimeout(() => el.remove(), 2600);
+    }
+
+    function bindEventos() {
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          catActiva = btn.dataset.cat;
+          document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          render();
+          document.getElementById('productos').scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+
+      let timer;
+      document.getElementById('search-input').addEventListener('input', e => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { busqueda = e.target.value; render(); }, 300);
+      });
+    }
+  </script>
+
+  <!-- ─── PWA INSTALL BANNER ─── -->
+  <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9990;
+    background:#1c1917;color:white;padding:1rem 1.25rem;
+    box-shadow:0 -4px 24px rgba(0,0,0,.35);
+    font-family:'Jost',sans-serif;">
+    <div style="max-width:600px;margin:0 auto;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+      <div style="flex:1;min-width:0">
+        <p style="font-size:.85rem;font-weight:700;margin-bottom:.2rem;display:flex;align-items:center;gap:.5rem">
+          <span style="font-size:1.1rem">✝</span> León de Judá
+        </p>
+        <p style="font-size:.78rem;color:rgba(255,255,255,.6);line-height:1.3">
+          Instalá la app y accedé más rápido a nuestra tienda, sin necesidad del navegador.
+        </p>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-shrink:0">
+        <button id="pwa-install-btn" style="background:#c9a84c;color:#1c1917;border:none;
+          border-radius:6px;padding:.55rem 1.1rem;font-family:'Jost',sans-serif;
+          font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;
+          letter-spacing:.04em;transition:background .2s">
+          Instalar app
+        </button>
+        <button id="pwa-dismiss-btn" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);
+          border:1px solid rgba(255,255,255,.12);border-radius:6px;
+          padding:.55rem .9rem;font-family:'Jost',sans-serif;
+          font-size:.8rem;cursor:pointer;white-space:nowrap">
+          Ahora no
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- iOS install instructions (Safari no tiene beforeinstallprompt) -->
+  <div id="ios-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9990;
+    background:#1c1917;color:white;padding:1rem 1.25rem;
+    box-shadow:0 -4px 24px rgba(0,0,0,.35);
+    font-family:'Jost',sans-serif;">
+    <div style="max-width:600px;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:.6rem">
+        <p style="font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:.5rem">
+          <span>✝</span> Instalá León de Judá
+        </p>
+        <button id="ios-dismiss-btn" style="background:none;border:none;color:rgba(255,255,255,.5);
+          font-size:1.1rem;cursor:pointer;padding:.2rem">✕</button>
+      </div>
+      <p style="font-size:.78rem;color:rgba(255,255,255,.7);line-height:1.5">
+        En Safari, tocá el ícono <strong style="color:#c9a84c">
+        <svg style="display:inline;width:14px;height:14px;vertical-align:middle" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l-3 4h2v9h2V6h2L12 2zm-7 14v4h14v-4h-2v2H7v-2H5z"/>
+        </svg> Compartir</strong> y luego <strong style="color:#c9a84c">"Agregar a pantalla de inicio"</strong>.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // ─── PWA Install prompt ───
+    let deferredPrompt = null;
+
+    const yaInstalado = localStorage.getItem('pwa_dismissed');
+    const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const enStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+
+    if (!enStandalone && !yaInstalado) {
+      // Android / Chrome Desktop
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('pwa-banner').style.display = 'block';
+      });
+
+      // iOS Safari
+      if (esIOS) {
+        setTimeout(() => {
+          document.getElementById('ios-banner').style.display = 'block';
+        }, 2500);
+      }
+    }
+
+    document.getElementById('pwa-install-btn')?.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      document.getElementById('pwa-banner').style.display = 'none';
+      localStorage.setItem('pwa_dismissed', '1');
+    });
+
+    document.getElementById('pwa-dismiss-btn')?.addEventListener('click', () => {
+      document.getElementById('pwa-banner').style.display = 'none';
+      localStorage.setItem('pwa_dismissed', '1');
+    });
+
+    document.getElementById('ios-dismiss-btn')?.addEventListener('click', () => {
+      document.getElementById('ios-banner').style.display = 'none';
+      localStorage.setItem('pwa_dismissed', '1');
+    });
+  </script>
+
+</body>
+</html>

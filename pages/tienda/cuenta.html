@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f0f0f">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <title>León de Judá — Mi cuenta</title>
+
+  <style>
+    :root {
+      --bg:         #fafaf8;
+      --bg2:        #f0ede8;
+      --text:       #0f0f0f;
+      --text-muted: #7a7570;
+      --accent:     #b07d4a;
+      --border:     #e2ddd8;
+      --white:      #ffffff;
+      --green:      #16a34a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Karla', sans-serif; background: var(--bg); color: var(--text); }
+    a { text-decoration: none; color: inherit; }
+
+    /* Navbar */
+    .navbar { position: sticky; top: 0; z-index: 900; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 64px; }
+    .navbar-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; }
+    .nav-btn { background: none; border: none; cursor: pointer; color: var(--text); padding: 0.5rem; border-radius: 8px; display: flex; align-items: center; gap: 0.35rem; font-family: 'Karla', sans-serif; font-size: 0.875rem; font-weight: 500; transition: background 0.2s; }
+    .nav-btn i { font-size: 1.2rem; }
+    .nav-btn:hover { background: var(--bg2); }
+    .carrito-badge { position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: var(--accent); color: white; font-size: 0.65rem; font-weight: 700; border-radius: 50%; display: none; align-items: center; justify-content: center; }
+
+    /* Layout */
+    .page-wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .avatar {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: var(--bg2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .page-header-info h1 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 400; }
+    .page-header-info p { font-size: 0.875rem; color: var(--text-muted); }
+
+    /* Tabs */
+    .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+    .tab { padding: 0.875rem 1.25rem; background: none; border: none; cursor: pointer; font-family: 'Karla', sans-serif; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.04em; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Tarjeta */
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+    .card-titulo { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+
+    /* Formulario perfil */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .form-group { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem; }
+    input[type=text], input[type=email], input[type=tel] { width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Karla', sans-serif; font-size: 0.95rem; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: var(--text); background: var(--white); }
+
+    .btn-save { padding: 0.75rem 2rem; background: var(--text); color: white; border: none; border-radius: 8px; font-family: 'Karla', sans-serif; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+    .btn-save:hover { background: #333; }
+    .btn-save:disabled { background: var(--border); color: var(--text-muted); cursor: wait; }
+
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.875rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    /* Pedidos */
+    .pedido-item { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+
+    .pedido-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+
+    .pedido-id { font-size: 0.75rem; color: var(--text-muted); }
+    .pedido-fecha { font-size: 0.8rem; color: var(--text-muted); }
+
+    .estado-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .estado-pendiente  { background: #fef3c7; color: #92400e; }
+    .estado-confirmado { background: #dbeafe; color: #1e40af; }
+    .estado-enviado    { background: #e0e7ff; color: #3730a3; }
+    .estado-entregado  { background: #dcfce7; color: #166534; }
+    .estado-cancelado  { background: #fee2e2; color: #991b1b; }
+
+    .pedido-productos { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .pedido-prod-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; }
+    .pedido-prod-img { width: 48px; height: 60px; border-radius: 6px; overflow: hidden; background: var(--bg2); flex-shrink: 0; }
+    .pedido-prod-img img { width: 100%; height: 100%; object-fit: cover; }
+    .pedido-prod-nombre { flex: 1; font-weight: 600; }
+    .pedido-prod-talla { color: var(--text-muted); }
+    .pedido-prod-precio { font-weight: 700; }
+
+    .pedido-total { text-align: right; font-weight: 700; font-size: 0.95rem; }
+
+    /* Vacío */
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
+    .empty-state p { font-size: 0.95rem; }
+
+    /* Loading */
+    .skeleton { background: linear-gradient(90deg, var(--bg2) 25%, #e8e3dc 50%, var(--bg2) 75%); background-size:200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    @keyframes shimmer { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+
+    /* Botón cerrar sesión */
+    .btn-logout { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 0.6rem 1.25rem; font-family: 'Karla', sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
+    .btn-logout:hover { border-color: var(--text); color: var(--text); }
+
+    /* ── Chat dentro del pedido ── */
+    .pedido-item { cursor: default; }
+
+    .btn-chat {
+      display: inline-flex; align-items: center; gap: .4rem;
+      margin-top: .75rem;
+      padding: .5rem 1rem;
+      background: var(--text); color: white;
+      border: none; border-radius: 6px;
+      font-family: 'Karla', sans-serif; font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+      position: relative;
+    }
+    .btn-chat:hover { background: #333; }
+    .btn-chat .chat-badge {
+      position: absolute; top: -6px; right: -6px;
+      background: #ef4444; color: white;
+      font-size: .6rem; font-weight: 800;
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Panel de chat expandible */
+    .chat-panel {
+      display: none;
+      flex-direction: column;
+      border-top: 1px solid var(--border);
+      margin-top: .75rem;
+    }
+
+    .chat-panel.open { display: flex; }
+
+    .chat-mensajes {
+      max-height: 280px;
+      overflow-y: auto;
+      padding: .75rem;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      background: var(--bg2);
+      border-radius: 8px;
+      margin-top: .75rem;
+      scroll-behavior: smooth;
+    }
+
+    .msg-burbuja-wrap { display: flex; flex-direction: column; }
+    .msg-burbuja-wrap.cliente { align-items: flex-end; }
+    .msg-burbuja-wrap.admin   { align-items: flex-start; }
+
+    .msg-burbuja {
+      max-width: 80%; padding: .55rem .85rem;
+      border-radius: 12px; font-size: .82rem; line-height: 1.5;
+      word-break: break-word;
+    }
+    .msg-burbuja-wrap.cliente .msg-burbuja { background: var(--text); color: white; border-bottom-right-radius: 3px; }
+    .msg-burbuja-wrap.admin   .msg-burbuja { background: white; color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
+
+    .msg-hora { font-size: .65rem; color: var(--text-muted); margin-top: .15rem; padding: 0 .2rem; }
+    .msg-burbuja-wrap.admin .msg-hora::before { content: '✝ León de Judá · '; color: var(--accent); font-weight: 600; }
+
+    .chat-sin-mensajes {
+      text-align: center; padding: 1.25rem;
+      color: var(--text-muted); font-size: .8rem;
+      line-height: 1.6;
+    }
+
+    .chat-input-row {
+      display: flex; gap: .5rem;
+      margin-top: .6rem;
+    }
+
+    .chat-input-row input {
+      flex: 1; padding: .6rem .9rem;
+      border: 1.5px solid var(--border); border-radius: 50px;
+      font-family: 'Karla', sans-serif; font-size: .85rem;
+      background: var(--bg); color: var(--text);
+      outline: none; transition: border-color .2s;
+    }
+    .chat-input-row input:focus { border-color: var(--text); }
+
+    .btn-enviar {
+      width: 38px; height: 38px;
+      background: var(--text); color: white;
+      border: none; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; flex-shrink: 0;
+      transition: background .2s, transform .15s;
+    }
+    .btn-enviar:hover { background: #333; transform: scale(1.05); }
+    .btn-enviar:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+
+    /* Popup mensaje nuevo */
+    .popup-nuevo-msg {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      background: var(--text); color: white;
+      padding: .7rem 1.2rem; border-radius: 50px;
+      font-size: .82rem; font-weight: 500;
+      display: flex; align-items: center; gap: .5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,.25);
+      z-index: 9999; cursor: pointer;
+      animation: pop-in .3s ease;
+      white-space: nowrap;
+      font-family: 'Karla', sans-serif;
+    }
+    .popup-nuevo-msg i { color: #86efac; }
+    @keyframes pop-in { from { opacity:0; transform:translateX(-50%) translateY(10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+
+    /* Encabezado del chat dentro del pedido */
+    .chat-header-info {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .6rem .75rem;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      font-size: .8rem;
+      font-weight: 500;
+      margin-top: .75rem;
+      border-radius: 8px 8px 0 0;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="navbar-logo" href="/index.html">León de Judá</a>
+    <div style="display:flex;gap:0.25rem;align-items:center">
+      <a href="/pages/tienda/carrito.html" class="nav-btn" style="position:relative">
+        <i class="bi bi-bag"></i>
+        <span class="carrito-badge">0</span>
+      </a>
+      <!-- Botón volver al panel (solo admin) -->
+      <a href="/pages/admin/panel.html" class="nav-btn" id="btn-volver-panel" style="display:none;color:#c9a84c">
+        <i class="bi bi-grid-1x2"></i>
+        <span style="font-size:.78rem;font-weight:600">Panel</span>
+      </a>
+      <button class="btn-logout" onclick="cerrarSesion()">
+        <i class="bi bi-box-arrow-right"></i> Salir
+      </button>
+    </div>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <div class="page-wrap">
+    <!-- Header cuenta -->
+    <div class="page-header">
+      <div class="avatar"><i class="bi bi-person"></i></div>
+      <div class="page-header-info">
+        <h1 id="cuenta-nombre">Mi cuenta</h1>
+        <p id="cuenta-email">—</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="pedidos">Mis pedidos</button>
+      <button class="tab" data-tab="perfil">Mi perfil</button>
+    </div>
+
+    <!-- Panel Pedidos -->
+    <div class="panel active" id="panel-pedidos">
+      <div id="pedidos-wrap">
+        <div class="skeleton" style="height:120px;margin-bottom:1rem;border-radius:12px"></div>
+        <div class="skeleton" style="height:120px;border-radius:12px"></div>
+      </div>
+    </div>
+
+    <!-- Panel Perfil -->
+    <div class="panel" id="panel-perfil">
+      <div class="card">
+        <h2 class="card-titulo">Datos personales</h2>
+
+        <div id="perfil-ok" class="alert-success" style="display:none">
+          <i class="bi bi-check-circle-fill"></i> Perfil actualizado correctamente.
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="p-nombre" placeholder="Tu nombre">
+          </div>
+          <div class="form-group">
+            <label>Apellido</label>
+            <input type="text" id="p-apellido" placeholder="Tu apellido">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Correo (no se puede cambiar)</label>
+          <input type="email" id="p-email" disabled>
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="tel" id="p-tel" placeholder="+54 9 11 1234 5678">
+        </div>
+
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Dirección de envío predeterminada</label>
+          <input type="text" id="p-dir" placeholder="Calle y número">
+        </div>
+
+        <div class="form-group">
+          <label>Provincia</label>
+          <select id="p-provincia" style="width:100%;padding:.75rem 1rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Karla',sans-serif;font-size:.95rem;background:var(--bg);color:var(--text);outline:none">
+            <option value="">Seleccioná…</option>
+            <option>Buenos Aires</option><option>CABA</option>
+            <option>Catamarca</option><option>Chaco</option><option>Chubut</option>
+            <option>Córdoba</option><option>Corrientes</option><option>Entre Ríos</option>
+            <option>Formosa</option><option>Jujuy</option><option>La Pampa</option>
+            <option>La Rioja</option><option>Mendoza</option><option>Misiones</option>
+            <option>Neuquén</option><option>Río Negro</option><option>Salta</option>
+            <option>San Juan</option><option>San Luis</option><option>Santa Cruz</option>
+            <option>Santa Fe</option><option>Santiago del Estero</option>
+            <option>Tierra del Fuego</option><option>Tucumán</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ciudad</label>
+          <input type="text" id="p-ciudad" placeholder="Tu ciudad">
+        </div>
+
+        <button class="btn-save" id="btn-save-perfil" onclick="guardarPerfil()" style="grid-column:1/-1">
+          <i class="bi bi-check-circle"></i> Guardar cambios
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js"></script>
+
+  <script>
+    let usuarioActual = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      Carrito.actualizarContador();
+
+      // Proteger la página: si no está logueado, redirigir
+      const user = await getUsuario();
+      if (!user) {
+        window.location.href = '/login.html?redirect=/pages/tienda/cuenta.html';
+        return;
+      }
+
+      usuarioActual = user;
+      document.getElementById('cuenta-email').textContent = user.email;
+
+      // Mostrar botón de volver al panel si es admin
+      if (user.email === ADMIN_EMAIL) {
+        const btnPanel = document.getElementById('btn-volver-panel');
+        if (btnPanel) btnPanel.style.display = 'flex';
+      }
+
+      await cargarPerfil(user);
+      // Guardar nombre en usuarioActual para usarlo en mensajes
+      await cargarPedidos(user.id);
+
+      // Tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+        });
+      });
+    });
+
+    // ────────────────────────────────────────────────────────
+    //  CARGAR PERFIL
+    // ────────────────────────────────────────────────────────
+    async function cargarPerfil(user) {
+      const { data } = await sb
+        .from('perfiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      document.getElementById('p-email').value = user.email;
+
+      if (data) {
+        document.getElementById('p-nombre').value   = data.nombre   || '';
+        document.getElementById('p-apellido').value = data.apellido || '';
+        document.getElementById('p-tel').value      = data.telefono || '';
+        document.getElementById('p-dir').value      = data.direccion || '';
+        if (data.provincia) document.getElementById('p-provincia').value = data.provincia;
+        if (data.ciudad)    document.getElementById('p-ciudad').value    = data.ciudad;
+        if (data.nombre) {
+          const nombreCompleto = data.nombre + (data.apellido ? ' ' + data.apellido : '');
+          document.getElementById('cuenta-nombre').textContent = nombreCompleto;
+          // Guardar para usarlo en mensajes
+          usuarioActual._nombre = nombreCompleto;
+        }
+      } else {
+        // Intentar datos del user metadata (de cuando se registró)
+        const meta = user.user_metadata || {};
+        if (meta.nombre) document.getElementById('p-nombre').value = meta.nombre;
+        if (meta.apellido) document.getElementById('p-apellido').value = meta.apellido;
+        if (meta.telefono) document.getElementById('p-tel').value = meta.telefono;
+      }
+    }
+
+    // ────────────────────────────────────────────────────────
+    //  GUARDAR PERFIL
+    // ────────────────────────────────────────────────────────
+    async function guardarPerfil() {
+      const btn = document.getElementById('btn-save-perfil');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando…';
+
+      const { error } = await sb.from('perfiles').upsert({
+        user_id:   usuarioActual.id,
+        nombre:    document.getElementById('p-nombre').value.trim(),
+        apellido:  document.getElementById('p-apellido').value.trim(),
+        telefono:  document.getElementById('p-tel').value.trim(),
+        direccion: document.getElementById('p-dir').value.trim(),
+        provincia: document.getElementById('p-provincia').value.trim(),
+        ciudad:    document.getElementById('p-ciudad').value.trim(),
+      });
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-check-circle"></i> Guardar cambios';
+
+      if (error) {
+        alert('Error al guardar: ' + error.message);
+        return;
+      }
+
+      const nombre   = document.getElementById('p-nombre').value.trim();
+      const apellido = document.getElementById('p-apellido').value.trim();
+      if (nombre) {
+        const nombreCompleto = nombre + (apellido ? ' ' + apellido : '');
+        document.getElementById('cuenta-nombre').textContent = nombreCompleto;
+
+        // Actualizar nombre_cliente en pedidos existentes del usuario
+        await sb.from('pedidos')
+          .update({ nombre_cliente: nombreCompleto })
+          .eq('user_id', usuarioActual.id);
+      }
+
+      const ok = document.getElementById('perfil-ok');
+      ok.style.display = 'flex';
+      setTimeout(() => ok.style.display = 'none', 3000);
+    }
+
+    // ────────────────────────────────────────────────────────
+    //  CARGAR PEDIDOS
+    // ────────────────────────────────────────────────────────
+    async function cargarPedidos(userId) {
+      const wrap = document.getElementById('pedidos-wrap');
+
+      const { data: pedidos, error } = await sb
+        .from('pedidos')
+        .select('*, pedido_items(*, productos(nombre, imagen_url, precio))')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        wrap.innerHTML = '<p style="color:var(--text-muted)">Error al cargar pedidos.</p>';
+        return;
+      }
+
+      if (!pedidos || pedidos.length === 0) {
+        wrap.innerHTML = `
+          <div class="empty-state">
+            <i class="bi bi-bag-x"></i>
+            <p>Todavía no realizaste ningún pedido.</p>
+          </div>`;
+        return;
+      }
+
+      wrap.innerHTML = pedidos.map(p => pedidoHTML(p)).join('');
+
+      // Buscar mensajes no leídos del admin y agregar badges
+      const { data: noLeidos } = await sb
+        .from('mensajes')
+        .select('pedido_id')
+        .in('pedido_id', pedidos.map(p => p.id))
+        .eq('remitente', 'admin')
+        .eq('leido', false);
+
+      if (noLeidos?.length) {
+        // Contar por pedido
+        const conteos = {};
+        noLeidos.forEach(m => conteos[m.pedido_id] = (conteos[m.pedido_id]||0) + 1);
+
+        Object.entries(conteos).forEach(([pid, n]) => {
+          const btn = document.getElementById('btn-chat-' + pid);
+          if (btn) {
+            btn.insertAdjacentHTML('beforeend', `<span class="chat-badge">${n}</span>`);
+            btn.style.background = '#166534'; // verde si hay mensajes nuevos
+          }
+        });
+
+        // Mostrar popup si hay mensajes nuevos
+        const total = noLeidos.length;
+        if (total > 0) mostrarPopupNuevoMsg(Object.keys(conteos)[0]);
+      }
+
+      // Suscribir a todos los pedidos para recibir mensajes en tiempo real
+      pedidos.forEach(p => suscribirChatCliente(p.id));
+    }
+
+    // ── suscripciones de chat activas por pedido ──────────────
+    const chatSuscripciones = {};
+
+    function pedidoHTML(pedido) {
+      const fecha  = new Date(pedido.created_at).toLocaleDateString('es-AR', { day:'2-digit', month:'long', year:'numeric' });
+      const items  = pedido.pedido_items || [];
+      const estado = pedido.estado || 'pendiente';
+
+      const itemsHTML = items.slice(0, 3).map(item => {
+        const prod = item.productos || {};
+        return `
+          <div class="pedido-prod-row">
+            <div class="pedido-prod-img">
+              <img src="${prod.imagen_url || 'https://placehold.co/48x60/f0ede8/7a7570?text=+'}"
+                alt="${prod.nombre || ''}"
+                onerror="this.src='https://placehold.co/48x60/f0ede8/7a7570?text=+'">
+            </div>
+            <span class="pedido-prod-nombre">${prod.nombre || '—'}</span>
+            <span class="pedido-prod-talla">${item.talla || ''}</span>
+            <span class="pedido-prod-precio">${formatearPrecio(item.precio_unitario * item.cantidad)}</span>
+          </div>`;
+      }).join('');
+
+      const mas = items.length > 3 ? `<p style="font-size:0.8rem;color:var(--text-muted)">+${items.length - 3} producto(s) más</p>` : '';
+
+      return `
+        <div class="pedido-item" id="pedido-card-${pedido.id}">
+          <div class="pedido-header">
+            <div>
+              <p class="pedido-id"># ${pedido.id.substring(0, 8).toUpperCase()}</p>
+              <p class="pedido-fecha">${fecha}</p>
+            </div>
+            <span class="estado-badge estado-${estado}">${capitalizar(estado)}</span>
+          </div>
+          <div class="pedido-productos">${itemsHTML}${mas}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+            <div class="pedido-total">Total: ${formatearPrecio(pedido.total)}</div>
+            <button class="btn-chat" id="btn-chat-${pedido.id}" onclick="toggleChat('${pedido.id}')">
+              <i class="bi bi-chat-dots"></i> Consultar pedido
+            </button>
+          </div>
+
+          <!-- Panel de chat expandible -->
+          <div class="chat-panel" id="chat-panel-${pedido.id}">
+            <div class="chat-header-info">
+              <i class="bi bi-chat-dots" style="color:var(--accent)"></i>
+              <span>Chat del pedido <strong># ${pedido.id.substring(0,8).toUpperCase()}</strong></span>
+              <span style="color:var(--text-muted);font-size:.75rem"> · ${new Date(pedido.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'short'})}</span>
+            </div>
+            <div class="chat-mensajes" id="chat-msgs-${pedido.id}">
+              <div class="chat-sin-mensajes">
+                <i class="bi bi-chat-heart" style="font-size:1.3rem;color:var(--accent);display:block;margin-bottom:.4rem"></i>
+                Enviá tu consulta y te responderemos a la brevedad.
+              </div>
+            </div>
+            <div class="chat-input-row">
+              <input type="text" id="chat-inp-${pedido.id}"
+                placeholder="Escribí tu consulta…"
+                maxlength="500"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();enviarMensajeCliente('${pedido.id}')}">
+              <button class="btn-enviar" onclick="enviarMensajeCliente('${pedido.id}')">
+                <i class="bi bi-send-fill"></i>
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ── Abrir/cerrar chat ──────────────────────────────────────
+    async function toggleChat(pedidoId) {
+      const panel = document.getElementById('chat-panel-' + pedidoId);
+      const isOpen = panel.classList.contains('open');
+
+      if (isOpen) {
+        panel.classList.remove('open');
+        return;
+      }
+
+      panel.classList.add('open');
+      await cargarMensajesCliente(pedidoId);
+      suscribirChatCliente(pedidoId);
+
+      // Marcar mensajes del admin como leídos
+      await sb.from('mensajes')
+        .update({ leido: true })
+        .eq('pedido_id', pedidoId)
+        .eq('remitente', 'admin')
+        .eq('leido', false);
+
+      // Quitar badge del botón
+      const badge = document.querySelector(`#btn-chat-${pedidoId} .chat-badge`);
+      if (badge) badge.remove();
+    }
+
+    // ── Cargar mensajes del chat ───────────────────────────────
+    async function cargarMensajesCliente(pedidoId) {
+      const { data } = await sb
+        .from('mensajes')
+        .select('*')
+        .eq('pedido_id', pedidoId)
+        .order('created_at', { ascending: true });
+
+      const lista = document.getElementById('chat-msgs-' + pedidoId);
+      if (!lista) return;
+
+      if (!data?.length) {
+        lista.innerHTML = `<div class="chat-sin-mensajes">
+          <i class="bi bi-chat-heart" style="font-size:1.3rem;color:var(--accent);display:block;margin-bottom:.4rem"></i>
+          Enviá tu consulta y te responderemos a la brevedad.
+        </div>`;
+        return;
+      }
+
+      lista.innerHTML = data.map(m => msgBurbujaHTML(m)).join('');
+      lista.scrollTop = lista.scrollHeight;
+    }
+
+    // ── Suscripción en tiempo real ─────────────────────────────
+    function suscribirChatCliente(pedidoId) {
+      if (chatSuscripciones[pedidoId]) return;
+
+      chatSuscripciones[pedidoId] = sb
+        .channel('cliente-chat-' + pedidoId)
+        .on('postgres_changes', {
+          event: 'INSERT', schema: 'public', table: 'mensajes',
+          filter: `pedido_id=eq.${pedidoId}`,
+        }, async payload => {
+          const msg = payload.new;
+
+          const panel       = document.getElementById('chat-panel-' + pedidoId);
+          const panelAbierto = panel?.classList.contains('open');
+          const esAdmin      = msg.remitente === 'admin';
+          const esCliente    = msg.remitente === 'cliente' && msg.user_id === usuarioActual.id;
+
+          if (panelAbierto) {
+            const lista = document.getElementById('chat-msgs-' + pedidoId);
+            if (lista) {
+              // Para mensajes propios: reemplazar el optimista si existe
+              if (esCliente) {
+                // El optimista ya se mostró, no duplicar
+                return;
+              }
+              // Para mensajes del admin: agregar y marcar leído
+              if (esAdmin) {
+                const ph = lista.querySelector('.chat-sin-mensajes');
+                if (ph) ph.remove();
+                lista.insertAdjacentHTML('beforeend', msgBurbujaHTML(msg));
+                lista.scrollTop = lista.scrollHeight;
+                await sb.from('mensajes').update({ leido: true }).eq('id', msg.id);
+              }
+            }
+          } else if (esAdmin) {
+            // Panel cerrado y mensaje del admin: alertar
+            mostrarPopupNuevoMsg(pedidoId);
+            sonidoAlerta();
+            const btn = document.getElementById('btn-chat-' + pedidoId);
+            if (btn) {
+              btn.style.background = '#166534';
+              const badge = btn.querySelector('.chat-badge');
+              if (badge) {
+                badge.textContent = parseInt(badge.textContent||0) + 1;
+              } else {
+                btn.insertAdjacentHTML('beforeend', '<span class="chat-badge">1</span>');
+              }
+            }
+          }
+        })
+        .on('postgres_changes', {
+          event: 'UPDATE', schema: 'public', table: 'mensajes',
+          filter: `pedido_id=eq.${pedidoId}`,
+        }, payload => {
+          // Actualizar palomitas cuando admin lee mensajes del cliente
+          // (el campo leido pasa a true)
+          if (payload.new.remitente === 'cliente' && payload.new.leido) {
+            const lista = document.getElementById('chat-msgs-' + pedidoId);
+            if (!lista) return;
+            // Cambiar palomitas grises a verdes
+            lista.querySelectorAll('[title="Enviado"]').forEach(el => {
+              el.style.color = '#4ade80';
+              el.setAttribute('title', 'Leído');
+            });
+          }
+        })
+        .subscribe(status => {
+          console.log('[Chat] Pedido', pedidoId.substring(0,8), '→', status);
+        });
+    }
+
+    // Sonido de alerta (beep corto con Web Audio API)
+    function sonidoAlerta() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.4);
+      } catch(e) { /* silenciar si no hay soporte */ }
+    }
+
+    // ── Enviar mensaje del cliente ─────────────────────────────
+    async function enviarMensajeCliente(pedidoId) {
+      const input = document.getElementById('chat-inp-' + pedidoId);
+      const texto = input?.value.trim();
+      if (!texto) return;
+
+      input.value = '';
+
+      const nombreRemitente = usuarioActual._nombre || usuarioActual.email.split('@')[0];
+
+      // Mostrar mensaje inmediatamente (UI optimista)
+      const lista = document.getElementById('chat-msgs-' + pedidoId);
+      if (lista) {
+        const ph = lista.querySelector('.chat-sin-mensajes');
+        if (ph) ph.remove();
+        const msgTemp = {
+          remitente: 'cliente',
+          nombre_remitente: nombreRemitente,
+          contenido: texto,
+          created_at: new Date().toISOString(),
+          _temp: true,
+        };
+        lista.insertAdjacentHTML('beforeend', msgBurbujaHTML(msgTemp));
+        lista.scrollTop = lista.scrollHeight;
+      }
+
+      const { error } = await sb.from('mensajes').insert({
+        pedido_id:        pedidoId,
+        user_id:          usuarioActual.id,
+        remitente:        'cliente',
+        nombre_remitente: nombreRemitente,
+        contenido:        texto,
+        leido:            false,
+      });
+
+      if (error) {
+        alert('Error al enviar: ' + error.message);
+        // Revertir UI optimista
+        const lista2 = document.getElementById('chat-msgs-' + pedidoId);
+        const last = lista2?.lastElementChild;
+        if (last) last.remove();
+      }
+    }
+
+    // ── Popup mensaje nuevo ────────────────────────────────────
+    function mostrarPopupNuevoMsg(pedidoId) {
+      const existing = document.getElementById('popup-msg');
+      if (existing) existing.remove();
+
+      const el = document.createElement('div');
+      el.id = 'popup-msg';
+      el.className = 'popup-nuevo-msg';
+      el.innerHTML = '<i class="bi bi-chat-fill"></i> ✝ León de Judá te respondió';
+      el.onclick = () => {
+        el.remove();
+        const panel = document.getElementById('chat-panel-' + pedidoId);
+        if (panel && !panel.classList.contains('open')) toggleChat(pedidoId);
+        document.getElementById('pedido-card-' + pedidoId)?.scrollIntoView({ behavior: 'smooth' });
+      };
+      document.body.appendChild(el);
+      setTimeout(() => el?.remove(), 5000);
+    }
+
+    // ── Renderizar burbuja ─────────────────────────────────────
+    function msgBurbujaHTML(m) {
+      const hora     = new Date(m.created_at).toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+      const tipo     = m.remitente === 'cliente' ? 'cliente' : 'admin';
+      const esCliente = m.remitente === 'cliente';
+      const txt      = (m.contenido||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+
+      // Palomitas solo para mensajes propios del cliente
+      let ticks = '';
+      if (esCliente) {
+        if (m._temp) {
+          // Mensaje optimista: enviando
+          ticks = '<span style="color:rgba(255,255,255,.5);font-size:.72rem;margin-left:.2rem">✓</span>';
+        } else if (m.leido) {
+          // Admin lo leyó: doble palomita verde
+          ticks = '<span style="color:#4ade80;font-size:.72rem;margin-left:.2rem" title="Leído">✓✓</span>';
+        } else {
+          // Enviado pero no leído
+          ticks = '<span style="color:rgba(255,255,255,.6);font-size:.72rem;margin-left:.2rem" title="Enviado">✓✓</span>';
+        }
+      }
+
+      return `
+        <div class="msg-burbuja-wrap ${tipo}">
+          <div class="msg-burbuja">${txt}${esCliente ? `<span style="display:inline-block;vertical-align:middle">${ticks}</span>` : ''}</div>
+          <span class="msg-hora">${hora}</span>
+        </div>`;
+    }
+
+    function capitalizar(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+  </script>
+</body>
+</html>

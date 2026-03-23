@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1c1917">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <title>Leon de Juda — Producto</title>
+
+  <style>
+    :root {
+      --bg:         #f5f0e8;
+      --bg2:        #ede6d6;
+      --bg3:        #e4dac8;
+      --card-bg:    #faf7f2;
+      --text:       #1c1917;
+      --text-muted: #78716c;
+      --gold:       #9a7b2e;
+      --gold-light: #c9a84c;
+      --border:     #ddd5c0;
+      --white:      #ffffff;
+      --nav-h:      56px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; width: 100%; }
+    button { font-family: inherit; }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 20% 0%, rgba(154,123,46,.07) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    * { position: relative; z-index: 1; }
+
+    /* ── Navbar ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 900;
+      background: var(--text);
+      height: var(--nav-h);
+      display: flex; align-items: center;
+      padding: 0 1rem; gap: .75rem;
+    }
+
+    .navbar-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; font-weight: 600;
+      color: white; letter-spacing: .04em;
+    }
+
+    .navbar-logo small {
+      display: block; font-size: .55rem;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gold-light); font-family: 'Jost', sans-serif;
+      font-weight: 500;
+    }
+
+    .nav-icon-btn {
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,.85);
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 1.15rem; position: relative;
+      transition: background .15s;
+    }
+
+    .nav-icon-btn:hover { background: rgba(255,255,255,.1); color: white; }
+
+    .carrito-badge {
+      position: absolute; top: 5px; right: 5px;
+      width: 17px; height: 17px;
+      background: var(--gold-light); color: var(--text);
+      font-size: .6rem; font-weight: 800; border-radius: 50%;
+      display: none; align-items: center; justify-content: center;
+    }
+
+    .nav-back {
+      color: rgba(255,255,255,.7);
+      font-size: .8rem;
+      display: flex; align-items: center; gap: .35rem;
+      padding: .4rem .7rem;
+      border-radius: 6px;
+      transition: background .15s, color .15s;
+    }
+
+    .nav-back:hover { background: rgba(255,255,255,.08); color: white; }
+
+    .nav-spacer { flex: 1; }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      padding: .85rem 1rem;
+      font-size: .75rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: .35rem;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumb a:hover { color: var(--gold); }
+    .breadcrumb i { font-size: .65rem; }
+
+    /* ══════════════════════════════════════
+       LAYOUT — MOBILE: columna / DESKTOP: 2 col
+    ══════════════════════════════════════ */
+    .prod-layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1rem 4rem;
+    }
+
+    /* Desktop: lado a lado */
+    @media (min-width: 768px) {
+      .prod-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        padding: 0 1.5rem 4rem;
+        align-items: start;
+      }
+    }
+
+    /* ── Galería ── */
+    /* CLAVE: en mobile NO es sticky, en desktop SÍ */
+    .galeria {
+      margin-bottom: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .galeria {
+        position: sticky;
+        top: calc(var(--nav-h) + 1rem);
+        margin-bottom: 0;
+      }
+    }
+
+    .img-principal {
+      aspect-ratio: 3/4;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg3);
+      margin-bottom: .6rem;
+    }
+
+    .img-principal img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .4s;
+      cursor: zoom-in;
+    }
+
+    .img-principal img:hover { transform: scale(1.04); }
+
+    .thumbnails {
+      display: flex; gap: .5rem; flex-wrap: wrap;
+    }
+
+    .thumbnail {
+      width: 64px; height: 80px;
+      border-radius: 6px; overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color .2s;
+      background: var(--bg3);
+    }
+
+    .thumbnail.active { border-color: var(--text); }
+    .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Info ── */
+    .prod-info { padding-top: 0; }
+
+    .prod-cat-tag {
+      font-size: .65rem; font-weight: 700;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: .5rem;
+    }
+
+    .prod-nombre {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 500; line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    .prod-precios {
+      display: flex; align-items: center;
+      gap: .75rem; margin-bottom: 1.5rem;
+    }
+
+    .prod-precio { font-size: 1.5rem; font-weight: 700; color: var(--gold); }
+
+    .prod-precio-orig {
+      font-size: 1rem; color: var(--text-muted);
+      text-decoration: line-through;
+    }
+
+    .desc-badge {
+      background: #fef3c7; color: #92400e;
+      font-size: .72rem; font-weight: 700;
+      padding: .2rem .55rem; border-radius: 4px;
+    }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+    /* Tallas */
+    .sec-label {
+      font-size: .7rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: .6rem;
+    }
+
+    .tallas-wrap { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+
+    .talla-btn {
+      min-width: 50px; height: 50px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      background: transparent; cursor: pointer;
+      font-family: 'Jost', sans-serif; font-size: .875rem; font-weight: 600;
+      color: var(--text); transition: all .15s;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 .75rem;
+    }
+
+    .talla-btn:hover  { border-color: var(--gold); color: var(--gold); }
+    .talla-btn.sel    { background: var(--text); border-color: var(--text); color: white; }
+
+    .guia-tallas {
+      font-size: .78rem; color: var(--text-muted);
+      margin-bottom: 1.25rem; cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* Cantidad */
+    .cantidad-wrap {
+      display: flex; align-items: center;
+      gap: .75rem; margin-bottom: 1.5rem;
+    }
+
+    .qty-btn {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--border); border-radius: 6px;
+      background: transparent; cursor: pointer;
+      font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+      transition: border-color .2s;
+    }
+
+    .qty-btn:hover { border-color: var(--text); }
+    .qty-num { font-weight: 700; font-size: 1.1rem; min-width: 24px; text-align: center; }
+
+    /* Botones */
+    .btn-agregar {
+      width: 100%; padding: .95rem;
+      background: var(--text); color: white;
+      border: none; border-radius: 8px;
+      font-family: 'Jost', sans-serif; font-size: .9rem; font-weight: 600;
+      cursor: pointer; letter-spacing: .04em;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+      transition: background .2s, transform .15s; margin-bottom: .75rem;
+    }
+
+    .btn-agregar:hover    { background: #2c2520; transform: translateY(-1px); }
+    .btn-agregar:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; }
+
+    .btn-comprar {
+      width: 100%; padding: .95rem;
+      background: var(--gold); color: white;
+      border: none; border-radius: 8px;
+      font-family: 'Jost', sans-serif; font-size: .9rem; font-weight: 600;
+      cursor: pointer; letter-spacing: .04em;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+      transition: background .2s, transform .15s;
+    }
+
+    .btn-comprar:hover    { background: var(--gold-light); transform: translateY(-1px); }
+    .btn-comprar:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; }
+
+    /* Descripción */
+    .descripcion {
+      margin-top: 1.5rem; line-height: 1.75;
+      color: #3a3632; font-size: .9rem;
+    }
+
+    /* Acordeón */
+    .accordion-item { border-top: 1px solid var(--border); padding: 1rem 0; }
+
+    .accordion-header {
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; font-weight: 600; font-size: .875rem; letter-spacing: .03em;
+    }
+
+    .accordion-body {
+      display: none; padding-top: .75rem;
+      font-size: .875rem; color: var(--text-muted); line-height: 1.7;
+    }
+
+    .accordion-item.open .accordion-body  { display: block; }
+    .accordion-item.open .accordion-icon  { transform: rotate(180deg); }
+    .accordion-icon { transition: transform .2s; }
+
+    /* Toast */
+    .toast-wrap { position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); z-index: 9999; pointer-events: none; }
+    .toast { background: var(--text); color: white; padding: .65rem 1.1rem; border-radius: 50px; font-size: .82rem; font-weight: 500; white-space: nowrap; display: flex; align-items: center; gap: .5rem; animation: t-in .3s ease, t-out .3s ease 2.2s forwards; box-shadow: 0 4px 16px rgba(0,0,0,.25); }
+    .toast i { color: #86efac; }
+    @keyframes t-in  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+    @keyframes t-out { from { opacity:1; } to { opacity:0; } }
+
+    /* Skeleton */
+    .skel { background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%); background-size:200% 100%; animation: shimmer 1.5s infinite; border-radius:8px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  </style>
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/index.html" class="nav-back">
+      <i class="bi bi-arrow-left"></i> Tienda
+    </a>
+    <span class="nav-spacer"></span>
+    <a href="/pages/tienda/carrito.html" class="nav-icon-btn">
+      <i class="bi bi-bag"></i>
+      <span class="carrito-badge">0</span>
+    </a>
+    <a href="/login.html" class="nav-icon-btn" id="nav-login">
+      <i class="bi bi-person"></i>
+    </a>
+    <a href="/pages/tienda/cuenta.html" class="nav-icon-btn" id="nav-cuenta" style="display:none">
+      <i class="bi bi-person-check"></i>
+    </a>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="/index.html">Inicio</a>
+    <i class="bi bi-chevron-right"></i>
+    <span id="bread-cat">—</span>
+    <i class="bi bi-chevron-right"></i>
+    <span id="bread-nombre" style="color:var(--text)">—</span>
+  </div>
+
+  <!-- CONTENIDO (se rellena por JS) -->
+  <div class="prod-layout" id="prod-layout">
+    <!-- Skeleton de carga -->
+    <div class="galeria">
+      <div class="skel" style="aspect-ratio:3/4;border-radius:12px"></div>
+    </div>
+    <div class="prod-info">
+      <div class="skel" style="height:11px;width:70px;margin-bottom:12px"></div>
+      <div class="skel" style="height:34px;width:75%;margin-bottom:10px"></div>
+      <div class="skel" style="height:28px;width:110px"></div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toasts"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js"></script>
+
+  <script>
+    let prodActual = null, tallaSeleccionada = null, cantidad = 1;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      Carrito.actualizarContador();
+      await actualizarNavbarAuth();
+      const id = new URLSearchParams(location.search).get('id');
+      if (!id) { location.href = '/index.html'; return; }
+      await cargarProducto(id);
+    });
+
+    async function cargarProducto(id) {
+      const { data, error } = await sb.from('productos').select('*').eq('id', id).single();
+
+      if (error || !data) {
+        document.getElementById('prod-layout').innerHTML =
+          '<p style="padding:2rem;color:var(--text-muted)">Producto no encontrado.</p>';
+        return;
+      }
+
+      prodActual = data;
+      document.title = `León de Judá — ${data.nombre}`;
+      document.getElementById('bread-cat').textContent    = data.categoria || 'Tienda';
+      document.getElementById('bread-nombre').textContent = data.nombre;
+
+      const imagenes = (data.imagenes_urls?.length ? data.imagenes_urls : [])
+        .concat(data.imagen_url ? [data.imagen_url] : [])
+        .filter((v, i, a) => v && a.indexOf(v) === i);
+
+      if (!imagenes.length) imagenes.push('https://placehold.co/600x800/e4dac8/78716c?text=Foto');
+
+      const descuento = data.precio_original
+        ? Math.round((1 - data.precio / data.precio_original) * 100) : null;
+
+      const thumbsHTML = imagenes.length > 1
+        ? `<div class="thumbnails">
+            ${imagenes.map((img, i) =>
+              `<div class="thumbnail ${i===0?'active':''}" onclick="cambiarImg('${img}',this)">
+                <img src="${img}" alt="" onerror="this.src='https://placehold.co/64x80/e4dac8/78716c?text=+'">
+              </div>`).join('')}
+           </div>`
+        : '';
+
+      // Tallas
+      const tallas = data.tallas?.length ? data.tallas : ['Única'];
+      if (tallas.length === 1) tallaSeleccionada = tallas[0];
+
+      const tallasHTML = tallas.map(t =>
+        `<button class="talla-btn ${tallas.length===1?'sel':''}" onclick="selTalla('${t}',this)">${t}</button>`
+      ).join('');
+
+      document.getElementById('prod-layout').innerHTML = `
+        <!-- GALERÍA (arriba en mobile, izquierda en desktop) -->
+        <div class="galeria">
+          <div class="img-principal">
+            <img id="img-main" src="${imagenes[0]}" alt="${data.nombre}"
+              onerror="this.src='https://placehold.co/600x800/e4dac8/78716c?text=Foto'">
+          </div>
+          ${thumbsHTML}
+        </div>
+
+        <!-- INFO (abajo en mobile, derecha en desktop) -->
+        <div class="prod-info">
+          <p class="prod-cat-tag">${data.categoria || 'Producto'}</p>
+          <h1 class="prod-nombre">${data.nombre}</h1>
+
+          <div class="prod-precios">
+            <span class="prod-precio">${formatearPrecio(data.precio)}</span>
+            ${data.precio_original ? `<span class="prod-precio-orig">${formatearPrecio(data.precio_original)}</span>` : ''}
+            ${descuento ? `<span class="desc-badge">-${descuento}%</span>` : ''}
+          </div>
+
+          <hr class="divider">
+
+          <p class="sec-label">Talla</p>
+          <div class="tallas-wrap">${tallasHTML}</div>
+          <p class="guia-tallas"><i class="bi bi-rulers"></i> Ver guía de tallas</p>
+
+          <p class="sec-label">Cantidad</p>
+          <div class="cantidad-wrap">
+            <button class="qty-btn" onclick="cambiarCantidad(-1)">−</button>
+            <span class="qty-num" id="qty-num">1</span>
+            <button class="qty-btn" onclick="cambiarCantidad(1)">+</button>
+          </div>
+
+          <button class="btn-agregar" id="btn-agregar" onclick="agregarCarrito()" ${!tallaSeleccionada?'disabled':''}>
+            <i class="bi bi-bag-plus"></i> Agregar al carrito
+          </button>
+          <button class="btn-comprar" id="btn-comprar" onclick="comprarAhora()" ${!tallaSeleccionada?'disabled':''}>
+            <i class="bi bi-credit-card"></i> Comprar ahora
+          </button>
+
+          ${data.descripcion ? `<p class="descripcion">${data.descripcion}</p>` : ''}
+
+          <hr class="divider">
+
+          <div class="accordion-item">
+            <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+              <span>Envío y devoluciones</span>
+              <i class="bi bi-chevron-down accordion-icon"></i>
+            </div>
+            <div class="accordion-body">
+              Envío estándar: 3 a 7 días hábiles. Devoluciones gratuitas dentro de los 30 días con etiqueta original.
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+              <span>Cuidado de la prenda</span>
+              <i class="bi bi-chevron-down accordion-icon"></i>
+            </div>
+            <div class="accordion-body">
+              Lavar a máquina en frío. No usar secadora. Planchar a temperatura media.
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function cambiarImg(src, el) {
+      document.getElementById('img-main').src = src;
+      document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function selTalla(t, btn) {
+      tallaSeleccionada = t;
+      document.querySelectorAll('.talla-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      document.getElementById('btn-agregar').disabled = false;
+      document.getElementById('btn-comprar').disabled = false;
+    }
+
+    function cambiarCantidad(d) {
+      cantidad = Math.max(1, cantidad + d);
+      document.getElementById('qty-num').textContent = cantidad;
+    }
+
+    function agregarCarrito() {
+      if (!prodActual || !tallaSeleccionada) return;
+      Carrito.agregar(prodActual, tallaSeleccionada, cantidad);
+      toast(`${prodActual.nombre} (x${cantidad}) agregado ✓`);
+    }
+
+    async function comprarAhora() {
+      if (!prodActual || !tallaSeleccionada) return;
+      const user = await getUsuario();
+      if (!user) { location.href = '/login.html?redirect=/pages/tienda/carrito.html'; return; }
+      Carrito.agregar(prodActual, tallaSeleccionada, cantidad);
+      location.href = '/pages/tienda/carrito.html';
+    }
+
+    function toast(msg) {
+      const w = document.getElementById('toasts');
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${msg}`;
+      w.appendChild(el);
+      setTimeout(() => el.remove(), 2600);
+    }
+  </script>
+</body>
+</html>
