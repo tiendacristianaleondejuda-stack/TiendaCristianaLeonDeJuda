@@ -3,7 +3,7 @@
 // ================================================================
 
 const ONESIGNAL_APP_ID       = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
-const ONESIGNAL_REST_API_KEY = 'os_v2_app_tdlrlcue45dodhte6ylhr675a3zl264dujru6uufev5ftvm2mjpmcv2nyqcl7ldwrgpq4czykeyr4bbtx22auykndrmaqpear54if6a';
+const ONESIGNAL_REST_API_KEY = 'os_v2_app_tdlrlcue45dodhte6ylhr675az6r346sfcueavm4yexwqr26d2lyrvfor6z66fyx77vmxvf37sx7xd3uu2lxd37bzabq2tjnuthkszq';
 const SITE_URL  = 'https://tiendacristianaleondejuda.vercel.app';
 const ICONO_URL = SITE_URL + '/assets/icons/icon-192x192.png';
 
