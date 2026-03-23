@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   const ONESIGNAL_APP_ID = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
 
   // ⚠️ PON TU API KEY REAL AQUÍ (la que empieza con os_v2_)
-  const ONESIGNAL_API_KEY = 'os_v2_app_tdlrlcue45dodhte6ylhr675az4d5mgyz64ut2uekba42mb3fsu4c5mmtly5nen222xefwdym6hvhiovnjhadtjn5tlor3e6bpd3s5a';
+  const ONESIGNAL_API_KEY = 'os_v2_app_tdlrlcue45dodhte6ylhr675a3zl264dujru6uufev5ftvm2mjpmcv2nyqcl7ldwrgpq4czykeyr4bbtx22auykndrmaqpear54if6a';
 
   try {
 
