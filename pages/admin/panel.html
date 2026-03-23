@@ -1289,10 +1289,9 @@
      SCRIPTS
 ════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/js/supabase-config.js"></script>           <!-- ← PRIMERO supabase-config -->
+<script src="/js/supabase-config.js"></script>
+<script src="/js/notificaciones.js"></script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script src="/js/notificaciones.js"></script>            <!-- ← DESPUÉS notificaciones -->
-
 
 <script>
   // Verificar que OneSignal se cargó correctamente
@@ -1314,9 +1313,8 @@
   let todosProductos = [];
   let todosPedidos   = [];
   let productoEditId = null;
-  let imagenesSubidas = [];   // URLs definitivas en Supabase Storage
-  let imagenesPrevias = [];   // {file, localURL} pendientes de subir
-
+  let imagenesSubidas = [];
+  let imagenesPrevias = [];
 
 // ═══════════════════════════════════════════════════════════
 //  INICIALIZACIÓN
