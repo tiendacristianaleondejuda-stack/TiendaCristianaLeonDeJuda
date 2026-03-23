@@ -5,11 +5,11 @@
 const ONESIGNAL_APP_ID       = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
 const ONESIGNAL_REST_API_KEY = 'os_v2_app_tdlrlcue45dodhte6ylhr675a3zl264dujru6uufev5ftvm2mjpmcv2nyqcl7ldwrgpq4czykeyr4bbtx22auykndrmaqpear54if6a';
 
-// ⚠️ IMPORTANTE: Cambia esta URL por la de tu sitio en Vercel
-const SITE_URL  = 'https://tiendacristianaleondejuda.vercel.app';  // <-- REEMPLAZA CON TU URL DE VERCEL
-const ICONO_URL = SITE_URL + '/assets/icons/icon-192x192.png';
+// Tu URL de Vercel
+const SITE_URL  = 'https://tiendacristianaleondejuda.vercel.app/';
+const ICONO_URL = SITE_URL + 'assets/icons/icon-192x192.png';
 
-const ONESIGNAL_CONFIGURADO = true; // Ya tienes APP ID configurada
+const ONESIGNAL_CONFIGURADO = true;
 
 // ── Inicializar OneSignal ────────────────────────────────────────
 if (ONESIGNAL_CONFIGURADO) {
@@ -19,39 +19,39 @@ if (ONESIGNAL_CONFIGURADO) {
     try {
       await OneSignal.init({
         appId: ONESIGNAL_APP_ID,
+        // 🔧 Importante: Usar la ruta correcta del Service Worker (en la raíz)
         serviceWorkerParam: { scope: '/' },
-        serviceWorkerPath: '/OneSignalSDKWorker.js',  // ← Importante: ruta correcta
+        serviceWorkerPath: '/OneSignalSDKWorker.js',
+        serviceWorkerUpdaterPath: '/OneSignalSDKUpdaterWorker.js',
         notifyButton: { enable: false },
         promptOptions: {
           slidedown: {
-            prompts: [{
-              type: 'push',
-              autoPrompt: false,
-              text: {
-                actionMessage: 'Recibí alertas de pedidos y mensajes nuevos.',
-                acceptButton:  'Activar',
-                cancelButton:  'Ahora no',
-              },
-            }],
+            enabled: false,
           },
         },
       });
 
-      // Etiquetar al admin cuando inicie sesión
+      console.log('[OneSignal] Inicializado correctamente');
+
+      // Etiquetar al admin
       try {
         const user = await getUsuario?.();
-        if (user && user.email === 'admin@leondejuda.com') { // Reemplaza con tu email admin
-          await OneSignal.User.addTag('rol',   'admin');
+        // ⚠️ CAMBIA ESTE EMAIL POR EL TUYO
+        if (user && user.email === 'tiendacristianaleondejuda@gmail.com') {
+          await OneSignal.User.addTag('rol', 'admin');
           await OneSignal.User.addTag('email', user.email);
           console.info('[OneSignal] ✅ Admin registrado');
+        } else {
+          console.log('[OneSignal] Usuario no es admin:', user?.email);
         }
-      } catch(e) {}
+      } catch(e) {
+        console.warn('[OneSignal] Error al etiquetar admin:', e);
+      }
 
-      // Actualizar botón
       actualizarBotonNotif();
 
     } catch(err) {
-      console.warn('[OneSignal]', err.message);
+      console.warn('[OneSignal] Error en init:', err.message);
       actualizarBotonNotif();
     }
   });
@@ -111,7 +111,6 @@ async function pedirPermisoNotificaciones() {
     const resultado = await Notification.requestPermission();
 
     if (resultado === 'granted') {
-      // Suscribir en OneSignal
       if (window.OneSignalDeferred) {
         window.OneSignalDeferred.push(async function(OneSignal) {
           try { 
@@ -119,7 +118,7 @@ async function pedirPermisoNotificaciones() {
             console.log('[OneSignal] Permiso concedido');
             
             const user = await getUsuario?.();
-            if (user && user.email === 'tiendacristianaleondejuda@gmail.com') { // Reemplaza con tu email admin
+            if (user && user.email === 'admin@leondejuda.com') {
               await OneSignal.User.addTag('rol', 'admin');
               await OneSignal.User.addTag('email', user.email);
             }
