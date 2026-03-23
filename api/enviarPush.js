@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       headers: {
         'Content-Type': 'application/json',
         // 👇 CLAVE
-        'Authorization': 'Key ' + ONESIGNAL_API_KEY,
+        'Authorization': 'Bearer ' + ONESIGNAL_API_KEY,
       },
       body: JSON.stringify({
         app_id: ONESIGNAL_APP_ID,
