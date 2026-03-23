@@ -361,7 +361,9 @@
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script src="/js/supabase-config.js"></script>
+  <script src="/js/notificaciones.js"></script>
 
   <script>
     let usuarioActual = null;
@@ -463,10 +465,14 @@
       const nombre   = document.getElementById('p-nombre').value.trim();
       const apellido = document.getElementById('p-apellido').value.trim();
       if (nombre) {
-        const nombreCompleto = nombre + (apellido ? ' ' + apellido : '');
-        document.getElementById('cuenta-nombre').textContent = nombreCompleto;
+        document.getElementById('cuenta-nombre').textContent = nombre + (apellido ? ' ' + apellido : '');
+      }
 
-        // Actualizar nombre_cliente en pedidos existentes del usuario
+      // Actualizar nombre_cliente en pedidos existentes del usuario
+      const nombre   = document.getElementById('p-nombre').value.trim();
+      const apellido = document.getElementById('p-apellido').value.trim();
+      if (nombre) {
+        const nombreCompleto = nombre + (apellido ? ' ' + apellido : '');
         await sb.from('pedidos')
           .update({ nombre_cliente: nombreCompleto })
           .eq('user_id', usuarioActual.id);
@@ -781,6 +787,14 @@
         const lista2 = document.getElementById('chat-msgs-' + pedidoId);
         const last = lista2?.lastElementChild;
         if (last) last.remove();
+      } else {
+        // Enviar push al admin (funciona aunque el panel esté cerrado)
+        try {
+          if (typeof notificarMensajeAdmin === 'function') {
+            const preview = texto.substring(0, 50) + (texto.length > 50 ? '…' : '');
+            await notificarMensajeAdmin(nombreRemitente, preview);
+          }
+        } catch(e) { /* silenciar */ }
       }
     }
 
