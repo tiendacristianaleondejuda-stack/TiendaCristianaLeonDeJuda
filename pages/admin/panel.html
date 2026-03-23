@@ -1284,23 +1284,37 @@
 <!-- Toasts -->
 <div class="toast-wrap" id="toasts"></div>
 
+
 <!-- ════════════════════════════════
      SCRIPTS
 ════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script src="/js/supabase-config.js"></script>
 <script src="/js/notificaciones.js"></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-//  ESTADO GLOBAL
-// ═══════════════════════════════════════════════════════════
-let todosProductos = [];
-let todosPedidos   = [];
-let productoEditId = null;
-let imagenesSubidas = [];   // URLs definitivas en Supabase Storage
-let imagenesPrevias = [];   // {file, localURL} pendientes de subir
+  // Verificar que OneSignal se cargó correctamente
+  setTimeout(() => {
+    if (typeof window.OneSignal === 'undefined') {
+      console.warn('[OneSignal] No se cargó correctamente');
+    } else {
+      console.log('[OneSignal] ✅ Cargado correctamente');
+      // Actualizar estado del botón
+      if (typeof actualizarBotonNotif === 'function') {
+        actualizarBotonNotif();
+      }
+    }
+  }, 1000);
+  
+  // ═══════════════════════════════════════════════════════════
+  //  ESTADO GLOBAL
+  // ═══════════════════════════════════════════════════════════
+  let todosProductos = [];
+  let todosPedidos   = [];
+  let productoEditId = null;
+  let imagenesSubidas = [];
+  let imagenesPrevias = [];
 
 // ═══════════════════════════════════════════════════════════
 //  INICIALIZACIÓN
@@ -1761,6 +1775,7 @@ async function cambiarEstado(pedidoId, nuevoEstado) {
 
 let adminChatPedidoId  = null;
 let adminChatSuscripcion = null;
+let adminGlobalSuscripcion = null;  // ← canal global único
 
 async function verPedido(id) {
   const p = todosPedidos.find(x => x.id === id);
@@ -2338,10 +2353,16 @@ function mostrarAlertaAdmin(texto) {
 }
 
 async function iniciarSuscripcionMensajesGlobal() {
+  // Destruir canal anterior si existe (evita duplicados por doble llamada)
+  if (adminGlobalSuscripcion) {
+    adminGlobalSuscripcion.unsubscribe();
+    adminGlobalSuscripcion = null;
+  }
+
   // Pequeño delay para asegurar que Supabase esté inicializado
   await new Promise(r => setTimeout(r, 1000));
 
-  sb.channel('admin-global-' + Date.now())
+  adminGlobalSuscripcion = sb.channel('admin-global-mensajes')
     .on('postgres_changes', {
       event:  'INSERT',
       schema: 'public',
