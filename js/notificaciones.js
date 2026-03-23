@@ -1,16 +1,20 @@
 // ================================================================
-//  notificaciones.js — OneSignal + alertas de pedidos y mensajes
+//  notificaciones.js — Push con ntfy.sh (sin API keys)
+//  ntfy es gratuito, funciona en Android e iOS sin configuración
 // ================================================================
 
-const ONESIGNAL_APP_ID       = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
-const ONESIGNAL_REST_API_KEY = 'os_v2_app_tdlrlcue45dodhte6ylhr675a24g3spwfcfuponh7nrgzcldpkn52e2mwwyqwsekjr4l7x7gpgg6lb4jtau3ft6nsnj7ft2yniv2eri';
-const SITE_URL  = 'https://tiendacristianaleondejuda.vercel.app';
-const ICONO_URL = SITE_URL + '/assets/icons/icon-192x192.png';
+// ── Configuración ntfy ───────────────────────────────────────────
+// El "topic" es como un canal privado — cambialo por algo único
+// que solo vos conozcas para que nadie más pueda enviarte mensajes
+const NTFY_TOPIC = 'leondejuda-admin-cristiana-2025';  // ← podés cambiar esto
 
-const ONESIGNAL_CONFIGURADO = ONESIGNAL_APP_ID !== 'TU_APP_ID_DE_ONESIGNAL_AQUI';
+const SITE_URL = 'https://tiendacristianaleondejuda.vercel.app';
 
-// ── Inicializar OneSignal ────────────────────────────────────────
-if (ONESIGNAL_CONFIGURADO) {
+// ── OneSignal (solo para registrar el device del admin al panel) ─
+const ONESIGNAL_APP_ID   = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
+const ONESIGNAL_CONFIGURADO = true;
+
+if (typeof window !== 'undefined') {
   window.OneSignalDeferred = window.OneSignalDeferred || [];
 
   OneSignalDeferred.push(async function(OneSignal) {
@@ -19,37 +23,10 @@ if (ONESIGNAL_CONFIGURADO) {
         appId: ONESIGNAL_APP_ID,
         serviceWorkerParam: { scope: '/' },
         notifyButton: { enable: false },
-        promptOptions: {
-          slidedown: {
-            prompts: [{
-              type: 'push',
-              autoPrompt: false,
-              text: {
-                actionMessage: 'Recibí alertas de pedidos y mensajes nuevos.',
-                acceptButton:  'Activar',
-                cancelButton:  'Ahora no',
-              },
-            }],
-          },
-        },
       });
-
-      // Etiquetar al admin
-      try {
-        const user = await getUsuario?.();
-        if (user && user.email === ADMIN_EMAIL) {
-          await OneSignal.User.addTag('rol',   'admin');
-          await OneSignal.User.addTag('email', user.email);
-          console.info('[OneSignal] ✅ Admin registrado');
-        }
-      } catch(e) {}
-
-      // Actualizar botón
-      actualizarBotonNotif();
-
-    } catch(err) {
-      console.warn('[OneSignal]', err.message);
-      actualizarBotonNotif();
+      console.info('[OneSignal] Inicializado (para in-app)');
+    } catch(e) {
+      console.warn('[OneSignal]', e.message);
     }
   });
 }
@@ -64,27 +41,27 @@ function actualizarBotonNotif() {
   const estado = Notification?.permission || 'default';
 
   if (estado === 'granted') {
-    btn.style.color        = '#4ade80';
-    btn.style.borderColor  = 'rgba(74,222,128,.35)';
-    btn.style.background   = 'rgba(74,222,128,.1)';
-    if (icon)  icon.className  = 'bi bi-bell-fill';
+    btn.style.color       = '#4ade80';
+    btn.style.borderColor = 'rgba(74,222,128,.35)';
+    btn.style.background  = 'rgba(74,222,128,.1)';
+    if (icon)  icon.className   = 'bi bi-bell-fill';
     if (label) label.textContent = 'Alertas activas';
   } else if (estado === 'denied') {
-    btn.style.color        = '#f87171';
-    btn.style.borderColor  = 'rgba(248,113,113,.35)';
-    btn.style.background   = 'rgba(248,113,113,.1)';
-    if (icon)  icon.className  = 'bi bi-bell-slash';
+    btn.style.color       = '#f87171';
+    btn.style.borderColor = 'rgba(248,113,113,.35)';
+    btn.style.background  = 'rgba(248,113,113,.1)';
+    if (icon)  icon.className   = 'bi bi-bell-slash';
     if (label) label.textContent = 'Bloqueadas';
   } else {
-    btn.style.color        = 'var(--text-muted)';
-    btn.style.borderColor  = 'var(--border)';
-    btn.style.background   = 'var(--bg3)';
-    if (icon)  icon.className  = 'bi bi-bell';
+    btn.style.color       = 'var(--text-muted)';
+    btn.style.borderColor = 'var(--border)';
+    btn.style.background  = 'var(--bg3)';
+    if (icon)  icon.className   = 'bi bi-bell';
     if (label) label.textContent = 'Activar alertas';
   }
 }
 
-// ── Pedir permiso ────────────────────────────────────────────────
+// ── Pedir permiso (para alertas in-app en el panel) ─────────────
 async function pedirPermisoNotificaciones() {
   const estado = Notification?.permission || 'default';
 
@@ -92,88 +69,77 @@ async function pedirPermisoNotificaciones() {
     alert(
       '⛔ Las notificaciones están BLOQUEADAS.\n\n' +
       'Para activarlas:\n' +
-      '• Android Chrome: toca el candado 🔒 en la barra de dirección → Notificaciones → Permitir\n' +
-      '• PC Chrome: haz clic en el candado 🔒 → Notificaciones → Permitir\n' +
-      '\nDespués recargá la página.'
+      '• Android Chrome: tocá el candado 🔒 en la barra → Notificaciones → Permitir\n' +
+      '• PC Chrome: hacé clic en el candado 🔒 → Notificaciones → Permitir\n\n' +
+      'Después recargá la página.'
     );
     return;
   }
 
   if (estado === 'granted') {
-    alert('✅ Las alertas ya están activadas en este dispositivo.');
-    return;
-  }
-
-  if (!ONESIGNAL_CONFIGURADO) {
-    alert('OneSignal aún no está configurado.');
+    // Mostrar instrucciones para ntfy
+    alert(
+      '✅ Alertas del panel activadas.\n\n' +
+      '📱 Para recibir alertas en tu celular aunque tengas la app cerrada:\n\n' +
+      '1. Instalá la app "ntfy" desde Google Play o App Store\n' +
+      '2. Abrila y tocá el "+" para agregar un canal\n' +
+      '3. Escribí exactamente: ' + NTFY_TOPIC + '\n' +
+      '4. ¡Listo! Recibirás alertas de pedidos y mensajes nuevos.'
+    );
     return;
   }
 
   try {
     const resultado = await Notification.requestPermission();
-
+    actualizarBotonNotif();
     if (resultado === 'granted') {
-      // Suscribir en OneSignal
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      window.OneSignalDeferred.push(async function(OneSignal) {
-        try { await OneSignal.Notifications.requestPermission(); } catch(e) {}
-        const user = await getUsuario?.();
-        if (user && user.email === ADMIN_EMAIL) {
-          await OneSignal.User.addTag('rol',   'admin');
-          await OneSignal.User.addTag('email', user.email);
-        }
-      });
-      actualizarBotonNotif();
-      alert('✅ ¡Alertas activadas! Recibirás notificaciones de pedidos y mensajes nuevos.');
-    } else {
-      actualizarBotonNotif();
+      alert(
+        '✅ ¡Alertas del panel activadas!\n\n' +
+        '📱 Para alertas en tu celular cuando la app está cerrada:\n\n' +
+        '1. Instalá "ntfy" desde Google Play o App Store (es gratis)\n' +
+        '2. Tocá "+" y escribí el canal: ' + NTFY_TOPIC + '\n' +
+        '3. ¡Listo!'
+      );
     }
-  } catch(err) {
-    console.warn('[OneSignal] Error al pedir permiso:', err.message);
+  } catch(e) {
+    console.warn('Error al pedir permiso:', e.message);
   }
 }
 
-// ── Enviar push para nuevo pedido ────────────────────────────────
-async function notificarNuevoPedido(pedidoId, total) {
-  if (!ONESIGNAL_CONFIGURADO) return;
-  await _enviarPushAdmin('pedido', { pedidoId, total });
-}
-
-// ── Enviar push para mensaje nuevo ───────────────────────────────
-async function notificarMensajeAdmin(nombre, preview) {
-  if (!ONESIGNAL_CONFIGURADO) return;
-  await _enviarPushAdmin('mensaje', { nombre, preview });
-}
-
-// ── Helper: llama a la Edge Function de Supabase (evita CORS) ───
-//  La Edge Function es la que llama a OneSignal desde el servidor
-async function _enviarPushAdmin(tipo, payload) {
+// ── Enviar notificación push vía ntfy ───────────────────────────
+async function _enviarPushNtfy(titulo, cuerpo, emoji) {
   try {
-    // URL de la Edge Function: Project URL + /functions/v1/notify
-    const edgeFnUrl = SUPABASE_URL.replace('.supabase.co', '.supabase.co') + '/functions/v1/notify';
-
-    const resp = await fetch(edgeFnUrl, {
+    await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
       method: 'POST',
       headers: {
-        'Content-Type':  'application/json',
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Title':    titulo,
+        'Tags':     emoji,
+        'Priority': 'high',
+        'Click':    SITE_URL + '/pages/admin/panel.html',
+        'Content-Type': 'text/plain',
       },
-      body: JSON.stringify({ tipo, ...payload }),
+      body: cuerpo,
     });
-
-    const data = await resp.json().catch(() => ({}));
-
-    if (!resp.ok) {
-      const e = JSON.stringify(data.errors || data);
-      if (e.includes('subscribed') || e.includes('No subscribers')) {
-        console.info('[Push] Admin aún no activó las notificaciones push.');
-      } else {
-        console.warn('[Push] Error desde Edge Function:', e);
-      }
-    } else {
-      console.info('[Push] ✅ Notificación enviada:', data.id);
-    }
-  } catch(err) {
-    console.warn('[Push] No se pudo enviar:', err.message);
+    console.info('[ntfy] ✅ Notificación enviada');
+  } catch(e) {
+    console.warn('[ntfy] No se pudo enviar:', e.message);
   }
+}
+
+// ── Notificar nuevo pedido ───────────────────────────────────────
+async function notificarNuevoPedido(pedidoId, total) {
+  await _enviarPushNtfy(
+    'Nuevo pedido recibido',
+    `Pedido #${pedidoId.substring(0,8).toUpperCase()} · ${total}`,
+    'shopping_bags'
+  );
+}
+
+// ── Notificar mensaje de cliente ─────────────────────────────────
+async function notificarMensajeAdmin(nombre, preview) {
+  await _enviarPushNtfy(
+    `Mensaje de ${nombre}`,
+    `"${preview}"`,
+    'speech_balloon'
+  );
 }
