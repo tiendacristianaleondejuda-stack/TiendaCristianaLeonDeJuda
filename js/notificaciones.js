@@ -1,6 +1,6 @@
 // ================================================================
 //  notificaciones.js — OneSignal + alertas de pedidos y mensajes
-//  Versión: Carga manual de la SDK
+//  Versión: Sin prompts automáticos
 // ================================================================
 
 const ONESIGNAL_APP_ID       = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
@@ -9,11 +9,12 @@ const SITE_URL  = 'https://tiendacristianaleondejuda.vercel.app/';
 const ICONO_URL = SITE_URL + 'assets/icons/icon-192x192.png';
 
 let oneSignalCargado = false;
+let oneSignalInicializado = false;
 
 // Función para cargar OneSignal dinámicamente
 function cargarOneSignal() {
   return new Promise((resolve, reject) => {
-    if (typeof window.OneSignal !== 'undefined' && window.OneSignal.initialized) {
+    if (window.OneSignal && oneSignalInicializado) {
       resolve(window.OneSignal);
       return;
     }
@@ -22,7 +23,6 @@ function cargarOneSignal() {
     script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
     script.async = true;
     script.onload = () => {
-      // Esperar a que OneSignal esté listo
       setTimeout(() => {
         if (window.OneSignal) {
           resolve(window.OneSignal);
@@ -36,26 +36,38 @@ function cargarOneSignal() {
   });
 }
 
-// Inicializar OneSignal
+// Inicializar OneSignal sin ningún prompt automático
 async function iniciarOneSignal() {
-  if (oneSignalCargado) return;
+  if (oneSignalInicializado) return;
   
   try {
     const OneSignal = await cargarOneSignal();
     
+    // Desactivar completamente los prompts automáticos
     await OneSignal.init({
       appId: ONESIGNAL_APP_ID,
       notifyButton: { enable: false },
       allowLocalhostAsSecureOrigin: true,
       promptOptions: {
         slidedown: {
-          enabled: false,
+          enabled: false,           // Desactivar slide down
+          autoPrompt: false,        // No mostrar automáticamente
+          customLink: {
+            enabled: false,          // Desactivar link personalizado
+          },
         },
+        autoPrompt: false,           // No mostrar prompt automático
+        actionMessage: false,        // No mostrar mensaje de acción
+        acceptButton: false,         // No mostrar botón de aceptar
+        cancelButton: false,         // No mostrar botón de cancelar
+      },
+      welcomeNotification: {
+        disable: true,               // Desactivar notificación de bienvenida
       },
     });
     
-    console.log('[OneSignal] Inicializado correctamente');
-    oneSignalCargado = true;
+    console.log('[OneSignal] Inicializado correctamente (sin prompts automáticos)');
+    oneSignalInicializado = true;
     
     // Registrar admin si está logueado
     try {
@@ -64,6 +76,8 @@ async function iniciarOneSignal() {
         await OneSignal.User.addTag('rol', 'admin');
         await OneSignal.User.addTag('email', user.email);
         console.info('[OneSignal] ✅ Admin registrado');
+      } else {
+        console.log('[OneSignal] Usuario no es admin:', user?.email);
       }
     } catch(e) {
       console.warn('[OneSignal] Error al registrar admin:', e);
@@ -117,7 +131,7 @@ async function pedirPermisoNotificaciones() {
   const estado = Notification?.permission || 'default';
 
   if (estado === 'denied') {
-    alert('⛔ Las notificaciones están BLOQUEADAS.\n\nPara activarlas:\n• Android Chrome: toca el candado 🔒 → Notificaciones → Permitir\n• PC Chrome: haz clic en el candado 🔒 → Notificaciones → Permitir');
+    alert('⛔ Las notificaciones están BLOQUEADAS.\n\nPara activarlas:\n• Android Chrome: toca el candado 🔒 → Notificaciones → Permitir\n• PC Chrome: haz clic en el candado 🔒 → Notificaciones → Permitir\n\nDespués recargá la página.');
     return;
   }
 
@@ -128,7 +142,7 @@ async function pedirPermisoNotificaciones() {
 
   try {
     // Asegurar que OneSignal esté inicializado
-    if (!oneSignalCargado) {
+    if (!oneSignalInicializado) {
       await iniciarOneSignal();
     }
     
@@ -148,6 +162,7 @@ async function pedirPermisoNotificaciones() {
       actualizarBotonNotif();
       alert('✅ ¡Alertas activadas! Recibirás notificaciones de pedidos y mensajes nuevos.');
     } else {
+      console.log('[OneSignal] Usuario rechazó el permiso');
       actualizarBotonNotif();
     }
   } catch(err) {
@@ -171,6 +186,12 @@ async function notificarMensajeAdmin(nombre, preview) {
 }
 
 async function _enviarPushAdmin(titulo, cuerpo) {
+  // No enviar si OneSignal no está inicializado
+  if (!oneSignalInicializado) {
+    console.log('[OneSignal] No inicializado, no se envía push');
+    return;
+  }
+  
   try {
     const response = await fetch('https://onesignal.com/api/v1/notifications', {
       method: 'POST',
@@ -194,12 +215,28 @@ async function _enviarPushAdmin(titulo, cuerpo) {
       if (data.errors && data.errors[0]?.includes('No subscribers')) {
         console.info('[OneSignal] Admin aún no activó las notificaciones push.');
       } else {
-        console.warn('[OneSignal] Error:', JSON.stringify(data.errors || data));
+        console.warn('[OneSignal] Error al enviar push:', JSON.stringify(data.errors || data));
       }
     } else {
       console.info('[OneSignal] ✅ Push enviado:', data.id);
     }
   } catch(err) {
     console.warn('[OneSignal] Error al enviar push:', err.message);
+  }
+}
+
+// Función para verificar el estado (útil para debug)
+async function verificarEstadoOneSignal() {
+  if (!oneSignalInicializado) {
+    console.log('OneSignal no inicializado');
+    return;
+  }
+  
+  const estado = Notification?.permission;
+  console.log('Permiso de notificaciones:', estado);
+  
+  if (window.OneSignal) {
+    const subscription = await window.OneSignal.User.getSubscription();
+    console.log('Suscripción OneSignal:', subscription);
   }
 }
