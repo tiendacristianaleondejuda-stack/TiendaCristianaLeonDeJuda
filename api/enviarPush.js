@@ -1,4 +1,13 @@
+// 👇 IMPORTANTE: forzar runtime node
+export const config = {
+  runtime: 'nodejs'
+};
+
 export default async function handler(req, res) {
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Método no permitido' });
+  }
 
   const ONESIGNAL_APP_ID = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
 
@@ -6,26 +15,28 @@ export default async function handler(req, res) {
 
   try {
 
+    const { titulo, mensaje } = req.body || {};
+
     const response = await fetch('https://onesignal.com/api/v1/notifications', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 👇 IMPORTANTE: este formato exacto
+        // 👇 CLAVE
         'Authorization': 'Key ' + ONESIGNAL_API_KEY,
       },
       body: JSON.stringify({
         app_id: ONESIGNAL_APP_ID,
         included_segments: ['All'],
-        headings: { es: 'Prueba' },
-        contents: { es: 'Notificación de prueba' },
+        headings: { es: titulo || 'Prueba' },
+        contents: { es: mensaje || 'Funciona' },
       }),
     });
 
     const data = await response.json();
 
-    res.status(200).json(data);
+    return res.status(200).json(data);
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
