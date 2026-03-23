@@ -440,48 +440,44 @@
     //  GUARDAR PERFIL
     // ────────────────────────────────────────────────────────
     async function guardarPerfil() {
-      const btn = document.getElementById('btn-save-perfil');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando…';
+  const btn = document.getElementById('btn-save-perfil');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando…';
 
-      const { error } = await sb.from('perfiles').upsert({
-        user_id:   usuarioActual.id,
-        nombre:    document.getElementById('p-nombre').value.trim(),
-        apellido:  document.getElementById('p-apellido').value.trim(),
-        telefono:  document.getElementById('p-tel').value.trim(),
-        direccion: document.getElementById('p-dir').value.trim(),
-        provincia: document.getElementById('p-provincia').value.trim(),
-        ciudad:    document.getElementById('p-ciudad').value.trim(),
-      });
+  const { error } = await sb.from('perfiles').upsert({
+    user_id:   usuarioActual.id,
+    nombre:    document.getElementById('p-nombre').value.trim(),
+    apellido:  document.getElementById('p-apellido').value.trim(),
+    telefono:  document.getElementById('p-tel').value.trim(),
+    direccion: document.getElementById('p-dir').value.trim(),
+    provincia: document.getElementById('p-provincia').value.trim(),
+    ciudad:    document.getElementById('p-ciudad').value.trim(),
+  });
 
-      btn.disabled = false;
-      btn.innerHTML = '<i class="bi bi-check-circle"></i> Guardar cambios';
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-check-circle"></i> Guardar cambios';
 
-      if (error) {
-        alert('Error al guardar: ' + error.message);
-        return;
-      }
+  if (error) {
+    alert('Error al guardar: ' + error.message);
+    return;
+  }
 
-      const nombre   = document.getElementById('p-nombre').value.trim();
-      const apellido = document.getElementById('p-apellido').value.trim();
-      if (nombre) {
-        document.getElementById('cuenta-nombre').textContent = nombre + (apellido ? ' ' + apellido : '');
-      }
+  // Actualizar nombre en UI y en pedidos
+  const nombre   = document.getElementById('p-nombre').value.trim();
+  const apellido = document.getElementById('p-apellido').value.trim();
+  if (nombre) {
+    const nombreCompleto = nombre + (apellido ? ' ' + apellido : '');
+    document.getElementById('cuenta-nombre').textContent = nombreCompleto;
+    // Actualizar nombre_cliente en pedidos existentes
+    await sb.from('pedidos')
+      .update({ nombre_cliente: nombreCompleto })
+      .eq('user_id', usuarioActual.id);
+  }
 
-      // Actualizar nombre_cliente en pedidos existentes del usuario
-      const nombre   = document.getElementById('p-nombre').value.trim();
-      const apellido = document.getElementById('p-apellido').value.trim();
-      if (nombre) {
-        const nombreCompleto = nombre + (apellido ? ' ' + apellido : '');
-        await sb.from('pedidos')
-          .update({ nombre_cliente: nombreCompleto })
-          .eq('user_id', usuarioActual.id);
-      }
-
-      const ok = document.getElementById('perfil-ok');
-      ok.style.display = 'flex';
-      setTimeout(() => ok.style.display = 'none', 3000);
-    }
+  const ok = document.getElementById('perfil-ok');
+  ok.style.display = 'flex';
+  setTimeout(() => ok.style.display = 'none', 3000);
+}
 
     // ────────────────────────────────────────────────────────
     //  CARGAR PEDIDOS
