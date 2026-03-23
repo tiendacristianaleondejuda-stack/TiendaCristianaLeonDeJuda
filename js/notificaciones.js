@@ -1,5 +1,6 @@
 // ================================================================
 //  notificaciones.js — OneSignal + alertas de pedidos y mensajes
+//  Versión: Carga manual de la SDK
 // ================================================================
 
 const ONESIGNAL_APP_ID       = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
@@ -7,70 +8,107 @@ const ONESIGNAL_REST_API_KEY = 'os_v2_app_tdlrlcue45dodhte6ylhr675a3zl264dujru6u
 const SITE_URL  = 'https://tiendacristianaleondejuda.vercel.app/';
 const ICONO_URL = SITE_URL + 'assets/icons/icon-192x192.png';
 
-// ⚠️ IMPORTANTE: Forzar la ruta del Service Worker ANTES de init
-window.OneSignal = window.OneSignal || [];
-window.OneSignal.push(function() {
-  window.OneSignal.SERVICE_WORKER_PATH = '/OneSignalSDKWorker.js';
-  window.OneSignal.SERVICE_WORKER_UPDATER_PATH = '/OneSignalSDKUpdaterWorker.js';
-});
+let oneSignalCargado = false;
 
-// Inicializar
-window.OneSignalDeferred = window.OneSignalDeferred || [];
+// Función para cargar OneSignal dinámicamente
+function cargarOneSignal() {
+  return new Promise((resolve, reject) => {
+    if (typeof window.OneSignal !== 'undefined' && window.OneSignal.initialized) {
+      resolve(window.OneSignal);
+      return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+    script.async = true;
+    script.onload = () => {
+      // Esperar a que OneSignal esté listo
+      setTimeout(() => {
+        if (window.OneSignal) {
+          resolve(window.OneSignal);
+        } else {
+          reject(new Error('OneSignal no disponible'));
+        }
+      }, 500);
+    };
+    script.onerror = () => reject(new Error('Error al cargar OneSignal'));
+    document.head.appendChild(script);
+  });
+}
 
-OneSignalDeferred.push(async function(OneSignal) {
+// Inicializar OneSignal
+async function iniciarOneSignal() {
+  if (oneSignalCargado) return;
+  
   try {
+    const OneSignal = await cargarOneSignal();
+    
     await OneSignal.init({
       appId: ONESIGNAL_APP_ID,
       notifyButton: { enable: false },
+      allowLocalhostAsSecureOrigin: true,
       promptOptions: {
         slidedown: {
           enabled: false,
         },
       },
     });
-
+    
     console.log('[OneSignal] Inicializado correctamente');
-
-    const user = await getUsuario?.();
-    if (user && user.email === 'tiendacristianaleondejuda@gmail.com') {
-      await OneSignal.User.addTag('rol', 'admin');
-      await OneSignal.User.addTag('email', user.email);
-      console.info('[OneSignal] ✅ Admin registrado');
+    oneSignalCargado = true;
+    
+    // Registrar admin si está logueado
+    try {
+      const user = await getUsuario?.();
+      if (user && user.email === 'tiendacristianaleondejuda@gmail.com') {
+        await OneSignal.User.addTag('rol', 'admin');
+        await OneSignal.User.addTag('email', user.email);
+        console.info('[OneSignal] ✅ Admin registrado');
+      }
+    } catch(e) {
+      console.warn('[OneSignal] Error al registrar admin:', e);
     }
-
+    
     actualizarBotonNotif();
-
+    
   } catch(err) {
-    console.warn('[OneSignal] Error:', err.message);
+    console.warn('[OneSignal] Error en init:', err.message);
     actualizarBotonNotif();
   }
-});
+}
+
+// Iniciar cuando la página cargue
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', iniciarOneSignal);
+} else {
+  iniciarOneSignal();
+}
 
 function actualizarBotonNotif() {
-  const btn   = document.getElementById('btn-notif');
-  const icon  = document.getElementById('notif-icon');
+  const btn = document.getElementById('btn-notif');
+  const icon = document.getElementById('notif-icon');
   const label = document.getElementById('notif-label');
   if (!btn) return;
 
   const estado = Notification?.permission || 'default';
 
   if (estado === 'granted') {
-    btn.style.color        = '#4ade80';
-    btn.style.borderColor  = 'rgba(74,222,128,.35)';
-    btn.style.background   = 'rgba(74,222,128,.1)';
-    if (icon)  icon.className  = 'bi bi-bell-fill';
+    btn.style.color = '#4ade80';
+    btn.style.borderColor = 'rgba(74,222,128,.35)';
+    btn.style.background = 'rgba(74,222,128,.1)';
+    if (icon) icon.className = 'bi bi-bell-fill';
     if (label) label.textContent = 'Alertas activas';
   } else if (estado === 'denied') {
-    btn.style.color        = '#f87171';
-    btn.style.borderColor  = 'rgba(248,113,113,.35)';
-    btn.style.background   = 'rgba(248,113,113,.1)';
-    if (icon)  icon.className  = 'bi bi-bell-slash';
+    btn.style.color = '#f87171';
+    btn.style.borderColor = 'rgba(248,113,113,.35)';
+    btn.style.background = 'rgba(248,113,113,.1)';
+    if (icon) icon.className = 'bi bi-bell-slash';
     if (label) label.textContent = 'Bloqueadas';
   } else {
-    btn.style.color        = '#7c8090';
-    btn.style.borderColor  = 'rgba(255,255,255,.12)';
-    btn.style.background   = 'rgba(255,255,255,.05)';
-    if (icon)  icon.className  = 'bi bi-bell';
+    btn.style.color = '#7c8090';
+    btn.style.borderColor = 'rgba(255,255,255,.12)';
+    btn.style.background = 'rgba(255,255,255,.05)';
+    if (icon) icon.className = 'bi bi-bell';
     if (label) label.textContent = 'Activar alertas';
   }
 }
@@ -79,40 +117,42 @@ async function pedirPermisoNotificaciones() {
   const estado = Notification?.permission || 'default';
 
   if (estado === 'denied') {
-    alert('Las notificaciones están BLOQUEADAS. Revisá la configuración del sitio.');
+    alert('⛔ Las notificaciones están BLOQUEADAS.\n\nPara activarlas:\n• Android Chrome: toca el candado 🔒 → Notificaciones → Permitir\n• PC Chrome: haz clic en el candado 🔒 → Notificaciones → Permitir');
     return;
   }
 
   if (estado === 'granted') {
-    alert('✅ Las alertas ya están activadas.');
+    alert('✅ Las alertas ya están activadas en este dispositivo.');
     return;
   }
 
   try {
+    // Asegurar que OneSignal esté inicializado
+    if (!oneSignalCargado) {
+      await iniciarOneSignal();
+    }
+    
     const resultado = await Notification.requestPermission();
 
     if (resultado === 'granted') {
-      window.OneSignalDeferred.push(async function(OneSignal) {
-        try { 
-          await OneSignal.Notifications.requestPermission(); 
-          console.log('[OneSignal] Permiso concedido');
-          
-          const user = await getUsuario?.();
-          if (user && user.email === 'tiendacristianaleondejuda@gmail.com') {
-            await OneSignal.User.addTag('rol', 'admin');
-            await OneSignal.User.addTag('email', user.email);
-          }
-        } catch(e) {
-          console.warn('[OneSignal] Error:', e);
+      if (window.OneSignal) {
+        await window.OneSignal.Notifications.requestPermission();
+        console.log('[OneSignal] Permiso concedido');
+        
+        const user = await getUsuario?.();
+        if (user && user.email === 'tiendacristianaleondejuda@gmail.com') {
+          await window.OneSignal.User.addTag('rol', 'admin');
+          await window.OneSignal.User.addTag('email', user.email);
         }
-      });
+      }
       actualizarBotonNotif();
-      alert('✅ ¡Alertas activadas!');
+      alert('✅ ¡Alertas activadas! Recibirás notificaciones de pedidos y mensajes nuevos.');
     } else {
       actualizarBotonNotif();
     }
   } catch(err) {
-    console.warn('[OneSignal] Error:', err.message);
+    console.warn('[OneSignal] Error al pedir permiso:', err.message);
+    alert('Error al activar notificaciones: ' + err.message);
   }
 }
 
@@ -145,16 +185,21 @@ async function _enviarPushAdmin(titulo, cuerpo) {
         contents: { en: cuerpo, es: cuerpo },
         url: SITE_URL + 'pages/admin/panel.html',
         chrome_web_icon: ICONO_URL,
+        priority: 10,
       }),
     });
     
     const data = await response.json();
     if (!response.ok) {
-      console.warn('[OneSignal] Error:', data.errors);
+      if (data.errors && data.errors[0]?.includes('No subscribers')) {
+        console.info('[OneSignal] Admin aún no activó las notificaciones push.');
+      } else {
+        console.warn('[OneSignal] Error:', JSON.stringify(data.errors || data));
+      }
     } else {
       console.info('[OneSignal] ✅ Push enviado:', data.id);
     }
   } catch(err) {
-    console.warn('[OneSignal] Error:', err.message);
+    console.warn('[OneSignal] Error al enviar push:', err.message);
   }
 }
