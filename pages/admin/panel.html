@@ -1773,9 +1773,9 @@ async function cambiarEstado(pedidoId, nuevoEstado) {
   else { badge.style.display = 'none'; }
 }
 
-let adminChatPedidoId  = null;
-let adminChatSuscripcion = null;
-let adminGlobalSuscripcion = null;  // ← canal global único
+let adminChatPedidoId     = null;
+let adminChatSuscripcion  = null;
+let adminGlobalSuscripcion = null;   // ← canal global único, evita duplicados
 
 async function verPedido(id) {
   const p = todosPedidos.find(x => x.id === id);
@@ -1905,7 +1905,19 @@ function suscribirMsgModal(pedidoId) {
       const lista = document.getElementById('admin-modal-msgs');
       if (!lista) return;
 
-      if (msg.remitente === 'admin') return; // ya mostrado optimistamente
+      // Si es del admin: actualizar el mensaje optimista (reemplazar ✓ por ✓✓)
+      // en vez de duplicarlo. Buscamos el último optimista sin id (id===null en el temp)
+      if (msg.remitente === 'admin') {
+        const optimistas = lista.querySelectorAll('[title="Enviando"]');
+        if (optimistas.length > 0) {
+          // Reemplazar el último optimista con el mensaje confirmado (tiene id real)
+          const ultimo = optimistas[optimistas.length - 1].closest('div');
+          if (ultimo) {
+            ultimo.outerHTML = adminModalMsgHTML(msg);
+          }
+        }
+        return;
+      }
 
       // Mensaje del cliente: mostrar + marcar leído + sonido suave
       const ph = lista.querySelector('[data-placeholder]');
@@ -1944,13 +1956,36 @@ async function enviarMsgAdmin() {
   input.value  = '';
   btn.disabled = true;
 
-  await sb.from('mensajes').insert({
+  // Mostrar mensaje optimistamente en la UI de inmediato
+  const lista = document.getElementById('admin-modal-msgs');
+  if (lista) {
+    const msgTemp = {
+      remitente: 'admin',
+      contenido: texto,
+      created_at: new Date().toISOString(),
+      id: null,   // sin id = palomita "enviando"
+      leido: false,
+    };
+    lista.insertAdjacentHTML('beforeend', adminModalMsgHTML(msgTemp));
+    lista.scrollTop = lista.scrollHeight;
+  }
+
+  const { error } = await sb.from('mensajes').insert({
     pedido_id: adminChatPedidoId,
     user_id:   null,
     remitente: 'admin',
     contenido: texto,
     leido:     false,
   });
+
+  if (error) {
+    // Revertir el mensaje optimista si falló
+    if (lista) {
+      const last = lista.lastElementChild;
+      if (last) last.remove();
+    }
+    toast('Error al enviar: ' + error.message, 'err');
+  }
 
   btn.disabled = false;
   input.focus();
