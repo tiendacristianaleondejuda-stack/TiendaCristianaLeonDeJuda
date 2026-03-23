@@ -4,7 +4,7 @@
 
 const ONESIGNAL_APP_ID       = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
 const ONESIGNAL_REST_API_KEY = 'os_v2_app_tdlrlcue45dodhte6ylhr675az4d5mgyz64ut2uekba42mb3fsu4c5mmtly5nen222xefwdym6hvhiovnjhadtjn5tlor3e6bpd3s5a';
-const SITE_URL  = 'https://leon-de-juda-v1.netlify.app';
+const SITE_URL  = 'https://tiendacristianaleondejuda.vercel.app/';
 const ICONO_URL = SITE_URL + '/assets/icons/icon-192x192.png';
 
 const ONESIGNAL_CONFIGURADO = ONESIGNAL_APP_ID !== 'TU_APP_ID_DE_ONESIGNAL_AQUI';
