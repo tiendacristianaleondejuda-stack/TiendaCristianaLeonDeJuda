@@ -1773,9 +1773,9 @@ async function cambiarEstado(pedidoId, nuevoEstado) {
   else { badge.style.display = 'none'; }
 }
 
-let adminChatPedidoId     = null;
-let adminChatSuscripcion  = null;
-let adminGlobalSuscripcion = null;   // ← canal global único, evita duplicados
+let adminChatPedidoId      = null;
+let adminChatSuscripcion   = null;
+let adminGlobalSuscripcion = null;
 
 async function verPedido(id) {
   const p = todosPedidos.find(x => x.id === id);
@@ -1896,7 +1896,7 @@ function suscribirMsgModal(pedidoId) {
   if (adminChatSuscripcion) adminChatSuscripcion.unsubscribe();
 
   adminChatSuscripcion = sb
-    .channel('admin-modal-' + pedidoId + '-' + Date.now())
+    .channel('admin-modal-chat')
     .on('postgres_changes', {
       event: 'INSERT', schema: 'public', table: 'mensajes',
       filter: `pedido_id=eq.${pedidoId}`,
@@ -1905,16 +1905,12 @@ function suscribirMsgModal(pedidoId) {
       const lista = document.getElementById('admin-modal-msgs');
       if (!lista) return;
 
-      // Si es del admin: actualizar el mensaje optimista (reemplazar ✓ por ✓✓)
-      // en vez de duplicarlo. Buscamos el último optimista sin id (id===null en el temp)
       if (msg.remitente === 'admin') {
+        // Actualizar burbuja optimista (✓ enviando → ✓✓ enviado)
         const optimistas = lista.querySelectorAll('[title="Enviando"]');
         if (optimistas.length > 0) {
-          // Reemplazar el último optimista con el mensaje confirmado (tiene id real)
-          const ultimo = optimistas[optimistas.length - 1].closest('div');
-          if (ultimo) {
-            ultimo.outerHTML = adminModalMsgHTML(msg);
-          }
+          const ultimo = optimistas[optimistas.length - 1].closest('div[style]');
+          if (ultimo) ultimo.outerHTML = adminModalMsgHTML(msg);
         }
         return;
       }
@@ -1956,34 +1952,23 @@ async function enviarMsgAdmin() {
   input.value  = '';
   btn.disabled = true;
 
-  // Mostrar mensaje optimistamente en la UI de inmediato
+  // Mostrar burbuja optimista de inmediato
   const lista = document.getElementById('admin-modal-msgs');
   if (lista) {
-    const msgTemp = {
-      remitente: 'admin',
-      contenido: texto,
-      created_at: new Date().toISOString(),
-      id: null,   // sin id = palomita "enviando"
-      leido: false,
-    };
-    lista.insertAdjacentHTML('beforeend', adminModalMsgHTML(msgTemp));
+    lista.insertAdjacentHTML('beforeend', adminModalMsgHTML({
+      remitente: 'admin', contenido: texto,
+      created_at: new Date().toISOString(), id: null, leido: false,
+    }));
     lista.scrollTop = lista.scrollHeight;
   }
 
   const { error } = await sb.from('mensajes').insert({
-    pedido_id: adminChatPedidoId,
-    user_id:   null,
-    remitente: 'admin',
-    contenido: texto,
-    leido:     false,
+    pedido_id: adminChatPedidoId, user_id: null,
+    remitente: 'admin', contenido: texto, leido: false,
   });
 
   if (error) {
-    // Revertir el mensaje optimista si falló
-    if (lista) {
-      const last = lista.lastElementChild;
-      if (last) last.remove();
-    }
+    if (lista) { const last = lista.lastElementChild; if (last) last.remove(); }
     toast('Error al enviar: ' + error.message, 'err');
   }
 
@@ -2388,13 +2373,12 @@ function mostrarAlertaAdmin(texto) {
 }
 
 async function iniciarSuscripcionMensajesGlobal() {
-  // Destruir canal anterior si existe (evita duplicados por doble llamada)
+  // Destruir canal anterior si existe (evita duplicados si se llama más de una vez)
   if (adminGlobalSuscripcion) {
     adminGlobalSuscripcion.unsubscribe();
     adminGlobalSuscripcion = null;
   }
 
-  // Pequeño delay para asegurar que Supabase esté inicializado
   await new Promise(r => setTimeout(r, 1000));
 
   adminGlobalSuscripcion = sb.channel('admin-global-mensajes')
@@ -2411,7 +2395,7 @@ async function iniciarSuscripcionMensajesGlobal() {
       const nombre  = msg.nombre_remitente || 'Un cliente';
       const preview = (msg.contenido || '').substring(0, 50) + (msg.contenido?.length > 50 ? '…' : '');
 
-      // Si el modal está abierto para ESTE pedido: agregar mensaje sin alerta
+      // Si el modal está abierto para ESTE pedido: mostrar sin alerta
       if (adminChatPedidoId === msg.pedido_id) {
         const lista = document.getElementById('admin-modal-msgs');
         if (lista) {
@@ -2422,10 +2406,10 @@ async function iniciarSuscripcionMensajesGlobal() {
         }
       }
 
-      // Alerta visual + sonido + notificación del sistema
+      // Alerta visual + sonido en el panel
       mostrarAlertaAdmin(`<strong>${nombre}</strong><br><small style="opacity:.8">"${preview}"</small>`);
 
-      // Badge en tabla de pedidos (si está visible)
+      // Badge en tabla de pedidos
       const idCorto = msg.pedido_id.substring(0,8).toUpperCase();
       document.querySelectorAll('#pedidos-tbody td:first-child').forEach(td => {
         if (td.textContent.includes(idCorto) && !td.querySelector('.msg-badge-vivo')) {
@@ -2435,17 +2419,13 @@ async function iniciarSuscripcionMensajesGlobal() {
         }
       });
 
-      // Enviar push OneSignal al móvil del admin
-      if (typeof notificarMensajeAdmin === 'function') {
-        notificarMensajeAdmin(nombre, preview);
-      }
+      // ⚠️ Push lo envía chat.html al insertar — no llamar acá para evitar duplicados
     })
     .subscribe(status => {
       console.log('[Admin Chat] Canal global:', status);
     });
 }
 
-// notificarMensajeAdmin definida en notificaciones.js
 
 // Cerrar modales al hacer clic fuera
 document.getElementById('modal-producto').addEventListener('click', e => { if (e.target === e.currentTarget) cerrarModalProducto(); });
