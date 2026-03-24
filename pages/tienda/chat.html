@@ -317,6 +317,7 @@
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase-config.js"></script>
+  <script src="/js/notificaciones.js"></script>
 
   <script>
     let usuarioActual  = null;
@@ -500,13 +501,21 @@
       input.value  = '';
       btnSend.disabled = true;
 
+      const nombreRemitente = usuarioActual._nombre || usuarioActual.email.split('@')[0];
+
       const { error } = await sb.from('mensajes').insert({
-        pedido_id: pedidoActual,
-        user_id:   usuarioActual.id,
-        remitente: 'cliente',
-        contenido: texto,
-        leido:     false,
+        pedido_id:        pedidoActual,
+        user_id:          usuarioActual.id,
+        remitente:        'cliente',
+        nombre_remitente: nombreRemitente,
+        contenido:        texto,
+        leido:            false,
       });
+
+      if (!error && typeof notificarMensajeAdmin === 'function') {
+        const preview = texto.substring(0, 50) + (texto.length > 50 ? '…' : '');
+        notificarMensajeAdmin(nombreRemitente, preview);
+      }
 
       btnSend.disabled = false;
       if (error) console.error('Error al enviar:', error.message);
