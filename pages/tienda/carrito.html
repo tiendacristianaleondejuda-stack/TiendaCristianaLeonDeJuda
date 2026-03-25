@@ -589,43 +589,41 @@
     if (itemsError) throw itemsError;
 
     // 3. Si eligió MercadoPago
-    if (metodoPago === 'mercadopago') {
-      // TU PUBLIC KEY - Ya la incorporé con tus datos
-      const mp = new MercadoPago('APP_USR-7fe2fa9b-d1d2-4aa0-802c-6d637d728e3a');
-      
-      const mpItems = carrito.items.map(i => ({
-        title: i.nombre,
-        quantity: i.cantidad,
-        unit_price: i.precio
-      }));
+if (metodoPago === 'mercadopago') {
+  
+  const mpItems = carrito.items.map(i => ({
+    title: i.nombre,
+    quantity: i.cantidad,
+    unit_price: i.precio
+  }));
 
-      // Llamar a la Edge Function
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/create-preference`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
-          items: mpItems,
-          pedidoId: pedido.id,
-          total,
-          email: user.email
-        })
-      });
+  // Llamar a la Edge Function
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/create-preference`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+    },
+    body: JSON.stringify({
+      items: mpItems,
+      pedidoId: pedido.id,
+      total,
+      email: user.email
+    })
+  });
 
-      const data = await response.json();
-      
-      if (data.init_point) {
-        // Vaciar carrito solo después de redirigir
-        Carrito.vaciar();
-        // Redirigir a Mercado Pago
-        window.location.href = data.init_point;
-        return;
-      } else {
-        throw new Error('Error al crear preferencia de pago');
-      }
-    }
+  const data = await response.json();
+  
+  if (data.init_point) {
+    // Vaciar carrito solo después de redirigir
+    Carrito.vaciar();
+    // Redirigir a Mercado Pago
+    window.location.href = data.init_point;
+    return;
+  } else {
+    throw new Error('Error al crear preferencia de pago');
+  }
+}
 
     // 4. Para otros métodos de pago
     Carrito.vaciar();
