@@ -79,25 +79,34 @@
   <script src="/js/supabase-config.js"></script>
   <script>
     (async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const pedidoId = urlParams.get('id');
-      
-      if (pedidoId) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pedidoId = urlParams.get('id');
+    
+    if (pedidoId) {
         // Actualizar estado del pedido a "confirmado"
         await sb.from('pedidos').update({ estado: 'confirmado' }).eq('id', pedidoId);
         
-        // Notificar al admin (si existe la función)
-        if (typeof window.notificarNuevoPedido === 'function') {
-          try {
-            const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
-            if (pedido) {
-              const formatearPrecio = (num) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(num);
-              await notificarNuevoPedido(pedidoId, formatearPrecio(pedido.total));
-            }
-          } catch(e) {}
+        // ✅ Vaciar el carrito recién aquí, cuando el pago fue exitoso
+        if (typeof Carrito !== 'undefined') {
+            Carrito.vaciar();
+        } else {
+            localStorage.removeItem('carrito'); // fallback directo
         }
-      }
-    })();
+        // Limpiar el pedido pendiente
+        localStorage.removeItem('mp_pedido_pendiente');
+        
+        // Notificar al admin
+        if (typeof window.notificarNuevoPedido === 'function') {
+            try {
+                const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
+                if (pedido) {
+                    const formatearPrecio = (num) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(num);
+                    await notificarNuevoPedido(pedidoId, formatearPrecio(pedido.total));
+                }
+            } catch(e) {}
+        }
+    }
+})();
   </script>
 </body>
 </html>
