@@ -395,6 +395,9 @@
   <script src="/js/supabase-config.js"></script>
   <script src="/js/notificaciones.js"></script>
 
+  <!-- SDK de Mercado Pago -->
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       await actualizarNavbarAuth();
@@ -534,86 +537,117 @@
     }
 
     async function confirmarPedido() {
-      const direccion  = document.getElementById('checkout-dir').value.trim();
-      const provincia  = document.getElementById('checkout-prov').value.trim();
-      const ciudad     = document.getElementById('checkout-ciudad').value.trim();
-      const telefono   = document.getElementById('checkout-tel').value.trim();
-      const notas      = document.getElementById('checkout-notas').value.trim();
-      const metodoPago = document.querySelector('input[name="metodo_pago"]:checked')?.value || 'transferencia';
+  const direccion  = document.getElementById('checkout-dir').value.trim();
+  const provincia  = document.getElementById('checkout-prov').value.trim();
+  const ciudad     = document.getElementById('checkout-ciudad').value.trim();
+  const telefono   = document.getElementById('checkout-tel').value.trim();
+  const notas      = document.getElementById('checkout-notas').value.trim();
+  const metodoPago = document.querySelector('input[name="metodo_pago"]:checked')?.value || 'transferencia';
 
-      if (!direccion) {
-        alert('Por favor ingresá la dirección de envío.');
-        return;
-      }
+  if (!direccion) {
+    alert('Por favor ingresá la dirección de envío.');
+    return;
+  }
 
-      const btn   = document.getElementById('btn-confirm-order');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando…';
+  const btn   = document.getElementById('btn-confirm-order');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando…';
 
-      const user = await getUsuario();
-      if (!user) { location.href = '/login.html'; return; }
+  const user = await getUsuario();
+  if (!user) { location.href = '/login.html'; return; }
 
-      const carrito = Carrito.get();
-      const total   = Carrito.total();
+  const carrito = Carrito.get();
+  const total   = Carrito.total();
 
-      try {
-        // 1. Crear el pedido
-        const { data: pedido, error: pedidoError } = await sb
-          .from('pedidos')
-          .insert({
-            user_id:         user.id,
-            nombre_cliente:  window._checkoutNombreCliente || null,
-            estado:          'pendiente',
-            total,
-            metodo_pago:     metodoPago,
-            direccion_envio: { direccion, provincia, ciudad, telefono, notas },
-          })
-          .select()
-          .single();
+  try {
+    // 1. Crear el pedido
+    const { data: pedido, error: pedidoError } = await sb
+      .from('pedidos')
+      .insert({
+        user_id:         user.id,
+        nombre_cliente:  window._checkoutNombreCliente || null,
+        estado:          'pendiente_pago',
+        total,
+        metodo_pago:     metodoPago,
+        direccion_envio: { direccion, provincia, ciudad, telefono, notas },
+      })
+      .select()
+      .single();
 
-        if (pedidoError) throw pedidoError;
+    if (pedidoError) throw pedidoError;
 
-        // 2. Crear los items del pedido
-        const items = carrito.items.map(i => ({
-          pedido_id:      pedido.id,
-          producto_id:    i.id,
-          cantidad:       i.cantidad,
-          talla:          i.talla,
-          precio_unitario: i.precio,
-        }));
+    // 2. Crear los items del pedido
+    const items = carrito.items.map(i => ({
+      pedido_id:      pedido.id,
+      producto_id:    i.id,
+      cantidad:       i.cantidad,
+      talla:          i.talla,
+      precio_unitario: i.precio,
+    }));
 
-        const { error: itemsError } = await sb.from('pedido_items').insert(items);
-        if (itemsError) throw itemsError;
+    const { error: itemsError } = await sb.from('pedido_items').insert(items);
+    if (itemsError) throw itemsError;
 
-        // 3. Vaciar el carrito
+    // 3. Si eligió MercadoPago
+    if (metodoPago === 'mercadopago') {
+      // TU PUBLIC KEY - Ya la incorporé con tus datos
+      const mp = new MercadoPago('APP_USR-7fe2fa9b-d1d2-4aa0-802c-6d637d728e3a');
+      
+      const mpItems = carrito.items.map(i => ({
+        title: i.nombre,
+        quantity: i.cantidad,
+        unit_price: i.precio
+      }));
+
+      // Llamar a la Edge Function
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/create-preference`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          items: mpItems,
+          pedidoId: pedido.id,
+          total,
+          email: user.email
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.init_point) {
+        // Vaciar carrito solo después de redirigir
         Carrito.vaciar();
-        cerrarModal();
-
-        // 4. Notificar al admin por OneSignal
-        try {
-          if (typeof notificarNuevoPedido === 'function') {
-            await notificarNuevoPedido(pedido.id, formatearPrecio(total));
-          }
-        } catch(e) { console.warn('Notificación no enviada:', e); }
-
-        // 4. Mostrar éxito
-        document.getElementById('page-content').innerHTML = `
-          <div class="vacio">
-            <i class="bi bi-check-circle" style="color:#16a34a;opacity:1"></i>
-            <h2>¡Pedido confirmado!</h2>
-            <p>Recibimos tu pedido. Te contactaremos a la brevedad para coordinar el envío.</p>
-            <a href="/index.html" class="btn-ir-tienda">
-              <i class="bi bi-bag"></i> Seguir comprando
-            </a>
-          </div>`;
-
-      } catch (err) {
-        console.error('Error al crear pedido:', err);
-        alert('Ocurrió un error al procesar el pedido. Intentá nuevamente.');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-check-circle"></i> Confirmar pedido';
+        // Redirigir a Mercado Pago
+        window.location.href = data.init_point;
+        return;
+      } else {
+        throw new Error('Error al crear preferencia de pago');
       }
     }
+
+    // 4. Para otros métodos de pago
+    Carrito.vaciar();
+    cerrarModal();
+
+    document.getElementById('page-content').innerHTML = `
+      <div class="vacio">
+        <i class="bi bi-check-circle" style="color:#16a34a;opacity:1"></i>
+        <h2>¡Pedido confirmado!</h2>
+        <p>Recibimos tu pedido. Te contactaremos a la brevedad para coordinar el envío y pago.</p>
+        <a href="/index.html" class="btn-ir-tienda">
+          <i class="bi bi-bag"></i> Seguir comprando
+        </a>
+      </div>`;
+
+  } catch (err) {
+    console.error('Error al crear pedido:', err);
+    alert('Ocurrió un error al procesar el pedido. Intentá nuevamente.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-check-circle"></i> Confirmar pedido';
+  }
+}
 
     function cerrarModal() {
       document.getElementById('modal-checkout').classList.remove('open');
