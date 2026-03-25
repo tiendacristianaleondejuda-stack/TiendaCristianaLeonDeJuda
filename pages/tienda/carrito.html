@@ -598,7 +598,7 @@ if (metodoPago === 'mercadopago') {
   }));
 
   // Llamar a la Edge Function
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/create-preference`, {
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/dynamic-worker`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
