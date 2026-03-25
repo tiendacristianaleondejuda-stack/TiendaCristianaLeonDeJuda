@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pago exitoso - León de Judá</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f0e8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .card {
+      max-width: 480px;
+      background: white;
+      border-radius: 24px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+    }
+    .icon {
+      width: 80px;
+      height: 80px;
+      background: #dcfce7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    .icon i { font-size: 2.5rem; color: #166534; }
+    h1 { font-size: 1.6rem; margin-bottom: 0.75rem; color: #1c1917; }
+    p { color: #78716c; margin-bottom: 1.5rem; line-height: 1.5; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #1c1917;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #2c2520; }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 0.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">
+      <i class="bi bi-check-circle-fill"></i>
+    </div>
+    <h1>¡Pago exitoso! ✅</h1>
+    <p>Tu pedido ha sido confirmado. Recibirás un correo con los detalles de envío.</p>
+    <a href="/index.html" class="btn">
+      <i class="bi bi-shop"></i> Volver a la tienda
+    </a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js"></script>
+  <script>
+    (async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pedidoId = urlParams.get('id');
+      
+      if (pedidoId) {
+        // Actualizar estado del pedido a "confirmado"
+        await sb.from('pedidos').update({ estado: 'confirmado' }).eq('id', pedidoId);
+        
+        // Notificar al admin (si existe la función)
+        if (typeof window.notificarNuevoPedido === 'function') {
+          try {
+            const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
+            if (pedido) {
+              const formatearPrecio = (num) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(num);
+              await notificarNuevoPedido(pedidoId, formatearPrecio(pedido.total));
+            }
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
