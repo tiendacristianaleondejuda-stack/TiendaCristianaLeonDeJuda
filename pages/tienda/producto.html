@@ -230,6 +230,24 @@
     }
 
     .talla-btn:hover  { border-color: var(--gold); color: var(--gold); }
+
+    .talla-btn.sin-stock {
+      opacity: .38;
+      cursor: not-allowed;
+      text-decoration: line-through;
+      border-style: dashed;
+    }
+    .talla-btn.sin-stock:hover { border-color: var(--border); color: var(--text); }
+
+    .stock-info-tag {
+      display: inline-flex; align-items: center; gap: .3rem;
+      font-size: .72rem; font-weight: 600;
+      padding: .2rem .6rem; border-radius: 50px;
+      margin-bottom: 1rem;
+    }
+    .stock-ok   { background: #dcfce7; color: #166534; }
+    .stock-low  { background: #fef3c7; color: #92400e; }
+    .stock-none { background: #fee2e2; color: #991b1b; }
     .talla-btn.sel    { background: var(--text); border-color: var(--text); color: white; }
 
     .guia-tallas {
@@ -408,13 +426,34 @@
            </div>`
         : '';
 
-      // Tallas
-      const tallas = data.tallas?.length ? data.tallas : ['Única'];
-      if (tallas.length === 1) tallaSeleccionada = tallas[0];
+      // Tallas + stock por talla
+      const tallas       = data.tallas?.length ? data.tallas : ['Única'];
+      const spt          = data.stock_por_talla || {};
+      // Fallback: if no stock_por_talla, distribute total stock across all sizes
+      const getStockTalla = t => (spt && Object.keys(spt).length) ? (spt[t] ?? 0) : (data.stock ?? 99);
 
-      const tallasHTML = tallas.map(t =>
-        `<button class="talla-btn ${tallas.length===1?'sel':''}" onclick="selTalla('${t}',this)">${t}</button>`
-      ).join('');
+      if (tallas.length === 1 && getStockTalla(tallas[0]) > 0) tallaSeleccionada = tallas[0];
+
+      const tallasHTML = tallas.map(t => {
+        const st = getStockTalla(t);
+        const sinStock = st === 0;
+        const isAuto = tallas.length === 1 && !sinStock;
+        return `<button class="talla-btn ${isAuto?'sel':''} ${sinStock?'sin-stock':''}"
+          onclick="${sinStock ? 'void(0)' : `selTalla('${t}',this)`}"
+          ${sinStock ? 'disabled' : ''}
+          data-stock="${st}">${t}</button>`;
+      }).join('');
+
+      // General stock status tag
+      const totalStock = data.stock ?? 0;
+      let stockTagHTML = '';
+      if (totalStock === 0) {
+        stockTagHTML = '<span class="stock-info-tag stock-none"><i class="bi bi-x-circle-fill"></i> Sin stock</span>';
+      } else if (totalStock <= 5) {
+        stockTagHTML = `<span class="stock-info-tag stock-low"><i class="bi bi-exclamation-circle-fill"></i> Últimas unidades</span>`;
+      } else {
+        stockTagHTML = `<span class="stock-info-tag stock-ok"><i class="bi bi-check-circle-fill"></i> Disponible</span>`;
+      }
 
       document.getElementById('prod-layout').innerHTML = `
         <!-- GALERÍA (arriba en mobile, izquierda en desktop) -->
@@ -439,8 +478,11 @@
 
           <hr class="divider">
 
+          ${stockTagHTML}
+
           <p class="sec-label">Talla</p>
           <div class="tallas-wrap">${tallasHTML}</div>
+          <p id="stock-talla-info" style="font-size:.75rem;color:var(--text-muted);margin-top:-.5rem;margin-bottom:1rem;min-height:1.2em"></p>
           <p class="guia-tallas"><i class="bi bi-rulers"></i> Ver guía de tallas</p>
 
           <p class="sec-label">Cantidad</p>
@@ -450,10 +492,10 @@
             <button class="qty-btn" onclick="cambiarCantidad(1)">+</button>
           </div>
 
-          <button class="btn-agregar" id="btn-agregar" onclick="agregarCarrito()" ${!tallaSeleccionada?'disabled':''}>
+          <button class="btn-agregar" id="btn-agregar" onclick="agregarCarrito()" ${totalStock===0||!tallaSeleccionada?'disabled':''}>
             <i class="bi bi-bag-plus"></i> Agregar al carrito
           </button>
-          <button class="btn-comprar" id="btn-comprar" onclick="comprarAhora()" ${!tallaSeleccionada?'disabled':''}>
+          <button class="btn-comprar" id="btn-comprar" onclick="comprarAhora()" ${totalStock===0||!tallaSeleccionada?'disabled':''}>
             <i class="bi bi-credit-card"></i> Comprar ahora
           </button>
 
@@ -496,10 +538,29 @@
       btn.classList.add('sel');
       document.getElementById('btn-agregar').disabled = false;
       document.getElementById('btn-comprar').disabled = false;
+
+      // Show stock info for selected talla
+      const maxStock = parseInt(btn.dataset.stock ?? '99');
+      const infoEl   = document.getElementById('stock-talla-info');
+      if (infoEl) {
+        if (maxStock <= 0) {
+          infoEl.innerHTML = '<span style="color:#991b1b">Sin stock en esta talla</span>';
+        } else if (maxStock <= 3) {
+          infoEl.innerHTML = `<span style="color:#92400e">⚠ Últimas ${maxStock} en talle ${t}</span>`;
+        } else {
+          infoEl.innerHTML = `<span style="color:#166534">✓ ${maxStock} disponibles en talle ${t}</span>`;
+        }
+        // Adjust quantity to not exceed stock
+        cantidad = Math.min(cantidad, maxStock);
+        const qEl = document.getElementById('qty-num');
+        if (qEl) qEl.textContent = cantidad;
+      }
     }
 
     function cambiarCantidad(d) {
-      cantidad = Math.max(1, cantidad + d);
+      const selBtn   = document.querySelector('.talla-btn.sel');
+      const maxStock = selBtn ? (parseInt(selBtn.dataset.stock) || 99) : 99;
+      cantidad = Math.max(1, Math.min(maxStock, cantidad + d));
       document.getElementById('qty-num').textContent = cantidad;
     }
 
