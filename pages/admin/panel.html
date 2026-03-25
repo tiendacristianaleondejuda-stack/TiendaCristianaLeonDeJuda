@@ -1216,10 +1216,7 @@
             <option value="accesorios">Accesorios</option>
           </select>
         </div>
-        <div class="field">
-          <label class="field-label">Stock</label>
-          <input type="number" class="field-input" id="prod-stock" min="0" value="0">
-        </div>
+        <input type="hidden" id="prod-stock" value="0">
         <div class="field">
           <label class="field-label">Precio de venta *</label>
           <input type="number" class="field-input" id="prod-precio" min="0" placeholder="Ej: 4500">
@@ -1230,8 +1227,14 @@
         </div>
         <div class="field" style="grid-column:1/-1">
           <label class="field-label">Tallas disponibles</label>
-          <input type="text" class="field-input" id="prod-tallas" placeholder='Ej: XS, S, M, L, XL  (separadas por coma)'>
+          <input type="text" class="field-input" id="prod-tallas" placeholder='Ej: XS, S, M, L, XL  (separadas por coma)' oninput="generarCamposStockTalla()">
           <p class="field-hint">Dejá vacío si el producto tiene talla única.</p>
+        </div>
+        <div class="field" style="grid-column:1/-1" id="stock-por-talla-wrap">
+          <label class="field-label">Stock por talla</label>
+          <div id="stock-tallas-grid" style="display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.5rem;padding:.85rem;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+            <!-- generado dinámicamente -->
+          </div>
         </div>
         <div class="field" style="grid-column:1/-1">
           <label class="field-label">Descripción</label>
@@ -1447,7 +1450,19 @@ function renderTablaProductos(lista) {
         </div>
       </td>
       <td style="font-weight:700">${formatearPrecio(p.precio)}</td>
-      <td>${p.stock ?? '—'}</td>
+      <td>
+        ${(() => {
+          const spt = p.stock_por_talla;
+          if (spt && Object.keys(spt).length) {
+            return Object.entries(spt).map(([t, n]) => {
+              const col = n === 0 ? 'var(--red)' : n <= 3 ? 'var(--orange)' : 'var(--green)';
+              const bg  = n === 0 ? 'var(--red-dim)' : n <= 3 ? 'var(--orange-dim)' : 'var(--green-dim)';
+              return '<span style="display:inline-flex;align-items:center;gap:.2rem;background:'+bg+';color:'+col+';padding:.15rem .45rem;border-radius:4px;font-size:.68rem;font-weight:700;margin:.1rem">'+t+': '+n+'</span>';
+            }).join('');
+          }
+          return '<span style="color:var(--text-muted)">'+(p.stock ?? '—')+'</span>';
+        })()}
+      </td>
       <td>
         ${p.activo ? '<span class="badge badge-green">Activo</span>' : '<span class="badge badge-muted">Inactivo</span>'}
         ${p.destacado ? ' <span class="badge badge-accent">Destacado</span>' : ''}
@@ -1476,8 +1491,25 @@ function cerrarModalProducto() {
   document.getElementById('modal-producto').classList.remove('open');
 }
 
+
+// ─── Stock por talla ───
+function generarCamposStockTalla(stockPorTalla = {}) {
+  const tallasRaw = document.getElementById('prod-tallas').value;
+  const tallas    = tallasRaw ? tallasRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+  const grid      = document.getElementById('stock-tallas-grid');
+  if (!grid) return;
+
+  const lista = tallas.length ? tallas : ['Única'];
+  grid.innerHTML = lista.map(t => `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem">
+      <span style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)">${t}</span>
+      <input type="number" class="field-input" id="stock-talla-${t}" min="0" value="${stockPorTalla[t] ?? 0}"
+        style="width:72px;text-align:center;padding:.5rem .25rem;font-size:.9rem">
+    </div>`).join('');
+}
+
 function limpiarFormProducto() {
-  ['prod-nombre','prod-cat','prod-stock','prod-precio','prod-precio-orig','prod-tallas','prod-descripcion'].forEach(id => {
+  ['prod-nombre','prod-cat','prod-precio','prod-precio-orig','prod-tallas','prod-descripcion'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -1485,6 +1517,7 @@ function limpiarFormProducto() {
   document.getElementById('prod-destacado').checked = false;
   document.getElementById('prod-stock').value       = '0';
   document.getElementById('img-preview-grid').innerHTML = '';
+  generarCamposStockTalla({});
   document.getElementById('img-progress').style.display = 'none';
   document.getElementById('prod-error').style.display   = 'none';
 }
@@ -1503,12 +1536,14 @@ function editarProducto(id) {
   document.getElementById('prod-precio').value       = prod.precio || '';
   document.getElementById('prod-precio-orig').value  = prod.precio_original || '';
   document.getElementById('prod-tallas').value       = (prod.tallas || []).join(', ');
+  generarCamposStockTalla(prod.stock_por_talla || {});
   document.getElementById('prod-descripcion').value  = prod.descripcion || '';
   document.getElementById('prod-activo').checked     = prod.activo !== false;
   document.getElementById('prod-destacado').checked  = !!prod.destacado;
   document.getElementById('prod-error').style.display = 'none';
 
   renderPreviews();
+  generarCamposStockTalla(prod.stock_por_talla || {});
   document.getElementById('modal-producto').classList.add('open');
 }
 
@@ -1539,10 +1574,22 @@ async function guardarProducto() {
   const tallasRaw = document.getElementById('prod-tallas').value;
   const tallas    = tallasRaw ? tallasRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
 
+  // Recolectar stock por talla
+  const tallasParaStock = tallas.length ? tallas : ['Única'];
+  const stockPorTalla   = {};
+  let   stockTotal      = 0;
+  tallasParaStock.forEach(t => {
+    const el = document.getElementById('stock-talla-' + t);
+    const v  = parseInt(el?.value) || 0;
+    stockPorTalla[t] = v;
+    stockTotal += v;
+  });
+
   const payload = {
     nombre,
     categoria:      document.getElementById('prod-cat').value,
-    stock:          parseInt(document.getElementById('prod-stock').value) || 0,
+    stock:          stockTotal,
+    stock_por_talla: stockPorTalla,
     precio,
     precio_original: parseFloat(document.getElementById('prod-precio-orig').value) || null,
     tallas,
@@ -1727,11 +1774,11 @@ function renderTablaPedidos(lista) {
     const metodoIcon = { transferencia:'🏦', mercadopago:'MP', efectivo:'💵', tarjeta:'💳' }[metodo] || '—';
     const nl       = p._mensajes_nuevos || 0;
 
-    return `<tr onclick="verPedido('${p.id}')" style="cursor:pointer">
+    return `<tr>
       <td>
         <div style="display:flex;flex-direction:column;gap:.15rem">
           <span style="font-weight:700;font-size:.875rem">${nombre}</span>
-          <span style="font-family:monospace;font-size:.65rem;color:var(--accent)">
+          <span style="font-family:monospace;font-size:.65rem;color:var(--accent);cursor:pointer" onclick="verPedido('${p.id}')">
             # ${p.id.substring(0,8).toUpperCase()}
             ${nl > 0 ? `<span style="margin-left:.25rem;background:var(--accent);color:#111;font-size:.6rem;font-weight:800;padding:.1rem .3rem;border-radius:50px">💬 ${nl}</span>` : ''}
           </span>
@@ -1748,7 +1795,7 @@ function renderTablaPedidos(lista) {
       </td>
       <td style="font-weight:700">${formatearPrecio(p.total)}</td>
       <td>${estadoBadge(p.estado)}</td>
-      <td onclick="event.stopPropagation()">
+      <td>
         <select class="estado-select" onchange="cambiarEstado('${p.id}', this.value)" title="Cambiar estado">
           ${['pendiente','confirmado','enviado','entregado','cancelado'].map(e =>
             `<option value="${e}" ${p.estado === e ? 'selected' : ''}>${capitalizar(e)}</option>`
