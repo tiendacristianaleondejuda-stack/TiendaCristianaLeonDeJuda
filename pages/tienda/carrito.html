@@ -615,14 +615,12 @@ if (metodoPago === 'mercadopago') {
   const data = await response.json();
   
   if (data.init_point) {
-    // Vaciar carrito solo después de redirigir
-    Carrito.vaciar();
+    // Guardar el pedidoId pendiente, NO vaciar el carrito todavía
+    localStorage.setItem('mp_pedido_pendiente', pedido.id);
     // Redirigir a Mercado Pago
     window.location.href = data.init_point;
     return;
-  } else {
-    throw new Error('Error al crear preferencia de pago');
-  }
+}
 }
 
     // 4. Para otros métodos de pago
