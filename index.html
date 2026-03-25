@@ -416,7 +416,8 @@
       border-radius: 3px;
     }
 
-    .prod-badge.oferta { background: var(--red); }
+    .prod-badge.oferta   { background: var(--red); }
+    .prod-badge.agotado  { background: #78716c; }
 
     .btn-add {
       position: absolute;
@@ -557,6 +558,8 @@
     }
 
     .talla-btn:hover  { border-color: var(--gold); color: var(--gold); }
+    .talla-btn.sin-stock { opacity:.38; cursor:not-allowed; text-decoration:line-through; border-style:dashed; }
+    .talla-btn.sin-stock:hover { border-color:var(--border); color:var(--text); }
     .talla-btn.sel    { background: var(--text); border-color: var(--text); color: white; }
 
     .btn-confirm {
@@ -923,17 +926,21 @@
         const img    = p.imagen_url || 'https://placehold.co/400x530/e4dac8/78716c?text=Foto';
         const precio = formatearPrecio(p.precio);
         const orig   = p.precio_original ? formatearPrecio(p.precio_original) : '';
-        const badge  = p.destacado ? '<span class="prod-badge">Destacado</span>'
-                      : p.precio_original ? '<span class="prod-badge oferta">Oferta</span>' : '';
+        const stockTotal = p.stock ?? 99;
+        const badge  = stockTotal === 0
+          ? '<span class="prod-badge agotado">Agotado</span>'
+          : p.destacado
+            ? '<span class="prod-badge">Destacado</span>'
+            : p.precio_original
+              ? '<span class="prod-badge oferta">Oferta</span>'
+              : '';
         const pdata  = JSON.stringify(p).replace(/"/g,'&quot;');
         return `
           <div class="prod-card" onclick="irA('${p.id}')">
             <div class="prod-img">
               <img src="${img}" alt="${p.nombre}" loading="lazy" onerror="this.src='https://placehold.co/400x530/e4dac8/78716c?text=Foto'">
               ${badge}
-              <button class="btn-add" title="Agregar" onclick="event.stopPropagation();abrirModal(${pdata})">
-                <i class="bi bi-plus"></i>
-              </button>
+              ${stockTotal > 0 ? `<button class="btn-add" title="Agregar" onclick="event.stopPropagation();abrirModal(${pdata})"><i class="bi bi-plus"></i></button>` : ''}
             </div>
             <p class="prod-nombre">${p.nombre}</p>
             <p class="prod-cat">${p.categoria || ''}</p>
@@ -952,8 +959,19 @@
       document.getElementById('modal-titulo-prod').textContent = prod.nombre;
       document.getElementById('modal-confirm').disabled = true;
       const tallas = prod.tallas?.length ? prod.tallas : ['Única'];
-      document.getElementById('modal-tallas').innerHTML = tallas.map(t =>
-        `<button class="talla-btn" onclick="selTalla('${t}',this)">${t}</button>`).join('');
+      const spt    = prod.stock_por_talla || {};
+      const getStock = t => (Object.keys(spt).length) ? (spt[t] ?? 0) : (prod.stock ?? 99);
+      document.getElementById('modal-tallas').innerHTML = tallas.map(t => {
+        const st = getStock(t);
+        const agotado = st === 0;
+        const label = agotado
+          ? `${t} <span style="font-size:.6rem;font-weight:700;background:#fee2e2;color:#991b1b;padding:.1rem .3rem;border-radius:3px;margin-left:.2rem">SIN STOCK</span>`
+          : (st <= 3
+            ? `${t} <span style="font-size:.6rem;font-weight:700;background:#fef3c7;color:#92400e;padding:.1rem .3rem;border-radius:3px;margin-left:.2rem">×${st}</span>`
+            : t);
+        return `<button class="talla-btn ${agotado?'sin-stock':''}" ${agotado?'disabled':''} data-stock="${st}"
+          onclick="${agotado?'void(0)':`selTalla('${t}',this)`}">${label}</button>`;
+      }).join('');
       document.getElementById('modal-talla').classList.add('open');
     }
 
