@@ -638,13 +638,12 @@
     /* ─── Despacho ─── */
     .despacho-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
       margin-bottom: 2rem;
     }
 
-    @media (max-width: 900px)  { .despacho-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 600px)  { .despacho-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 700px)  { .despacho-grid { grid-template-columns: 1fr; } }
 
     .despacho-col {
       background: var(--bg2);
@@ -1134,12 +1133,18 @@
     <!-- ══════════ DESPACHO ══════════ -->
     <div class="section" id="section-despacho">
       <div class="section-header">
-        <h2>Panel de despacho</h2>
+        <h2>Historial de envíos</h2>
         <button class="btn btn-ghost btn-sm" onclick="cargarDespacho()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button>
       </div>
-      <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:1.5rem">
-        Vista Kanban de los pedidos según su estado de despacho.
+      <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:1.25rem">
+        Pedidos en camino y entregados. Usá el buscador para encontrar un envío por número o cliente.
       </p>
+
+      <!-- Buscador -->
+      <div class="search-wrap" style="margin-bottom:1.5rem;max-width:380px">
+        <i class="bi bi-search"></i>
+        <input type="text" id="search-despacho" placeholder="Buscar por # pedido o cliente…" oninput="filtrarDespacho()">
+      </div>
 
       <div class="despacho-grid" id="despacho-grid">
         <!-- Se renderiza por JS -->
@@ -1812,18 +1817,15 @@ async function cambiarEstado(pedidoId, nuevoEstado) {
   const { error } = await sb.from('pedidos').update({ estado: nuevoEstado, updated_at: new Date().toISOString() }).eq('id', pedidoId);
   if (error) { toast('Error al actualizar estado', 'err'); return; }
   toast(`Estado → ${nuevoEstado === 'pendiente_pago' ? 'Pendiente pago' : capitalizar(nuevoEstado)}`, 'ok');
-  // Actualizar en memoria
   const p = todosPedidos.find(x => x.id === pedidoId);
   if (p) p.estado = nuevoEstado;
-  // Actualizar badge pendientes
   const pends = todosPedidos.filter(x => x.estado === 'pendiente').length;
   const badge = document.getElementById('badge-pendientes');
   if (pends > 0) { badge.textContent = pends; badge.style.display = 'inline'; }
   else { badge.style.display = 'none'; }
-  // Si pasó a enviado, recargar kanban de despacho automáticamente
-  if (nuevoEstado === 'enviado') {
+  // Si pasó a enviado o entregado, recargar historial de envíos
+  if (nuevoEstado === 'enviado' || nuevoEstado === 'entregado') {
     cargarDespacho();
-    toast('📦 Pedido movido a Despacho → En camino', 'ok');
   }
 }
 
@@ -2071,29 +2073,47 @@ function cerrarModalPedido() {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  DESPACHO (Kanban)
+//  DESPACHO — Historial de envíos
 // ═══════════════════════════════════════════════════════════
+let todosDespachos = []
+
 async function cargarDespacho() {
+  const grid = document.getElementById('despacho-grid')
+  grid.innerHTML = '<p style="color:var(--text-muted);font-size:.875rem">Cargando…</p>'
+
   const { data, error } = await sb
     .from('pedidos')
     .select('*, pedido_items(cantidad, talla, productos(nombre))')
-    .not('estado', 'eq', 'entregado')
-    .not('estado', 'eq', 'cancelado')
-    .order('created_at', { ascending: true });
+    .in('estado', ['enviado', 'entregado'])
+    .order('created_at', { ascending: false })
 
   if (error) { toast('Error al cargar despacho', 'err'); return; }
 
-  const columnas = [
-    { key: 'pendiente',      label: 'Pendientes',   color: '#fb923c', dot: '#fb923c' },
-    { key: 'pendiente_pago', label: 'Pend. pago',   color: '#fbbf24', dot: '#fbbf24' },
-    { key: 'pagado',         label: 'Pagados',       color: '#60a5fa', dot: '#60a5fa' },
-    { key: 'enviado',        label: 'En camino',     color: '#a78bfa', dot: '#a78bfa' },
-  ];
+  todosDespachos = data || []
+  renderDespacho(todosDespachos)
+}
 
-  const grid = document.getElementById('despacho-grid');
+function filtrarDespacho() {
+  const q = document.getElementById('search-despacho').value.toLowerCase().trim()
+  if (!q) { renderDespacho(todosDespachos); return; }
+  const filtrados = todosDespachos.filter(p =>
+    p.id.substring(0,8).toLowerCase().includes(q) ||
+    (p.nombre_cliente || '').toLowerCase().includes(q) ||
+    (p.direccion_envio?.telefono || '').includes(q)
+  )
+  renderDespacho(filtrados)
+}
+
+function renderDespacho(lista) {
+  const columnas = [
+    { key: 'enviado',   label: 'En camino',  color: '#a78bfa', dot: '#a78bfa' },
+    { key: 'entregado', label: 'Entregados',  color: '#4ade80', dot: '#4ade80' },
+  ]
+
+  const grid = document.getElementById('despacho-grid')
   grid.innerHTML = columnas.map(col => {
-    const pedidos = (data || []).filter(p => p.estado === col.key);
-    const cards   = pedidos.map(p => despachoCard(p, col.key)).join('');
+    const pedidos = lista.filter(p => p.estado === col.key)
+    const cards   = pedidos.map(p => despachoCard(p, col.key)).join('')
     return `
       <div class="despacho-col">
         <div class="despacho-col-header" style="color:${col.color}">
@@ -2104,38 +2124,45 @@ async function cargarDespacho() {
         <div class="despacho-col-body">
           ${cards || '<p style="font-size:.8rem;color:var(--text-muted);text-align:center;padding:.5rem">Sin pedidos</p>'}
         </div>
-      </div>`;
-  }).join('');
+      </div>`
+  }).join('')
 }
 
 function despachoCard(p, estadoActual) {
-  const dir    = p.direccion_envio?.direccion || '—';
-  const tel    = p.direccion_envio?.telefono  || '';
-  const notas  = p.direccion_envio?.notas     || '';
-  const items  = p.pedido_items || [];
-  const resumen = items.map(i => `${i.productos?.nombre || '—'} (${i.talla||'U'}) x${i.cantidad}`).join(' · ');
+  const dir    = p.direccion_envio?.direccion || '—'
+  const ciudad = p.direccion_envio?.ciudad    || ''
+  const prov   = p.direccion_envio?.provincia || ''
+  const tel    = p.direccion_envio?.telefono  || ''
+  const notas  = p.direccion_envio?.notas     || ''
+  const ubicacion = [ciudad, prov].filter(Boolean).join(', ') || dir
+  const items  = p.pedido_items || []
+  const resumen = items.map(i => `${i.productos?.nombre || '—'} (${i.talla||'U'}) x${i.cantidad}`).join(' · ')
+  const nombre = p.nombre_cliente || '<span style="color:var(--text-muted);font-style:italic">Sin nombre</span>'
 
-  const siguientes = { pendiente: 'pendiente_pago', pendiente_pago: 'pagado', pagado: 'enviado', enviado: 'entregado' };
-  const labels     = { pendiente_pago: 'Confirmar pago', pagado: 'Marcar enviado', enviado: 'Marcar entregado', entregado: 'Entregado' };
-  const siguiente  = siguientes[estadoActual];
+  const botonAvanzar = estadoActual === 'enviado'
+    ? `<button class="btn btn-primary btn-sm" onclick="avanzarEstado('${p.id}','entregado')">
+        <i class="bi bi-check-lg"></i> Marcar entregado
+       </button>`
+    : `<span style="font-size:.75rem;color:var(--green);font-weight:600"><i class="bi bi-check-circle-fill"></i> Entregado</span>`
 
   return `
     <div class="despacho-card">
-      <p class="despacho-card-id"># ${p.id.substring(0,8).toUpperCase()}</p>
-      <p class="despacho-card-dir"><i class="bi bi-geo-alt" style="color:var(--text-muted)"></i> ${dir}${tel ? ` · 📞 ${tel}` : ''}</p>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.4rem">
+        <p class="despacho-card-id"># ${p.id.substring(0,8).toUpperCase()}</p>
+        <span style="font-size:.65rem;color:var(--text-muted)">${fmtFecha(p.created_at)}</span>
+      </div>
+      <p style="font-size:.82rem;font-weight:600;margin-bottom:.3rem">${nombre}</p>
+      <p class="despacho-card-dir"><i class="bi bi-geo-alt" style="color:var(--text-muted)"></i> ${ubicacion}${tel ? ` · 📞 ${tel}` : ''}</p>
       ${notas ? `<p style="font-size:.75rem;color:var(--accent);margin-bottom:.4rem">📝 ${notas}</p>` : ''}
       <p class="despacho-card-items">${resumen}</p>
       <p class="despacho-card-total">${formatearPrecio(p.total)}</p>
-      <div class="despacho-card-btns">
-        ${siguiente ? `<button class="btn btn-primary btn-sm" onclick="avanzarEstado('${p.id}','${siguiente}')"><i class="bi bi-check-lg"></i> ${labels[siguiente]}</button>` : ''}
-        <button class="btn btn-danger btn-sm" onclick="cambiarEstadoDespacho('${p.id}','cancelado')"><i class="bi bi-x"></i></button>
-      </div>
-    </div>`;
+      <div class="despacho-card-btns">${botonAvanzar}</div>
+    </div>`
 }
 
 async function avanzarEstado(id, nuevoEstado) {
-  await cambiarEstado(id, nuevoEstado);
-  cargarDespacho();
+  await cambiarEstado(id, nuevoEstado)
+  cargarDespacho()
 }
 
 async function cambiarEstadoDespacho(id, estado) {
