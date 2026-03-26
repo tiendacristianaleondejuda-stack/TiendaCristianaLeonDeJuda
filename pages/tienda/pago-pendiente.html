@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pago pendiente - León de Judá</title>
+  <title>Pago exitoso - León de Judá</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,14 +27,14 @@
     .icon {
       width: 80px;
       height: 80px;
-      background: #fef3c7;
+      background: #dcfce7;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 1.5rem;
     }
-    .icon i { font-size: 2.5rem; color: #92400e; }
+    .icon i { font-size: 2.5rem; color: #166534; }
     h1 { font-size: 1.6rem; margin-bottom: 0.75rem; color: #1c1917; }
     p { color: #78716c; margin-bottom: 1.5rem; line-height: 1.5; }
     .btn {
@@ -50,18 +50,68 @@
       transition: background 0.2s;
     }
     .btn:hover { background: #2c2520; }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 0.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="icon">
-      <i class="bi bi-hourglass-split"></i>
+      <i class="bi bi-check-circle-fill"></i>
     </div>
-    <h1>Pago pendiente ⏳</h1>
-    <p>Tu pedido está en proceso de verificación. Te notificaremos cuando se confirme.</p>
+    <h1>¡Pago exitoso! ✅</h1>
+    <p>Tu pedido ha sido confirmado. Recibirás un correo con los detalles de envío.</p>
     <a href="/index.html" class="btn">
       <i class="bi bi-shop"></i> Volver a la tienda
     </a>
   </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-config.js"></script>
+<script>
+  (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const pedidoId = params.get('id');
+    // MercadoPago agrega estos params en la URL de retorno
+    const paymentId     = params.get('payment_id');
+    const paymentStatus = params.get('status'); // 'approved', 'pending', etc.
+
+    if (!pedidoId) return;
+
+    // Si MercadoPago confirma que fue aprobado, marcar como confirmado
+    // Si no, dejar en pendiente_pago y avisar
+    const aprobado = paymentStatus === 'approved';
+
+    await sb.from('pedidos')
+      .update({ estado: aprobado ? 'pagado' : 'pendiente_pago' })
+      .eq('id', pedidoId);
+
+    // Vaciar carrito siempre (el pedido quedó registrado)
+    if (typeof Carrito !== 'undefined') Carrito.vaciar();
+    else localStorage.removeItem('carrito');
+    localStorage.removeItem('mp_pedido_pendiente');
+
+    // Notificar admin solo si está confirmado
+    if (aprobado && typeof window.notificarNuevoPedido === 'function') {
+      try {
+        const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
+        if (pedido) {
+          const fmt = n => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(n);
+          await notificarNuevoPedido(pedidoId, fmt(pedido.total));
+        }
+      } catch(e) {}
+    }
+  })();
+</script>
+
 </body>
 </html>
