@@ -393,7 +393,8 @@
     }
 
     tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,.02); }
+    tbody tr:hover { background: rgba(255,255,255,.04); }
+    tbody tr[onclick] { cursor: pointer; }
 
     .prod-thumb-cell {
       display: flex;
@@ -1069,9 +1070,9 @@
             <option value="">Todas las categorías</option>
             <option value="remeras">Remeras</option>
             <option value="pantalones">Pantalones</option>
-            <option value="vestidos">Vestidos</option>
+            <option value="gorras">Gorras</option>
             <option value="buzos">Buzos</option>
-            <option value="calzado">Calzado</option>
+            <option value="musculosas">Musculosas</option>
             <option value="accesorios">Accesorios</option>
           </select>
         </div>
@@ -1211,9 +1212,9 @@
             <option value="">Sin categoría</option>
             <option value="remeras">Remeras</option>
             <option value="pantalones">Pantalones</option>
-            <option value="vestidos">Vestidos</option>
+            <option value="gorras">Gorras</option>
             <option value="buzos">Buzos</option>
-            <option value="calzado">Calzado</option>
+            <option value="musculosas">Musculosas</option>
             <option value="accesorios">Accesorios</option>
           </select>
         </div>
@@ -1767,6 +1768,7 @@ function renderTablaPedidos(lista) {
     const ciudad   = p.direccion_envio?.ciudad     || '';
     const tel      = p.direccion_envio?.telefono   || '';
     const ubicacion = [ciudad, prov].filter(Boolean).join(', ') || dir;
+    // Mostrar nombre o "Sin nombre" en gris
     const nombre = p.nombre_cliente
       ? p.nombre_cliente
       : `<span style="color:var(--text-muted);font-style:italic;font-size:.8rem">Sin nombre</span>`;
@@ -1795,8 +1797,8 @@ function renderTablaPedidos(lista) {
       </td>
       <td style="font-weight:700">${formatearPrecio(p.total)}</td>
       <td>${estadoBadge(p.estado)}</td>
-      <td onclick="event.stopPropagation()">
-        <select class="estado-select" onchange="cambiarEstado('${p.id}', this.value)" title="Cambiar estado">
+      <td>
+        <select class="estado-select" onchange="cambiarEstado('${p.id}', this.value)" onclick="event.stopPropagation()" title="Cambiar estado">
           ${['pendiente','pendiente_pago','pagado','enviado','entregado','cancelado'].map(e =>
             `<option value="${e}" ${p.estado === e ? 'selected' : ''}>${e === 'pendiente_pago' ? 'Pendiente pago' : capitalizar(e)}</option>`
           ).join('')}
@@ -1809,7 +1811,7 @@ function renderTablaPedidos(lista) {
 async function cambiarEstado(pedidoId, nuevoEstado) {
   const { error } = await sb.from('pedidos').update({ estado: nuevoEstado, updated_at: new Date().toISOString() }).eq('id', pedidoId);
   if (error) { toast('Error al actualizar estado', 'err'); return; }
-  toast(`Estado → ${capitalizar(nuevoEstado)}`, 'ok');
+  toast(`Estado → ${nuevoEstado === 'pendiente_pago' ? 'Pendiente pago' : capitalizar(nuevoEstado)}`, 'ok');
   // Actualizar en memoria
   const p = todosPedidos.find(x => x.id === pedidoId);
   if (p) p.estado = nuevoEstado;
@@ -1818,6 +1820,11 @@ async function cambiarEstado(pedidoId, nuevoEstado) {
   const badge = document.getElementById('badge-pendientes');
   if (pends > 0) { badge.textContent = pends; badge.style.display = 'inline'; }
   else { badge.style.display = 'none'; }
+  // Si pasó a enviado, recargar kanban de despacho automáticamente
+  if (nuevoEstado === 'enviado') {
+    cargarDespacho();
+    toast('📦 Pedido movido a Despacho → En camino', 'ok');
+  }
 }
 
 let adminChatPedidoId      = null;
@@ -2077,10 +2084,10 @@ async function cargarDespacho() {
   if (error) { toast('Error al cargar despacho', 'err'); return; }
 
   const columnas = [
-    { key: 'pendiente',      label: 'Pendientes',     color: '#fb923c', dot: '#fb923c' },
-    { key: 'pendiente_pago', label: 'Pend. pago',     color: '#fbbf24', dot: '#fbbf24' },
-    { key: 'pagado',         label: 'Pagados',         color: '#60a5fa', dot: '#60a5fa' },
-    { key: 'enviado',        label: 'En camino',       color: '#a78bfa', dot: '#a78bfa' },
+    { key: 'pendiente',      label: 'Pendientes',   color: '#fb923c', dot: '#fb923c' },
+    { key: 'pendiente_pago', label: 'Pend. pago',   color: '#fbbf24', dot: '#fbbf24' },
+    { key: 'pagado',         label: 'Pagados',       color: '#60a5fa', dot: '#60a5fa' },
+    { key: 'enviado',        label: 'En camino',     color: '#a78bfa', dot: '#a78bfa' },
   ];
 
   const grid = document.getElementById('despacho-grid');
@@ -2109,7 +2116,7 @@ function despachoCard(p, estadoActual) {
   const resumen = items.map(i => `${i.productos?.nombre || '—'} (${i.talla||'U'}) x${i.cantidad}`).join(' · ');
 
   const siguientes = { pendiente: 'pendiente_pago', pendiente_pago: 'pagado', pagado: 'enviado', enviado: 'entregado' };
-  const labels     = { pendiente_pago: 'Confirmar pago', pagado: 'Marcar enviado', enviado: 'Marcar enviado', entregado: 'Marcar entregado' };
+  const labels     = { pendiente_pago: 'Confirmar pago', pagado: 'Marcar enviado', enviado: 'Marcar entregado', entregado: 'Entregado' };
   const siguiente  = siguientes[estadoActual];
 
   return `
