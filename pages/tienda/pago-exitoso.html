@@ -75,38 +75,48 @@
     </a>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/js/supabase-config.js"></script>
-  <script>
-    (async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const pedidoId = urlParams.get('id');
-    
-    if (pedidoId) {
-        // Actualizar estado del pedido a "confirmado"
-        await sb.from('pedidos').update({ estado: 'confirmado' }).eq('id', pedidoId);
-        
-        // ✅ Vaciar el carrito recién aquí, cuando el pago fue exitoso
-        if (typeof Carrito !== 'undefined') {
-            Carrito.vaciar();
-        } else {
-            localStorage.removeItem('carrito'); // fallback directo
-        }
-        // Limpiar el pedido pendiente
-        localStorage.removeItem('mp_pedido_pendiente');
-        
-        // Notificar al admin
-        if (typeof window.notificarNuevoPedido === 'function') {
-            try {
-                const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
-                if (pedido) {
-                    const formatearPrecio = (num) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(num);
-                    await notificarNuevoPedido(pedidoId, formatearPrecio(pedido.total));
-                }
-            } catch(e) {}
-        }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-config.js"></script>
+<script>
+  (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const pedidoId      = params.get('id');
+    const statusMP      = params.get('status');           // 'approved', 'pending', etc.
+    const collectionSt  = params.get('collection_status'); // respaldo
+
+    if (!pedidoId) return;
+
+    const aprobado = statusMP === 'approved' || collectionSt === 'approved';
+    const nuevoEstado = aprobado ? 'confirmado' : 'pendiente_pago';
+
+    // Intentar actualizar y loguear el resultado para detectar errores de RLS
+    const { error } = await sb.from('pedidos')
+      .update({ estado: nuevoEstado })
+      .eq('id', pedidoId);
+
+    if (error) {
+      console.error('Error actualizando pedido:', error.message, error.code);
+    } else {
+      console.log('Pedido actualizado a:', nuevoEstado);
     }
-})();
-  </script>
+
+    // Vaciar carrito
+    if (typeof Carrito !== 'undefined') Carrito.vaciar();
+    else localStorage.removeItem('carrito');
+    localStorage.removeItem('mp_pedido_pendiente');
+
+    // Notificar admin solo si fue aprobado
+    if (aprobado && typeof window.notificarNuevoPedido === 'function') {
+      try {
+        const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
+        if (pedido) {
+          const fmt = n => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(n);
+          await notificarNuevoPedido(pedidoId, fmt(pedido.total));
+        }
+      } catch(e) {}
+    }
+  })();
+</script>
+
 </body>
 </html>
