@@ -586,16 +586,21 @@
     }));
 
     const { error: itemsError } = await sb.from('pedido_items').insert(items);
-    if (itemsError) throw itemsError;
+if (itemsError) throw itemsError;
 
-    // 3. Si eligió MercadoPago
-if (metodoPago === 'mercadopago') {
-  
-  const mpItems = carrito.items.map(i => ({
-    title: i.nombre,
-    quantity: i.cantidad,
-    unit_price: i.precio
+// 3. Descontar stock (solo si NO es mercadopago, ese lo maneja el webhook)
+if (metodoPago !== 'mercadopago') {
+  const stockItems = carrito.items.map(i => ({
+    producto_id: i.id,
+    talla: i.talla,
+    cantidad: i.cantidad
   }));
+  const { error: stockError } = await sb.rpc('descontar_stock', { items: stockItems });
+  if (stockError) console.error('Error descontando stock:', stockError.message);
+}
+
+// 4. Si eligió MercadoPago
+if (metodoPago === 'mercadopago') {
 
   // Llamar a la Edge Function
   const response = await fetch(`${SUPABASE_URL}/functions/v1/dynamic-worker`, {
