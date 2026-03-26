@@ -1100,7 +1100,8 @@
           <select class="field-input" style="flex:0;width:auto;padding:.5rem .8rem;font-size:.8rem" id="filter-estado" onchange="filtrarTablaPedidos()">
             <option value="">Todos los estados</option>
             <option value="pendiente">Pendiente</option>
-            <option value="confirmado">Confirmado</option>
+            <option value="pendiente_pago">Pendiente pago</option>
+            <option value="pagado">Pagado</option>
             <option value="enviado">Enviado</option>
             <option value="entregado">Entregado</option>
             <option value="cancelado">Cancelado</option>
@@ -1797,8 +1798,8 @@ function renderTablaPedidos(lista) {
       <td>${estadoBadge(p.estado)}</td>
       <td>
         <select class="estado-select" onchange="cambiarEstado('${p.id}', this.value)" title="Cambiar estado">
-          ${['pendiente','confirmado','enviado','entregado','cancelado'].map(e =>
-            `<option value="${e}" ${p.estado === e ? 'selected' : ''}>${capitalizar(e)}</option>`
+          ${['pendiente','pendiente_pago','pagado','enviado','entregado','cancelado'].map(e =>
+            `<option value="${e}" ${p.estado === e ? 'selected' : ''}>${e === 'pendiente_pago' ? 'Pendiente pago' : capitalizar(e)}</option>`
           ).join('')}
         </select>
       </td>
@@ -1881,8 +1882,8 @@ async function verPedido(id) {
     <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem">
       <label style="font-size:.875rem;font-weight:600">Cambiar estado:</label>
       <select class="estado-select" style="flex:1" onchange="cambiarEstado('${p.id}', this.value)">
-        ${['pendiente','confirmado','enviado','entregado','cancelado'].map(e =>
-          `<option value="${e}" ${p.estado === e ? 'selected' : ''}>${capitalizar(e)}</option>`
+        ${['pendiente','pendiente_pago','pagado','enviado','entregado','cancelado'].map(e =>
+          `<option value="${e}" ${p.estado === e ? 'selected' : ''}>${e === 'pendiente_pago' ? 'Pendiente pago' : capitalizar(e)}</option>`
         ).join('')}
       </select>
     </div>
@@ -2077,9 +2078,10 @@ async function cargarDespacho() {
   if (error) { toast('Error al cargar despacho', 'err'); return; }
 
   const columnas = [
-    { key: 'pendiente',  label: 'Pendientes',  color: '#fb923c', dot: '#fb923c' },
-    { key: 'confirmado', label: 'Confirmados',  color: '#60a5fa', dot: '#60a5fa' },
-    { key: 'enviado',    label: 'En camino',    color: '#a78bfa', dot: '#a78bfa' },
+    { key: 'pendiente',      label: 'Pendientes',     color: '#fb923c', dot: '#fb923c' },
+    { key: 'pendiente_pago', label: 'Pend. pago',     color: '#fbbf24', dot: '#fbbf24' },
+    { key: 'pagado',         label: 'Pagados',         color: '#60a5fa', dot: '#60a5fa' },
+    { key: 'enviado',        label: 'En camino',       color: '#a78bfa', dot: '#a78bfa' },
   ];
 
   const grid = document.getElementById('despacho-grid');
@@ -2107,8 +2109,8 @@ function despachoCard(p, estadoActual) {
   const items  = p.pedido_items || [];
   const resumen = items.map(i => `${i.productos?.nombre || '—'} (${i.talla||'U'}) x${i.cantidad}`).join(' · ');
 
-  const siguientes = { pendiente: 'confirmado', confirmado: 'enviado', enviado: 'entregado' };
-  const labels     = { confirmado: 'Confirmar', enviado: 'Marcar enviado', entregado: 'Marcar entregado' };
+  const siguientes = { pendiente: 'pendiente_pago', pendiente_pago: 'pagado', pagado: 'enviado', enviado: 'entregado' };
+  const labels     = { pendiente_pago: 'Confirmar pago', pagado: 'Marcar enviado', enviado: 'Marcar enviado', entregado: 'Marcar entregado' };
   const siguiente  = siguientes[estadoActual];
 
   return `
@@ -2141,13 +2143,19 @@ async function cambiarEstadoDespacho(id, estado) {
 // ═══════════════════════════════════════════════════════════
 function estadoBadge(estado) {
   const map = {
-    pendiente:  'badge-orange',
-    confirmado: 'badge-blue',
-    enviado:    'badge-accent',
-    entregado:  'badge-green',
-    cancelado:  'badge-red',
+    pendiente:      'badge-orange',
+    pendiente_pago: 'badge-orange',
+    pagado:         'badge-blue',
+    enviado:        'badge-accent',
+    entregado:      'badge-green',
+    cancelado:      'badge-red',
   };
-  return `<span class="badge ${map[estado] || 'badge-muted'}">${capitalizar(estado || '—')}</span>`;
+  const labels = {
+    pendiente_pago: 'Pendiente pago',
+    pagado:         'Pagado',
+  };
+  const label = labels[estado] || capitalizar(estado || '—');
+  return `<span class="badge ${map[estado] || 'badge-muted'}">${label}</span>`;
 }
 
 function capitalizar(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
