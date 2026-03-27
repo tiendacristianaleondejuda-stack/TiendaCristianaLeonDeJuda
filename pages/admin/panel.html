@@ -643,7 +643,7 @@
       margin-bottom: 2rem;
     }
 
-    @media (max-width: 700px)  { .despacho-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 700px) { .despacho-grid { grid-template-columns: 1fr; } }
 
     .despacho-col {
       background: var(--bg2);
@@ -1137,18 +1137,13 @@
         <button class="btn btn-ghost btn-sm" onclick="cargarDespacho()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button>
       </div>
       <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:1.25rem">
-        Pedidos en camino y entregados. Usá el buscador para encontrar un envío por número o cliente.
+        Pedidos en camino y entregados. Buscá por número de pedido o nombre del cliente.
       </p>
-
-      <!-- Buscador -->
       <div class="search-wrap" style="margin-bottom:1.5rem;max-width:380px">
         <i class="bi bi-search"></i>
         <input type="text" id="search-despacho" placeholder="Buscar por # pedido o cliente…" oninput="filtrarDespacho()">
       </div>
-
-      <div class="despacho-grid" id="despacho-grid">
-        <!-- Se renderiza por JS -->
-      </div>
+      <div class="despacho-grid" id="despacho-grid"></div>
     </div>
 
     <!-- ══════════ MENSAJES ══════════ -->
@@ -1823,7 +1818,6 @@ async function cambiarEstado(pedidoId, nuevoEstado) {
   const badge = document.getElementById('badge-pendientes');
   if (pends > 0) { badge.textContent = pends; badge.style.display = 'inline'; }
   else { badge.style.display = 'none'; }
-  // Si pasó a enviado o entregado, recargar historial de envíos
   if (nuevoEstado === 'enviado' || nuevoEstado === 'entregado') {
     cargarDespacho();
   }
@@ -2109,7 +2103,6 @@ function renderDespacho(lista) {
     { key: 'enviado',   label: 'En camino',  color: '#a78bfa', dot: '#a78bfa' },
     { key: 'entregado', label: 'Entregados',  color: '#4ade80', dot: '#4ade80' },
   ]
-
   const grid = document.getElementById('despacho-grid')
   grid.innerHTML = columnas.map(col => {
     const pedidos = lista.filter(p => p.estado === col.key)
@@ -2129,15 +2122,37 @@ function renderDespacho(lista) {
 }
 
 function despachoCard(p, estadoActual) {
-  const dir    = p.direccion_envio?.direccion || '—'
-  const ciudad = p.direccion_envio?.ciudad    || ''
-  const prov   = p.direccion_envio?.provincia || ''
-  const tel    = p.direccion_envio?.telefono  || ''
-  const notas  = p.direccion_envio?.notas     || ''
+  const dir      = p.direccion_envio?.direccion || '—'
+  const ciudad   = p.direccion_envio?.ciudad    || ''
+  const prov     = p.direccion_envio?.provincia || ''
+  const tel      = p.direccion_envio?.telefono  || ''
+  const notas    = p.direccion_envio?.notas     || ''
   const ubicacion = [ciudad, prov].filter(Boolean).join(', ') || dir
-  const items  = p.pedido_items || []
-  const resumen = items.map(i => `${i.productos?.nombre || '—'} (${i.talla||'U'}) x${i.cantidad}`).join(' · ')
-  const nombre = p.nombre_cliente || '<span style="color:var(--text-muted);font-style:italic">Sin nombre</span>'
+  const items    = p.pedido_items || []
+  const resumen  = items.map(i => `${i.productos?.nombre || '—'} (${i.talla||'U'}) x${i.cantidad}`).join(' · ')
+  const nombre   = p.nombre_cliente || '<span style="color:var(--text-muted);font-style:italic">Sin nombre</span>'
+
+  // Sección de guía de envío
+  const correoLabel = { andreani: 'Andreani', oca: 'OCA', correo_argentino: 'Correo Argentino' }[p.correo_envio] || 'Andreani'
+  const trackingLink = p.numero_guia ? buildTrackingUrl(p.correo_envio || 'andreani', p.numero_guia) : null
+
+  const trackingHTML = `
+    <div style="border-top:1px solid var(--border);margin-top:.6rem;padding-top:.6rem">
+      <div style="display:flex;gap:.4rem;margin-bottom:.4rem">
+        <select id="correo-${p.id}" style="font-size:.72rem;padding:.25rem .4rem;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);flex:0">
+          <option value="andreani" ${(p.correo_envio||'andreani')==='andreani'?'selected':''}>Andreani</option>
+          <option value="oca" ${p.correo_envio==='oca'?'selected':''}>OCA</option>
+          <option value="correo_argentino" ${p.correo_envio==='correo_argentino'?'selected':''}>Correo Arg.</option>
+        </select>
+        <input type="text" id="guia-${p.id}" value="${p.numero_guia||''}"
+          placeholder="N° de guía"
+          style="flex:1;font-size:.72rem;padding:.25rem .5rem;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)">
+        <button onclick="guardarGuia('${p.id}')" style="font-size:.7rem;padding:.25rem .5rem;background:var(--accent);color:#111;border:none;border-radius:6px;cursor:pointer;font-weight:700;white-space:nowrap">
+          <i class="bi bi-save"></i>
+        </button>
+      </div>
+      ${trackingLink ? `<a href="${trackingLink}" target="_blank" style="font-size:.72rem;color:var(--accent);display:inline-flex;align-items:center;gap:.25rem"><i class="bi bi-box-arrow-up-right"></i> Ver en ${correoLabel}</a>` : ''}
+    </div>`
 
   const botonAvanzar = estadoActual === 'enviado'
     ? `<button class="btn btn-primary btn-sm" onclick="avanzarEstado('${p.id}','entregado')">
@@ -2147,7 +2162,7 @@ function despachoCard(p, estadoActual) {
 
   return `
     <div class="despacho-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.4rem">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.3rem">
         <p class="despacho-card-id"># ${p.id.substring(0,8).toUpperCase()}</p>
         <span style="font-size:.65rem;color:var(--text-muted)">${fmtFecha(p.created_at)}</span>
       </div>
@@ -2156,8 +2171,48 @@ function despachoCard(p, estadoActual) {
       ${notas ? `<p style="font-size:.75rem;color:var(--accent);margin-bottom:.4rem">📝 ${notas}</p>` : ''}
       <p class="despacho-card-items">${resumen}</p>
       <p class="despacho-card-total">${formatearPrecio(p.total)}</p>
-      <div class="despacho-card-btns">${botonAvanzar}</div>
+      ${trackingHTML}
+      <div class="despacho-card-btns" style="margin-top:.6rem">${botonAvanzar}</div>
     </div>`
+}
+
+function buildTrackingUrl(correo, guia) {
+  const urls = {
+    andreani:         `https://www.andreani.com/#!/informacionEnvio/${guia}`,
+    oca:              `https://www.oca.com.ar/OCAvista/faces/jsp/tracking.jsp?numero=${guia}`,
+    correo_argentino: `https://www.correoargentino.com.ar/formularios/e-pak?id=${guia}`,
+  }
+  return urls[correo] || '#'
+}
+
+async function guardarGuia(pedidoId) {
+  const guia   = document.getElementById(`guia-${pedidoId}`)?.value.trim()
+  const correo = document.getElementById(`correo-${pedidoId}`)?.value
+  if (!guia) { toast('Ingresá el número de guía', 'err'); return }
+
+  const { error } = await sb.from('pedidos')
+    .update({ numero_guia: guia, correo_envio: correo })
+    .eq('id', pedidoId)
+
+  if (error) { toast('Error al guardar guía', 'err'); return }
+
+  toast('Guía guardada ✓', 'ok')
+
+  // Actualizar en memoria local
+  const p = todosDespachos.find(x => x.id === pedidoId)
+  if (p) { p.numero_guia = guia; p.correo_envio = correo }
+
+  // Notificar al cliente por push
+  const pedido = todosPedidos.find(x => x.id === pedidoId) || p
+  if (pedido?.user_id && typeof notificarEnvioCliente === 'function') {
+    try {
+      await notificarEnvioCliente(pedidoId, guia, correo, pedido.user_id)
+      toast('📦 Cliente notificado', 'ok')
+    } catch(e) { console.warn('Error notificando cliente:', e) }
+  }
+
+  // Recargar para mostrar el link actualizado
+  cargarDespacho()
 }
 
 async function avanzarEstado(id, nuevoEstado) {
