@@ -100,11 +100,26 @@
       letter-spacing: 0.04em;
     }
 
-    .estado-pendiente  { background: #fef3c7; color: #92400e; }
-    .estado-confirmado { background: #dbeafe; color: #1e40af; }
-    .estado-enviado    { background: #e0e7ff; color: #3730a3; }
-    .estado-entregado  { background: #dcfce7; color: #166534; }
-    .estado-cancelado  { background: #fee2e2; color: #991b1b; }
+    .estado-pendiente       { background: #fef3c7; color: #92400e; }
+    .estado-pendiente_pago  { background: #fef3c7; color: #92400e; }
+    .estado-pagado          { background: #dbeafe; color: #1e40af; }
+    .estado-confirmado      { background: #dbeafe; color: #1e40af; }
+    .estado-enviado         { background: #e0e7ff; color: #3730a3; }
+    .estado-entregado       { background: #dcfce7; color: #166534; }
+    .estado-cancelado       { background: #fee2e2; color: #991b1b; }
+
+    .btn-tracking {
+      display: inline-flex; align-items: center; gap: .4rem;
+      margin-top: .75rem;
+      padding: .5rem 1rem;
+      background: #fef3c7; color: #92400e;
+      border: 1.5px solid #fde68a;
+      border-radius: 6px;
+      font-family: 'Karla', sans-serif; font-size: .8rem; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+      text-decoration: none;
+    }
+    .btn-tracking:hover { background: #fde68a; }
 
     .pedido-productos { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
     .pedido-prod-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; }
@@ -545,6 +560,17 @@
       const items  = pedido.pedido_items || [];
       const estado = pedido.estado || 'pendiente';
 
+      const estadoLabels = {
+        pendiente:      'Pendiente',
+        pendiente_pago: 'Pendiente pago',
+        pagado:         'Pagado',
+        confirmado:     'Confirmado',
+        enviado:        'En camino',
+        entregado:      'Entregado',
+        cancelado:      'Cancelado',
+      };
+      const estadoLabel = estadoLabels[estado] || capitalizar(estado);
+
       const itemsHTML = items.slice(0, 3).map(item => {
         const prod = item.productos || {};
         return `
@@ -557,10 +583,19 @@
             <span class="pedido-prod-nombre">${prod.nombre || '—'}</span>
             <span class="pedido-prod-talla">${item.talla || ''}</span>
             <span class="pedido-prod-precio">${formatearPrecio(item.precio_unitario * item.cantidad)}</span>
-          </div>`;
+          </div>`
       }).join('');
 
       const mas = items.length > 3 ? `<p style="font-size:0.8rem;color:var(--text-muted)">+${items.length - 3} producto(s) más</p>` : '';
+
+      // Botón de tracking si el pedido está enviado y tiene número de guía
+      const correoLabel = { andreani: 'Andreani', oca: 'OCA', correo_argentino: 'Correo Arg.' }[pedido.correo_envio] || 'Andreani';
+      const trackingUrl = buildTrackingUrlCliente(pedido.correo_envio || 'andreani', pedido.numero_guia);
+      const trackingBtn = (estado === 'enviado' || estado === 'entregado') && pedido.numero_guia
+        ? `<a href="${trackingUrl}" target="_blank" class="btn-tracking">
+             <i class="bi bi-truck"></i> Rastrear por ${correoLabel}
+           </a>`
+        : '';
 
       return `
         <div class="pedido-item" id="pedido-card-${pedido.id}">
@@ -569,10 +604,11 @@
               <p class="pedido-id"># ${pedido.id.substring(0, 8).toUpperCase()}</p>
               <p class="pedido-fecha">${fecha}</p>
             </div>
-            <span class="estado-badge estado-${estado}">${capitalizar(estado)}</span>
+            <span class="estado-badge estado-${estado}">${estadoLabel}</span>
           </div>
           <div class="pedido-productos">${itemsHTML}${mas}</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+          ${trackingBtn}
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-top:.75rem">
             <div class="pedido-total">Total: ${formatearPrecio(pedido.total)}</div>
             <button class="btn-chat" id="btn-chat-${pedido.id}" onclick="toggleChat('${pedido.id}')">
               <i class="bi bi-chat-dots"></i> Consultar pedido
@@ -603,6 +639,16 @@
             </div>
           </div>
         </div>`;
+    }
+
+    function buildTrackingUrlCliente(correo, guia) {
+      if (!guia) return '#';
+      const urls = {
+        andreani:         `https://www.andreani.com/#!/informacionEnvio/${guia}`,
+        oca:              `https://www.oca.com.ar/OCAvista/faces/jsp/tracking.jsp?numero=${guia}`,
+        correo_argentino: `https://www.correoargentino.com.ar/formularios/e-pak?id=${guia}`,
+      };
+      return urls[correo] || '#';
     }
 
     // ── Abrir/cerrar chat ──────────────────────────────────────
