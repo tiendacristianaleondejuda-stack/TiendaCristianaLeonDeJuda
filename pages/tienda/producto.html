@@ -102,36 +102,34 @@
       font-size: .75rem; color: var(--text-muted);
       display: flex; align-items: center; gap: .35rem;
       flex-wrap: wrap;
+      max-width: 1280px;
+      margin: 0 auto;
     }
 
     .breadcrumb a:hover { color: var(--gold); }
     .breadcrumb i { font-size: .65rem; }
 
     /* ══════════════════════════════════════
-       LAYOUT — MOBILE: columna / DESKTOP: 2 col
+       LAYOUT
     ══════════════════════════════════════ */
     .prod-layout {
-      max-width: 1100px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 0 1rem 4rem;
+      padding: 0 2rem 4rem;
     }
 
-    /* Desktop: lado a lado */
     @media (min-width: 768px) {
       .prod-layout {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 3rem;
-        padding: 0 1.5rem 4rem;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 4rem;
+        padding: 0 2.5rem 4rem;
         align-items: start;
       }
     }
 
     /* ── Galería ── */
-    /* CLAVE: en mobile NO es sticky, en desktop SÍ */
-    .galeria {
-      margin-bottom: 1.5rem;
-    }
+    .galeria { margin-bottom: 1.5rem; }
 
     @media (min-width: 768px) {
       .galeria {
@@ -143,36 +141,91 @@
 
     .img-principal {
       aspect-ratio: 3/4;
-      border-radius: 12px;
+      border-radius: 16px;
       overflow: hidden;
       background: var(--bg3);
-      margin-bottom: .6rem;
-    }
-
-    .img-principal img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      transition: transform .4s;
+      margin-bottom: .75rem;
       cursor: zoom-in;
+      position: relative;
     }
 
-    .img-principal img:hover { transform: scale(1.04); }
+    /* Zoom hover en desktop */
+    @media (min-width: 768px) {
+      .img-principal { overflow: hidden; }
+      .img-principal img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        transition: transform .5s ease;
+        transform-origin: center center;
+      }
+      .img-principal:hover img { transform: scale(1.55); }
+      .img-principal:hover { cursor: zoom-in; }
+    }
+
+    @media (max-width: 767px) {
+      .img-principal img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        transition: transform .3s;
+      }
+    }
 
     .thumbnails {
       display: flex; gap: .5rem; flex-wrap: wrap;
     }
 
     .thumbnail {
-      width: 64px; height: 80px;
-      border-radius: 6px; overflow: hidden;
+      width: 72px; height: 90px;
+      border-radius: 8px; overflow: hidden;
       cursor: pointer;
       border: 2px solid transparent;
-      transition: border-color .2s;
+      transition: border-color .2s, transform .15s;
       background: var(--bg3);
     }
 
+    .thumbnail:hover { transform: scale(1.05); }
     .thumbnail.active { border-color: var(--text); }
     .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Lightbox ── */
+    .lightbox-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,.92);
+      align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .lightbox-overlay.open { display: flex; }
+
+    .lightbox-img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+      user-select: none;
+    }
+
+    .lightbox-close {
+      position: fixed; top: 1rem; right: 1rem;
+      background: rgba(255,255,255,.15); border: none; cursor: pointer;
+      color: white; font-size: 1.5rem;
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .lightbox-close:hover { background: rgba(255,255,255,.3); }
+
+    .lightbox-nav {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,.15); border: none; cursor: pointer;
+      color: white; font-size: 1.4rem;
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .lightbox-nav:hover { background: rgba(255,255,255,.3); }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
 
     /* ── Info ── */
     .prod-info { padding-top: 0; }
@@ -185,7 +238,7 @@
 
     .prod-nombre {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
       font-weight: 500; line-height: 1.15;
       margin-bottom: 1rem;
     }
@@ -195,7 +248,7 @@
       gap: .75rem; margin-bottom: 1.5rem;
     }
 
-    .prod-precio { font-size: 1.5rem; font-weight: 700; color: var(--gold); }
+    .prod-precio { font-size: 1.6rem; font-weight: 700; color: var(--gold); }
 
     .prod-precio-orig {
       font-size: 1rem; color: var(--text-muted);
@@ -210,6 +263,33 @@
 
     .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
 
+    /* Colores */
+    .colores-wrap { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+
+    .color-btn {
+      width: 52px; height: 52px;
+      border-radius: 8px; overflow: hidden;
+      cursor: pointer;
+      border: 2.5px solid transparent;
+      transition: all .15s;
+      position: relative;
+      background: var(--bg3);
+    }
+    .color-btn img { width: 100%; height: 100%; object-fit: cover; }
+    .color-btn:hover { transform: scale(1.08); border-color: var(--gold-light); }
+    .color-btn.sel { border-color: var(--text); box-shadow: 0 0 0 2px var(--text); }
+    .color-btn .color-check {
+      display: none; position: absolute; inset: 0;
+      background: rgba(0,0,0,.35);
+      align-items: center; justify-content: center;
+      color: white; font-size: 1rem;
+    }
+    .color-btn.sel .color-check { display: flex; }
+    .color-nombre-sel {
+      font-size: .78rem; color: var(--text-muted);
+      margin-top: -.75rem; margin-bottom: 1rem;
+    }
+
     /* Tallas */
     .sec-label {
       font-size: .7rem; font-weight: 700;
@@ -220,7 +300,7 @@
     .tallas-wrap { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
 
     .talla-btn {
-      min-width: 50px; height: 50px;
+      min-width: 52px; height: 52px;
       border: 1.5px solid var(--border); border-radius: 8px;
       background: transparent; cursor: pointer;
       font-family: 'Jost', sans-serif; font-size: .875rem; font-weight: 600;
@@ -230,14 +310,12 @@
     }
 
     .talla-btn:hover  { border-color: var(--gold); color: var(--gold); }
-
     .talla-btn.sin-stock {
-      opacity: .38;
-      cursor: not-allowed;
-      text-decoration: line-through;
-      border-style: dashed;
+      opacity: .38; cursor: not-allowed;
+      text-decoration: line-through; border-style: dashed;
     }
     .talla-btn.sin-stock:hover { border-color: var(--border); color: var(--text); }
+    .talla-btn.sel { background: var(--text); border-color: var(--text); color: white; }
 
     .stock-info-tag {
       display: inline-flex; align-items: center; gap: .3rem;
@@ -248,7 +326,6 @@
     .stock-ok   { background: #dcfce7; color: #166534; }
     .stock-low  { background: #fef3c7; color: #92400e; }
     .stock-none { background: #fee2e2; color: #991b1b; }
-    .talla-btn.sel    { background: var(--text); border-color: var(--text); color: white; }
 
     .guia-tallas {
       font-size: .78rem; color: var(--text-muted);
@@ -263,7 +340,7 @@
     }
 
     .qty-btn {
-      width: 36px; height: 36px;
+      width: 38px; height: 38px;
       border: 1.5px solid var(--border); border-radius: 6px;
       background: transparent; cursor: pointer;
       font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
@@ -275,10 +352,10 @@
 
     /* Botones */
     .btn-agregar {
-      width: 100%; padding: .95rem;
+      width: 100%; padding: 1rem;
       background: var(--text); color: white;
-      border: none; border-radius: 8px;
-      font-family: 'Jost', sans-serif; font-size: .9rem; font-weight: 600;
+      border: none; border-radius: 10px;
+      font-family: 'Jost', sans-serif; font-size: .95rem; font-weight: 600;
       cursor: pointer; letter-spacing: .04em;
       display: flex; align-items: center; justify-content: center; gap: .6rem;
       transition: background .2s, transform .15s; margin-bottom: .75rem;
@@ -288,10 +365,10 @@
     .btn-agregar:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; }
 
     .btn-comprar {
-      width: 100%; padding: .95rem;
+      width: 100%; padding: 1rem;
       background: var(--gold); color: white;
-      border: none; border-radius: 8px;
-      font-family: 'Jost', sans-serif; font-size: .9rem; font-weight: 600;
+      border: none; border-radius: 10px;
+      font-family: 'Jost', sans-serif; font-size: .95rem; font-weight: 600;
       cursor: pointer; letter-spacing: .04em;
       display: flex; align-items: center; justify-content: center; gap: .6rem;
       transition: background .2s, transform .15s;
@@ -299,6 +376,64 @@
 
     .btn-comprar:hover    { background: var(--gold-light); transform: translateY(-1px); }
     .btn-comprar:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; }
+
+    /* Calculadora de envío */
+    .envio-calc {
+      margin-top: 1.25rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+    }
+
+    .envio-calc-titulo {
+      font-size: .72rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: .75rem;
+      display: flex; align-items: center; gap: .4rem;
+    }
+
+    .envio-calc-row {
+      display: flex; gap: .5rem; align-items: stretch;
+    }
+
+    .envio-input {
+      flex: 1; padding: .6rem .85rem;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-family: 'Jost', sans-serif; font-size: .9rem;
+      background: var(--bg); color: var(--text);
+      outline: none; transition: border-color .2s;
+    }
+    .envio-input:focus { border-color: var(--gold); }
+
+    .envio-btn {
+      padding: .6rem 1rem;
+      background: var(--text); color: white;
+      border: none; border-radius: 8px;
+      font-family: 'Jost', sans-serif; font-size: .82rem; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+      transition: background .2s;
+    }
+    .envio-btn:hover { background: #2c2520; }
+
+    .envio-resultado {
+      margin-top: .75rem;
+      display: none;
+    }
+
+    .envio-opcion {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .5rem .6rem;
+      border-radius: 8px;
+      margin-bottom: .35rem;
+      background: var(--bg2);
+      font-size: .85rem;
+    }
+
+    .envio-opcion-nombre { display: flex; align-items: center; gap: .4rem; font-weight: 600; }
+    .envio-opcion-precio { font-weight: 700; color: var(--gold); }
+    .envio-zona { font-size: .72rem; color: var(--text-muted); margin-top: .35rem; }
+    .envio-error { font-size: .82rem; color: #b91c1c; margin-top: .5rem; }
 
     /* Descripción */
     .descripcion {
@@ -319,8 +454,8 @@
       font-size: .875rem; color: var(--text-muted); line-height: 1.7;
     }
 
-    .accordion-item.open .accordion-body  { display: block; }
-    .accordion-item.open .accordion-icon  { transform: rotate(180deg); }
+    .accordion-item.open .accordion-body { display: block; }
+    .accordion-item.open .accordion-icon { transform: rotate(180deg); }
     .accordion-icon { transition: transform .2s; }
 
     /* Toast */
@@ -364,17 +499,24 @@
     <span id="bread-nombre" style="color:var(--text)">—</span>
   </div>
 
-  <!-- CONTENIDO (se rellena por JS) -->
+  <!-- CONTENIDO -->
   <div class="prod-layout" id="prod-layout">
-    <!-- Skeleton de carga -->
     <div class="galeria">
-      <div class="skel" style="aspect-ratio:3/4;border-radius:12px"></div>
+      <div class="skel" style="aspect-ratio:3/4;border-radius:16px"></div>
     </div>
     <div class="prod-info">
       <div class="skel" style="height:11px;width:70px;margin-bottom:12px"></div>
-      <div class="skel" style="height:34px;width:75%;margin-bottom:10px"></div>
+      <div class="skel" style="height:40px;width:75%;margin-bottom:10px"></div>
       <div class="skel" style="height:28px;width:110px"></div>
     </div>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox" onclick="cerrarLightbox(event)">
+    <button class="lightbox-close" onclick="cerrarLightbox()"><i class="bi bi-x-lg"></i></button>
+    <button class="lightbox-nav lightbox-prev" onclick="event.stopPropagation();navLightbox(-1)"><i class="bi bi-chevron-left"></i></button>
+    <img class="lightbox-img" id="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation();navLightbox(1)"><i class="bi bi-chevron-right"></i></button>
   </div>
 
   <div class="toast-wrap" id="toasts"></div>
@@ -384,7 +526,66 @@
   <script src="/js/supabase-config.js"></script>
 
   <script>
-    let prodActual = null, tallaSeleccionada = null, cantidad = 1;
+    let prodActual = null, tallaSeleccionada = null, colorSeleccionado = null, cantidad = 1;
+    let imagenesGaleria = [];
+    let lightboxIdx = 0;
+
+    // ── Tabla de precios de envío por zona ──────────────────────
+    // Zonas: CABA (1000-1499), GBA (1500-1999), Interior (resto)
+    const TARIFAS_ENVIO = {
+      andreani: { CABA: 2500,  GBA: 3200,  interior: 4800  },
+      oca:      { CABA: 2800,  GBA: 3500,  interior: 5200  },
+      correo:   { CABA: 1900,  GBA: 2600,  interior: 3900  },
+    };
+
+    function detectarZonaCP(cp) {
+      const n = parseInt(cp);
+      if (isNaN(n) || cp.length < 4) return null;
+      if (n >= 1000 && n <= 1499) return 'CABA';
+      if (n >= 1500 && n <= 1999) return 'GBA';
+      if (n >= 2000) return 'interior';
+      return null;
+    }
+
+    function calcularEnvio() {
+      const cp  = document.getElementById('envio-cp')?.value.trim();
+      const res = document.getElementById('envio-resultado');
+      const err = document.getElementById('envio-error');
+
+      if (!cp || cp.length < 4) {
+        if (err) err.textContent = 'Ingresá un código postal válido (ej: 1414)';
+        if (err) err.style.display = 'block';
+        return;
+      }
+
+      const zona = detectarZonaCP(cp);
+      if (!zona) {
+        if (err) err.textContent = 'Código postal no reconocido. Ingresá un CP argentino.';
+        if (err) err.style.display = 'block';
+        if (res) res.style.display = 'none';
+        return;
+      }
+
+      if (err) err.style.display = 'none';
+
+      const zonaLabel = { CABA: 'Ciudad de Buenos Aires', GBA: 'Gran Buenos Aires', interior: 'Interior del país' }[zona];
+
+      const opciones = [
+        { key: 'andreani', nombre: 'Andreani',          icono: '🟦' },
+        { key: 'oca',      nombre: 'OCA',               icono: '🟧' },
+        { key: 'correo',   nombre: 'Correo Argentino',  icono: '🟨' },
+      ];
+
+      res.innerHTML = `
+        <p class="envio-zona"><i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i> ${zonaLabel} · CP ${cp}</p>
+        ${opciones.map(o => `
+          <div class="envio-opcion">
+            <span class="envio-opcion-nombre">${o.icono} ${o.nombre}</span>
+            <span class="envio-opcion-precio">${formatearPrecio(TARIFAS_ENVIO[o.key][zona])}</span>
+          </div>`).join('')}
+        <p style="font-size:.7rem;color:var(--text-muted);margin-top:.4rem">* Precios estimados, pueden variar según el peso del paquete.</p>`;
+      res.style.display = 'block';
+    }
 
     document.addEventListener('DOMContentLoaded', async () => {
       Carrito.actualizarContador();
@@ -392,6 +593,13 @@
       const id = new URLSearchParams(location.search).get('id');
       if (!id) { location.href = '/index.html'; return; }
       await cargarProducto(id);
+
+      // Cerrar lightbox con ESC
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') cerrarLightbox();
+        if (e.key === 'ArrowLeft')  navLightbox(-1);
+        if (e.key === 'ArrowRight') navLightbox(1);
+      });
     });
 
     async function cargarProducto(id) {
@@ -408,28 +616,27 @@
       document.getElementById('bread-cat').textContent    = data.categoria || 'Tienda';
       document.getElementById('bread-nombre').textContent = data.nombre;
 
-      const imagenes = (data.imagenes_urls?.length ? data.imagenes_urls : [])
+      imagenesGaleria = (data.imagenes_urls?.length ? data.imagenes_urls : [])
         .concat(data.imagen_url ? [data.imagen_url] : [])
         .filter((v, i, a) => v && a.indexOf(v) === i);
 
-      if (!imagenes.length) imagenes.push('https://placehold.co/600x800/e4dac8/78716c?text=Foto');
+      if (!imagenesGaleria.length) imagenesGaleria.push('https://placehold.co/600x800/e4dac8/78716c?text=Foto');
 
       const descuento = data.precio_original
         ? Math.round((1 - data.precio / data.precio_original) * 100) : null;
 
-      const thumbsHTML = imagenes.length > 1
+      const thumbsHTML = imagenesGaleria.length > 1
         ? `<div class="thumbnails">
-            ${imagenes.map((img, i) =>
-              `<div class="thumbnail ${i===0?'active':''}" onclick="cambiarImg('${img}',this)">
-                <img src="${img}" alt="" onerror="this.src='https://placehold.co/64x80/e4dac8/78716c?text=+'">
+            ${imagenesGaleria.map((img, i) =>
+              `<div class="thumbnail ${i===0?'active':''}" onclick="cambiarImg('${img}',this,${i})">
+                <img src="${img}" alt="" onerror="this.src='https://placehold.co/72x90/e4dac8/78716c?text=+'">
               </div>`).join('')}
            </div>`
         : '';
 
-      // Tallas + stock por talla
+      // Tallas
       const tallas       = data.tallas?.length ? data.tallas : ['Única'];
       const spt          = data.stock_por_talla || {};
-      // Fallback: if no stock_por_talla, distribute total stock across all sizes
       const getStockTalla = t => (spt && Object.keys(spt).length) ? (spt[t] ?? 0) : (data.stock ?? 99);
 
       if (tallas.length === 1 && getStockTalla(tallas[0]) > 0) tallaSeleccionada = tallas[0];
@@ -444,7 +651,33 @@
           data-stock="${st}">${t}</button>`;
       }).join('');
 
-      // General stock status tag
+      // Colores
+      const colores = data.colores || [];
+      let coloresHTML = '';
+      if (colores.length > 0) {
+        coloresHTML = `
+          <p class="sec-label">Color</p>
+          <div class="colores-wrap">
+            ${colores.map((c, i) => `
+              <div class="color-btn ${i===0?'sel':''}" 
+                title="${c.nombre}"
+                onclick="selColor(${i}, this)"
+                data-nombre="${c.nombre}"
+                data-imagen="${c.imagen_url}">
+                <img src="${c.imagen_url}" alt="${c.nombre}" onerror="this.style.opacity='.3'">
+                <div class="color-check"><i class="bi bi-check-lg"></i></div>
+              </div>`).join('')}
+          </div>
+          <p class="color-nombre-sel" id="color-nombre-sel">${colores[0]?.nombre || ''}</p>`;
+        // Preseleccionar primer color
+        colorSeleccionado = colores[0];
+        // Cambiar imagen principal al primer color
+        if (colores[0]?.imagen_url) {
+          imagenesGaleria = [colores[0].imagen_url, ...imagenesGaleria.filter(u => u !== colores[0].imagen_url)];
+        }
+      }
+
+      // Stock general
       const totalStock = data.stock ?? 0;
       let stockTagHTML = '';
       if (totalStock === 0) {
@@ -456,16 +689,16 @@
       }
 
       document.getElementById('prod-layout').innerHTML = `
-        <!-- GALERÍA (arriba en mobile, izquierda en desktop) -->
+        <!-- GALERÍA -->
         <div class="galeria">
-          <div class="img-principal">
-            <img id="img-main" src="${imagenes[0]}" alt="${data.nombre}"
+          <div class="img-principal" id="img-principal-wrap" onclick="abrirLightbox(0)">
+            <img id="img-main" src="${imagenesGaleria[0]}" alt="${data.nombre}"
               onerror="this.src='https://placehold.co/600x800/e4dac8/78716c?text=Foto'">
           </div>
           ${thumbsHTML}
         </div>
 
-        <!-- INFO (abajo en mobile, derecha en desktop) -->
+        <!-- INFO -->
         <div class="prod-info">
           <p class="prod-cat-tag">${data.categoria || 'Producto'}</p>
           <h1 class="prod-nombre">${data.nombre}</h1>
@@ -479,6 +712,7 @@
           <hr class="divider">
 
           ${stockTagHTML}
+          ${coloresHTML}
 
           <p class="sec-label">Talla</p>
           <div class="tallas-wrap">${tallasHTML}</div>
@@ -498,6 +732,20 @@
           <button class="btn-comprar" id="btn-comprar" onclick="comprarAhora()" ${totalStock===0||!tallaSeleccionada?'disabled':''}>
             <i class="bi bi-credit-card"></i> Comprar ahora
           </button>
+
+          <!-- CALCULADORA DE ENVÍO -->
+          <div class="envio-calc">
+            <p class="envio-calc-titulo"><i class="bi bi-truck"></i> Calculá el costo de envío</p>
+            <div class="envio-calc-row">
+              <input type="number" class="envio-input" id="envio-cp"
+                placeholder="Ingresá tu código postal"
+                maxlength="8"
+                onkeydown="if(event.key==='Enter') calcularEnvio()">
+              <button class="envio-btn" onclick="calcularEnvio()">Calcular</button>
+            </div>
+            <p class="envio-error" id="envio-error" style="display:none"></p>
+            <div class="envio-resultado" id="envio-resultado"></div>
+          </div>
 
           ${data.descripcion ? `<p class="descripcion">${data.descripcion}</p>` : ''}
 
@@ -526,12 +774,35 @@
       `;
     }
 
-    function cambiarImg(src, el) {
+    function cambiarImg(src, el, idx) {
       document.getElementById('img-main').src = src;
       document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
+      lightboxIdx = idx;
     }
 
+    // ── Colores ──────────────────────────────────────────────────
+    function selColor(idx, btn) {
+      const colores = prodActual?.colores || [];
+      const color   = colores[idx];
+      if (!color) return;
+
+      colorSeleccionado = color;
+      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+
+      const label = document.getElementById('color-nombre-sel');
+      if (label) label.textContent = color.nombre;
+
+      // Cambiar imagen principal a la del color seleccionado
+      const imgMain = document.getElementById('img-main');
+      if (imgMain && color.imagen_url) {
+        imgMain.src = color.imagen_url;
+        imagenesGaleria[0] = color.imagen_url;
+      }
+    }
+
+    // ── Tallas ───────────────────────────────────────────────────
     function selTalla(t, btn) {
       tallaSeleccionada = t;
       document.querySelectorAll('.talla-btn').forEach(b => b.classList.remove('sel'));
@@ -539,7 +810,6 @@
       document.getElementById('btn-agregar').disabled = false;
       document.getElementById('btn-comprar').disabled = false;
 
-      // Show stock info for selected talla
       const maxStock = parseInt(btn.dataset.stock ?? '99');
       const infoEl   = document.getElementById('stock-talla-info');
       if (infoEl) {
@@ -550,7 +820,6 @@
         } else {
           infoEl.innerHTML = `<span style="color:#166534">✓ ${maxStock} disponibles en talle ${t}</span>`;
         }
-        // Adjust quantity to not exceed stock
         cantidad = Math.min(cantidad, maxStock);
         const qEl = document.getElementById('qty-num');
         if (qEl) qEl.textContent = cantidad;
@@ -564,9 +833,11 @@
       document.getElementById('qty-num').textContent = cantidad;
     }
 
+    // ── Carrito ──────────────────────────────────────────────────
     function agregarCarrito() {
       if (!prodActual || !tallaSeleccionada) return;
-      Carrito.agregar(prodActual, tallaSeleccionada, cantidad);
+      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre } : {};
+      Carrito.agregar(prodActual, tallaSeleccionada, cantidad, extra);
       toast(`${prodActual.nombre} (x${cantidad}) agregado ✓`);
     }
 
@@ -574,10 +845,32 @@
       if (!prodActual || !tallaSeleccionada) return;
       const user = await getUsuario();
       if (!user) { location.href = '/login.html?redirect=/pages/tienda/carrito.html'; return; }
-      Carrito.agregar(prodActual, tallaSeleccionada, cantidad);
+      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre } : {};
+      Carrito.agregar(prodActual, tallaSeleccionada, cantidad, extra);
       location.href = '/pages/tienda/carrito.html';
     }
 
+    // ── Lightbox ─────────────────────────────────────────────────
+    function abrirLightbox(idx) {
+      lightboxIdx = idx ?? 0;
+      document.getElementById('lightbox-img').src = imagenesGaleria[lightboxIdx];
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarLightbox(e) {
+      if (e && e.target !== document.getElementById('lightbox') && e.target !== e.currentTarget) return;
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function navLightbox(dir) {
+      if (!imagenesGaleria.length) return;
+      lightboxIdx = (lightboxIdx + dir + imagenesGaleria.length) % imagenesGaleria.length;
+      document.getElementById('lightbox-img').src = imagenesGaleria[lightboxIdx];
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────
     function toast(msg) {
       const w = document.getElementById('toasts');
       const el = document.createElement('div');
@@ -585,6 +878,10 @@
       el.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${msg}`;
       w.appendChild(el);
       setTimeout(() => el.remove(), 2600);
+    }
+
+    function formatearPrecio(num) {
+      return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(num);
     }
   </script>
 </body>
