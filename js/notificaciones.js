@@ -31,13 +31,21 @@ OneSignalDeferred.push(async function(OneSignal) {
       },
     });
 
-    // Etiquetar al admin
+    // Etiquetar al usuario según su rol
     try {
       const user = await getUsuario?.();
-      if (user && user.email === ADMIN_EMAIL) {
-        await OneSignal.User.addTag('rol',   'admin');
-        await OneSignal.User.addTag('email', user.email);
-        console.info('[OneSignal] ✅ Admin registrado');
+      if (user) {
+        // Registrar user_id para notificaciones personalizadas al cliente
+        await OneSignal.User.addTag('user_id', user.id);
+
+        // Si es admin, también registrar como admin
+        if (user.email === ADMIN_EMAIL) {
+          await OneSignal.User.addTag('rol',   'admin');
+          await OneSignal.User.addTag('email', user.email);
+          console.info('[OneSignal] ✅ Admin registrado');
+        } else {
+          console.info('[OneSignal] ✅ Cliente registrado:', user.id.substring(0,8));
+        }
       }
     } catch(e) {}
 
@@ -86,9 +94,12 @@ async function pedirPermisoNotificaciones() {
       window.OneSignalDeferred.push(async function(OneSignal) {
         try { await OneSignal.Notifications.requestPermission(); } catch(e) {}
         const user = await getUsuario?.();
-        if (user && user.email === ADMIN_EMAIL) {
-          await OneSignal.User.addTag('rol', 'admin');
-          await OneSignal.User.addTag('email', user.email);
+        if (user) {
+          await OneSignal.User.addTag('user_id', user.id);
+          if (user.email === ADMIN_EMAIL) {
+            await OneSignal.User.addTag('rol', 'admin');
+            await OneSignal.User.addTag('email', user.email);
+          }
         }
       });
       actualizarBotonNotif();
@@ -128,4 +139,9 @@ async function notificarNuevoPedido(pedidoId, total) {
 
 async function notificarMensajeAdmin(nombre, preview) {
   await _enviarPush('mensaje', { nombre, preview });
+}
+
+// ── Notificar al cliente cuando su pedido fue enviado ────────────
+async function notificarEnvioCliente(pedidoId, numeroGuia, correo, userId) {
+  await _enviarPush('envio', { pedidoId, numeroGuia, correo, userId });
 }
