@@ -635,6 +635,17 @@
       outline: none;
     }
 
+
+    /* ─── Tarifas de envío ─── */
+.tarifas-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.tarifas-table th { text-align: left; padding: .6rem .75rem; font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+.tarifas-table td { padding: .65rem .75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tarifas-table tr:last-child td { border-bottom: none; }
+.tarifas-table tr:hover td { background: var(--bg3); }
+.tarifa-input { width: 110px; padding: .4rem .6rem; border: 1.5px solid var(--border); border-radius: 6px; background: var(--bg2); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .85rem; outline: none; transition: border-color .2s; }
+.tarifa-input:focus { border-color: var(--accent); }
+.zona-badge { display: inline-block; padding: .2rem .6rem; background: var(--accent-dim); color: var(--accent); border-radius: 6px; font-size: .75rem; font-weight: 700; }
+
     /* ─── Despacho ─── */
     .despacho-grid {
       display: grid;
@@ -936,6 +947,11 @@
     <button class="nav-item" data-section="despacho" onclick="irA('despacho')">
       <i class="bi bi-truck"></i> Despacho
     </button>
+      <span class="nav-label">Configuración</span>
+     <button class="nav-item" data-section="tarifas" onclick="irA('tarifas')">
+      <i class="bi bi-calculator"></i> Tarifas de envío
+</button>
+<!-- Mensajes integrados dentro de cada pedido -->
     <!-- Mensajes integrados dentro de cada pedido -->
     <span id="badge-mensajes" style="display:none">0</span>
   </nav>
@@ -1147,6 +1163,29 @@
       <div class="despacho-grid" id="despacho-grid"></div>
     </div>
 
+
+    <!-- ══════════ TARIFAS DE ENVÍO ══════════ -->
+<div class="section" id="section-tarifas">
+  <div class="section-header">
+    <h2>Tarifas de envío</h2>
+    <button class="btn btn-ghost btn-sm" onclick="cargarTarifas()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button>
+  </div>
+  <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:.5rem">
+    Configurá el precio de envío por zona. El cliente ingresa su CP y ve el costo automáticamente.
+  </p>
+  <p style="color:var(--accent);font-size:.8rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.4rem">
+    <i class="bi bi-lightbulb-fill"></i>
+    Consultá los precios en
+    <a href="https://www.andreani.com" target="_blank" style="color:var(--accent);text-decoration:underline">andreani.com</a>,
+    <a href="https://www.oca.com.ar" target="_blank" style="color:var(--accent);text-decoration:underline">oca.com.ar</a> y
+    <a href="https://www.correoargentino.com.ar" target="_blank" style="color:var(--accent);text-decoration:underline">correoargentino.com.ar</a>
+    usando tu CP de origen (5900).
+  </p>
+  <div id="tarifas-wrap">
+    <p style="color:var(--text-muted);font-size:.875rem">Cargando tarifas…</p>
+  </div>
+</div>
+
     <!-- ══════════ MENSAJES ══════════ -->
     <div class="section" id="section-mensajes">
       <div class="section-header">
@@ -1243,7 +1282,20 @@
           <label class="field-label">Descripción</label>
           <textarea class="field-input" id="prod-descripcion" placeholder="Descripción del producto, materiales, características..."></textarea>
         </div>
-      </div>
+
+        <!-- 🔴 ACÁ VA EL BLOQUE DE COLORES - Justo después del cierre del field de descripción -->
+        <!-- COLORES -->
+        <div class="field" style="grid-column:1/-1">
+          <label class="field-label">Colores disponibles <span style="color:var(--text-muted);font-weight:400">(opcional)</span></label>
+          <p class="field-hint" style="margin-bottom:.75rem">Cada color tiene un nombre y una imagen. El cliente podrá elegir uno al comprar.</p>
+          <div id="colores-lista" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem"></div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="agregarColorFila()">
+            <i class="bi bi-plus-circle"></i> Agregar color
+          </button>
+        </div>
+        <!-- 🔴 HASTA ACÁ EL BLOQUE DE COLORES -->
+
+      </div>  <!-- ← Este es el cierre del form-grid-2 -->
 
       <div class="toggle-row">
         <label for="prod-activo">Visible en la tienda</label>
@@ -1340,7 +1392,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ═══════════════════════════════════════════════════════════
 //  NAVEGACIÓN
 // ═══════════════════════════════════════════════════════════
-const TITULOS = { dashboard:'Dashboard', productos:'Productos', pedidos:'Pedidos', despacho:'Despacho' };
+const TITULOS = { dashboard:'Dashboard', productos:'Productos', pedidos:'Pedidos', despacho:'Despacho', tarifas:'Tarifas de envío' };
 
 function irA(seccion) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1354,6 +1406,7 @@ function irA(seccion) {
   if (seccion === 'productos') cargarProductos();
   if (seccion === 'pedidos')   cargarPedidos();
   if (seccion === 'despacho')  cargarDespacho();
+  if (seccion === 'tarifas')   cargarTarifas();
 }
 
 function abrirSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('open'); }
@@ -1523,6 +1576,7 @@ function limpiarFormProducto() {
   generarCamposStockTalla({});
   document.getElementById('img-progress').style.display = 'none';
   document.getElementById('prod-error').style.display   = 'none';
+  document.getElementById('colores-lista').innerHTML = '';
 }
 
 function editarProducto(id) {
@@ -1544,6 +1598,12 @@ function editarProducto(id) {
   document.getElementById('prod-activo').checked     = prod.activo !== false;
   document.getElementById('prod-destacado').checked  = !!prod.destacado;
   document.getElementById('prod-error').style.display = 'none';
+
+  // Cargar colores existentes
+  document.getElementById('colores-lista').innerHTML = '';
+  if (prod.colores?.length) {
+    prod.colores.forEach(c => agregarColorFila(c.nombre, c.imagen_url));
+  }
 
   renderPreviews();
   generarCamposStockTalla(prod.stock_por_talla || {});
@@ -1600,6 +1660,7 @@ async function guardarProducto() {
     activo:         document.getElementById('prod-activo').checked,
     destacado:      document.getElementById('prod-destacado').checked,
     imagen_url:     imagenesSubidas[0] || null,
+    colores:        recolectarColores(),
     imagenes_urls:  imagenesSubidas,
   };
 
@@ -2618,6 +2679,137 @@ async function iniciarSuscripcionMensajesGlobal() {
     });
 }
 
+
+
+// ═══════════════════════════════════════════════════════════
+//  TARIFAS DE ENVÍO
+// ═══════════════════════════════════════════════════════════
+let tarifasData = [];
+
+async function cargarTarifas() {
+  const wrap = document.getElementById('tarifas-wrap');
+  if (!wrap) return;
+  const { data, error } = await sb.from('tarifas_envio').select('*').order('cp_desde');
+  if (error) { toast('Error al cargar tarifas', 'err'); return; }
+  tarifasData = data || [];
+  renderTarifas();
+}
+
+function renderTarifas() {
+  const wrap = document.getElementById('tarifas-wrap');
+  if (!wrap) return;
+  if (!tarifasData.length) {
+    wrap.innerHTML = '<p style="color:var(--text-muted)">No hay zonas configuradas.</p>';
+    return;
+  }
+  wrap.innerHTML = `
+    <div style="overflow-x:auto;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)">
+      <table class="tarifas-table">
+        <thead>
+          <tr>
+            <th>Zona</th>
+            <th>Descripción</th>
+            <th>CP desde–hasta</th>
+            <th><span style="color:#60a5fa">🟦 Andreani</span></th>
+            <th><span style="color:#fb923c">🟧 OCA</span></th>
+            <th><span style="color:var(--accent)">🟨 Correo Arg.</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tarifasData.map(t => `
+            <tr>
+              <td><span class="zona-badge">${t.zona}</span></td>
+              <td style="color:var(--text-muted);font-size:.8rem">${t.descripcion || '—'}</td>
+              <td style="font-family:monospace;font-size:.8rem;color:var(--text-muted)">${t.cp_desde} – ${t.cp_hasta}</td>
+              <td><input type="number" class="tarifa-input" id="tarifa-andreani-${t.id}" value="${t.precio_andreani || 0}" min="0"></td>
+              <td><input type="number" class="tarifa-input" id="tarifa-oca-${t.id}" value="${t.precio_oca || 0}" min="0"></td>
+              <td><input type="number" class="tarifa-input" id="tarifa-correo-${t.id}" value="${t.precio_correo || 0}" min="0"></td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="guardarTarifa('${t.id}')">
+                  <i class="bi bi-save"></i> Guardar
+                </button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.75rem;color:var(--text-muted);margin-top:.75rem">
+      <i class="bi bi-info-circle"></i> Ingresá 0 para ocultar ese correo en esa zona.
+    </p>`;
+}
+
+async function guardarTarifa(id) {
+  const andreani = parseInt(document.getElementById(`tarifa-andreani-${id}`)?.value) || 0;
+  const oca      = parseInt(document.getElementById(`tarifa-oca-${id}`)?.value) || 0;
+  const correo   = parseInt(document.getElementById(`tarifa-correo-${id}`)?.value) || 0;
+  const { error } = await sb.from('tarifas_envio').update({
+    precio_andreani: andreani, precio_oca: oca, precio_correo: correo,
+    updated_at: new Date().toISOString(),
+  }).eq('id', id);
+  if (error) { toast('Error al guardar tarifa', 'err'); return; }
+  const t = tarifasData.find(x => x.id === id);
+  if (t) { t.precio_andreani = andreani; t.precio_oca = oca; t.precio_correo = correo; }
+  toast('Tarifa guardada ✓', 'ok');
+}
+
+
+
+// ═══════════════════════════════════════════════════════════
+//  COLORES DEL PRODUCTO
+// ═══════════════════════════════════════════════════════════
+let colorCounter = 0;
+
+function agregarColorFila(nombre = '', imagenUrl = '') {
+  const lista = document.getElementById('colores-lista');
+  const idx   = colorCounter++;
+  const fila  = document.createElement('div');
+  fila.id     = `color-fila-${idx}`;
+  fila.style.cssText = 'display:flex;gap:.5rem;align-items:center;background:var(--bg3);padding:.5rem .75rem;border-radius:8px;border:1px solid var(--border)';
+  fila.innerHTML = `
+    <img id="color-preview-${idx}" src="${imagenUrl || ''}"
+      style="width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg2);border:1px solid var(--border);${imagenUrl ? '' : 'display:none'}">
+    <div id="color-noimg-${idx}" style="width:36px;height:36px;border-radius:6px;background:var(--bg2);border:1px solid var(--border);flex-shrink:0;display:${imagenUrl ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:.7rem;color:var(--text-muted)"><i class="bi bi-image"></i></div>
+    <input type="text" placeholder="Nombre (ej: Negro)" value="${nombre}"
+      id="color-nombre-${idx}"
+      style="flex:1;padding:.4rem .6rem;font-size:.82rem;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)">
+    <input type="text" placeholder="URL de la imagen" value="${imagenUrl}"
+      id="color-url-${idx}"
+      oninput="actualizarPreviewColor(${idx})"
+      style="flex:2;padding:.4rem .6rem;font-size:.82rem;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)">
+    <button onclick="document.getElementById('color-fila-${idx}').remove()"
+      style="background:none;border:none;cursor:pointer;color:var(--red);font-size:1rem;padding:.25rem;flex-shrink:0">
+      <i class="bi bi-trash3"></i>
+    </button>`;
+  lista.appendChild(fila);
+}
+
+function actualizarPreviewColor(idx) {
+  const url  = document.getElementById(`color-url-${idx}`)?.value.trim();
+  const img  = document.getElementById(`color-preview-${idx}`);
+  const noimg = document.getElementById(`color-noimg-${idx}`);
+  if (!img || !noimg) return;
+  if (url) {
+    img.src = url;
+    img.style.display = 'block';
+    noimg.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    noimg.style.display = 'flex';
+  }
+}
+
+function recolectarColores() {
+  const filas = document.querySelectorAll('#colores-lista > div[id^="color-fila-"]');
+  const colores = [];
+  filas.forEach(fila => {
+    const idx    = fila.id.replace('color-fila-', '');
+    const nombre = document.getElementById(`color-nombre-${idx}`)?.value.trim();
+    const url    = document.getElementById(`color-url-${idx}`)?.value.trim();
+    if (nombre && url) colores.push({ nombre, imagen_url: url });
+  });
+  return colores;
+}
 
 // Cerrar modales al hacer clic fuera
 document.getElementById('modal-producto').addEventListener('click', e => { if (e.target === e.currentTarget) cerrarModalProducto(); });
