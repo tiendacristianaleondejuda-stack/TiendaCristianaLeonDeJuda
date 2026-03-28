@@ -690,78 +690,84 @@
     let imagenesGaleria = [];
     let lightboxIdx = 0;
 
-    // ── Tabla de precios de envío por zona ──────────────────────
-    // Zonas: CABA (1000-1499), GBA (1500-1999), Interior (resto)
-    const TARIFAS_ENVIO = {
-      andreani: { CABA: 2500,  GBA: 3200,  interior: 4800  },
-      oca:      { CABA: 2800,  GBA: 3500,  interior: 5200  },
-      correo:   { CABA: 1900,  GBA: 2600,  interior: 3900  },
-    };
+    
+    // ── Calculadora de envío — lee tarifas de Supabase ──────────
+let tarifasEnvio = [];
 
-    function detectarZonaCP(cp) {
-      const n = parseInt(cp);
-      if (isNaN(n) || cp.length < 4) return null;
-      if (n >= 1000 && n <= 1499) return 'CABA';
-      if (n >= 1500 && n <= 1999) return 'GBA';
-      if (n >= 2000) return 'interior';
-      return null;
-    }
+async function cargarTarifasEnvio() {
+  try {
+    const { data } = await sb.from('tarifas_envio').select('*').order('cp_desde');
+    tarifasEnvio = data || [];
+  } catch(e) { tarifasEnvio = []; }
+}
 
-    function calcularEnvio() {
-      const cp  = document.getElementById('envio-cp')?.value.trim();
-      const res = document.getElementById('envio-resultado');
-      const err = document.getElementById('envio-error');
+function detectarZona(cp) {
+  const n = parseInt(cp);
+  if (isNaN(n)) return null;
+  return tarifasEnvio.find(t => n >= t.cp_desde && n <= t.cp_hasta) || null;
+}
 
-      if (!cp || cp.length < 4) {
-        if (err) err.textContent = 'Ingresá un código postal válido (ej: 1414)';
-        if (err) err.style.display = 'block';
-        return;
-      }
+function calcularEnvio() {
+  const cp  = document.getElementById('envio-cp')?.value.trim();
+  const res = document.getElementById('envio-resultado');
+  const err = document.getElementById('envio-error');
 
-      const zona = detectarZonaCP(cp);
-      if (!zona) {
-        if (err) err.textContent = 'Código postal no reconocido. Ingresá un CP argentino.';
-        if (err) err.style.display = 'block';
-        if (res) res.style.display = 'none';
-        return;
-      }
+  if (!cp || cp.length < 4) {
+    if (err) { err.textContent = 'Ingresá un código postal válido (ej: 1414)'; err.style.display = 'block'; }
+    return;
+  }
+  if (!tarifasEnvio.length) {
+    if (err) { err.textContent = 'Las tarifas no están configuradas todavía.'; err.style.display = 'block'; }
+    return;
+  }
 
-      if (err) err.style.display = 'none';
+  const zona = detectarZona(cp);
+  if (!zona) {
+    if (err) { err.textContent = 'Código postal no encontrado. Verificá que sea un CP argentino.'; err.style.display = 'block'; }
+    if (res) res.style.display = 'none';
+    return;
+  }
 
-      const zonaLabel = { CABA: 'Ciudad de Buenos Aires', GBA: 'Gran Buenos Aires', interior: 'Interior del país' }[zona];
+  if (err) err.style.display = 'none';
 
-      const opciones = [
-        { key: 'andreani', nombre: 'Andreani',          icono: '🟦' },
-        { key: 'oca',      nombre: 'OCA',               icono: '🟧' },
-        { key: 'correo',   nombre: 'Correo Argentino',  icono: '🟨' },
-      ];
+  const opciones = [
+    { key: 'precio_andreani', nombre: 'Andreani',         icono: '🟦' },
+    { key: 'precio_oca',      nombre: 'OCA',              icono: '🟧' },
+    { key: 'precio_correo',   nombre: 'Correo Argentino', icono: '🟨' },
+  ].filter(o => zona[o.key] > 0);
 
-      res.innerHTML = `
-        <p class="envio-zona"><i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i> ${zonaLabel} · CP ${cp}</p>
-        ${opciones.map(o => `
-          <div class="envio-opcion">
-            <span class="envio-opcion-nombre">${o.icono} ${o.nombre}</span>
-            <span class="envio-opcion-precio">${formatearPrecio(TARIFAS_ENVIO[o.key][zona])}</span>
-          </div>`).join('')}
-        <p style="font-size:.7rem;color:var(--text-muted);margin-top:.4rem">* Precios estimados, pueden variar según el peso del paquete.</p>`;
-      res.style.display = 'block';
-    }
+  if (!opciones.length) {
+    if (err) { err.textContent = 'No hay tarifas configuradas para tu zona todavía.'; err.style.display = 'block'; }
+    if (res) res.style.display = 'none';
+    return;
+  }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      Carrito.actualizarContador();
-      await actualizarNavbarAuth();
-      const id = new URLSearchParams(location.search).get('id');
-      if (!id) { location.href = '/index.html'; return; }
-      await cargarProducto(id);
-      await cargarRelacionados(id);
+  res.innerHTML = `
+    <p class="envio-zona"><i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i> ${zona.zona} · ${zona.descripcion || ''} · CP ${cp}</p>
+    ${opciones.map(o => `
+      <div class="envio-opcion">
+        <span class="envio-opcion-nombre">${o.icono} ${o.nombre}</span>
+        <span class="envio-opcion-precio">${formatearPrecio(zona[o.key])}</span>
+      </div>`).join('')}
+    <p style="font-size:.7rem;color:var(--text-muted);margin-top:.4rem">* Precios estimados, pueden variar según el peso del paquete.</p>`;
+  res.style.display = 'block';
+}
 
-      // Cerrar lightbox con ESC
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') cerrarLightbox();
-        if (e.key === 'ArrowLeft')  navLightbox(-1);
-        if (e.key === 'ArrowRight') navLightbox(1);
-      });
-    });
+document.addEventListener('DOMContentLoaded', async () => {
+  Carrito.actualizarContador();
+  await actualizarNavbarAuth();
+  await cargarTarifasEnvio();
+  const id = new URLSearchParams(location.search).get('id');
+  if (!id) { location.href = '/index.html'; return; }
+  await cargarProducto(id);
+
+  // Cerrar lightbox con ESC
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') cerrarLightbox();
+    if (e.key === 'ArrowLeft')  navLightbox(-1);
+    if (e.key === 'ArrowRight') navLightbox(1);
+  });
+});
 
     async function cargarProducto(id) {
       const { data, error } = await sb.from('productos').select('*').eq('id', id).single();
