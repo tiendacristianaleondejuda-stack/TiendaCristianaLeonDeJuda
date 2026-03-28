@@ -468,6 +468,166 @@
     /* Skeleton */
     .skel { background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%); background-size:200% 100%; animation: shimmer 1.5s infinite; border-radius:8px; }
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ══════════════════════════════════
+       PRODUCTOS RELACIONADOS
+    ══════════════════════════════════ */
+    .relacionados-section {
+      max-width: 1280px;
+      margin: 4rem auto 0;
+      padding: 0 1.5rem;
+    }
+
+    .relacionados-titulo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: .35rem;
+    }
+
+    .relacionados-sub {
+      font-size: .82rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .relacionados-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 900px) { .relacionados-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) { .relacionados-grid { grid-template-columns: repeat(2, 1fr); gap: .75rem; } }
+
+    .rel-card {
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+    }
+
+    .rel-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+
+    .rel-card-img {
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      background: var(--bg2);
+    }
+
+    .rel-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+    .rel-card:hover .rel-card-img img { transform: scale(1.04); }
+
+    .rel-card-info { padding: .75rem; }
+    .rel-card-nombre { font-weight: 600; font-size: .88rem; margin-bottom: .25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rel-card-precio { font-size: .9rem; font-weight: 700; color: var(--gold); }
+
+    /* ══════════════════════════════════
+       FOOTER RICO
+    ══════════════════════════════════ */
+    .footer-banner {
+      background: var(--gold);
+      color: white;
+      text-align: center;
+      padding: .75rem 1.25rem;
+      font-size: .82rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      margin-top: 4rem;
+    }
+
+    footer {
+      background: #141210;
+      color: rgba(255,255,255,.55);
+      font-size: .85rem;
+    }
+
+    .footer-main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 2.5rem;
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 3rem;
+    }
+
+    @media (max-width: 900px) { .footer-main { grid-template-columns: 1fr 1fr; gap: 2rem; } }
+    @media (max-width: 520px) { .footer-main { grid-template-columns: 1fr; gap: 1.75rem; padding: 2.5rem 1.25rem 2rem; } }
+
+    .footer-col-logo .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.7rem; color: white; font-weight: 600;
+      letter-spacing: .02em; display: block; margin-bottom: .35rem;
+    }
+
+    .footer-col-logo .footer-tagline {
+      font-size: .78rem; color: rgba(255,255,255,.35);
+      letter-spacing: .08em; text-transform: uppercase; margin-bottom: 1rem;
+    }
+
+    .footer-col-logo .footer-verse {
+      font-style: italic; font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; color: rgba(255,255,255,.4);
+      line-height: 1.5; margin-bottom: 1.25rem;
+    }
+
+    .footer-social { display: flex; gap: .6rem; }
+    .footer-social a {
+      width: 34px; height: 34px;
+      border: 1px solid rgba(255,255,255,.12); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.5); font-size: 1rem; transition: border-color .2s, color .2s, background .2s;
+    }
+    .footer-social a:hover { border-color: var(--gold); color: var(--gold); background: rgba(154,123,46,.08); }
+
+    .footer-col-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1rem;
+      font-weight: 600; color: white; letter-spacing: .06em;
+      text-transform: uppercase; margin-bottom: 1rem;
+      padding-bottom: .5rem; border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+
+    .footer-links { display: flex; flex-direction: column; gap: .55rem; }
+    .footer-links a {
+      color: rgba(255,255,255,.5); font-size: .84rem;
+      transition: color .15s; display: flex; align-items: center; gap: .4rem;
+    }
+    .footer-links a:hover { color: var(--gold-light); }
+    .footer-links a i { font-size: .8rem; opacity: .6; }
+
+    .footer-info-row {
+      display: flex; align-items: flex-start; gap: .6rem;
+      margin-bottom: .7rem; font-size: .83rem; line-height: 1.5;
+    }
+    .footer-info-row i { color: var(--gold); font-size: .95rem; margin-top: .1rem; flex-shrink: 0; }
+
+    .metodos-pago-grid { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .metodo-badge {
+      display: flex; align-items: center; gap: .4rem;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px; padding: .4rem .7rem;
+      font-size: .75rem; color: rgba(255,255,255,.65); font-weight: 500;
+    }
+    .metodo-badge i, .metodo-badge .emoji { font-size: 1rem; }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.06);
+      padding: 1.25rem 2rem; max-width: 1280px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: .5rem;
+      font-size: .75rem; color: rgba(255,255,255,.25);
+    }
+    @media (max-width: 520px) { .footer-bottom { flex-direction: column; text-align: center; padding: 1rem 1.25rem; } }
   </style>
 </head>
 
@@ -593,6 +753,7 @@
       const id = new URLSearchParams(location.search).get('id');
       if (!id) { location.href = '/index.html'; return; }
       await cargarProducto(id);
+      await cargarRelacionados(id);
 
       // Cerrar lightbox con ESC
       document.addEventListener('keydown', e => {
@@ -870,6 +1031,45 @@
       document.getElementById('lightbox-img').src = imagenesGaleria[lightboxIdx];
     }
 
+    // ── Productos relacionados ────────────────────────────────
+    async function cargarRelacionados(idActual) {
+      if (!prodActual) return;
+      const cat = prodActual.categoria;
+      if (!cat) return;
+
+      const { data } = await sb
+        .from('productos')
+        .select('id, nombre, precio, imagen_url, imagenes_urls, categoria')
+        .eq('activo', true)
+        .eq('categoria', cat)
+        .neq('id', idActual)
+        .limit(4);
+
+      if (!data?.length) return;
+
+      const seccion = document.getElementById('relacionados-section');
+      const grid    = document.getElementById('relacionados-grid');
+      const sub     = document.getElementById('relacionados-sub');
+
+      sub.textContent = `Más productos en ${cat}`;
+      grid.innerHTML  = data.map(p => {
+        const img = p.imagenes_urls?.[0] || p.imagen_url || 'https://placehold.co/300x400/e4dac8/78716c?text=+';
+        return `
+          <a class="rel-card" href="/pages/tienda/producto.html?id=${p.id}">
+            <div class="rel-card-img">
+              <img src="${img}" alt="${p.nombre}" loading="lazy"
+                onerror="this.src='https://placehold.co/300x400/e4dac8/78716c?text=+'">
+            </div>
+            <div class="rel-card-info">
+              <p class="rel-card-nombre">${p.nombre}</p>
+              <p class="rel-card-precio">${formatearPrecio(p.precio)}</p>
+            </div>
+          </a>`;
+      }).join('');
+
+      seccion.style.display = 'block';
+    }
+
     // ── Helpers ──────────────────────────────────────────────────
     function toast(msg) {
       const w = document.getElementById('toasts');
@@ -884,5 +1084,94 @@
       return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(num);
     }
   </script>
+  <!-- ─── PRODUCTOS RELACIONADOS ─── -->
+  <section class="relacionados-section" id="relacionados-section" style="display:none">
+    <h2 class="relacionados-titulo">También te puede gustar</h2>
+    <p class="relacionados-sub" id="relacionados-sub"></p>
+    <div class="relacionados-grid" id="relacionados-grid"></div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <div class="footer-banner">
+    <i class="bi bi-truck"></i>
+    Envío a todo el país · Andreani, OCA y Correo Argentino
+  </div>
+
+  <footer>
+    <div class="footer-main">
+
+      <!-- Col 1: Marca -->
+      <div class="footer-col-logo">
+        <span class="footer-logo">León de Judá</span>
+        <p class="footer-tagline">Ropa Cristiana</p>
+        <p class="footer-verse">"Revestíos de toda la armadura de Dios" — Efesios 6:11</p>
+        <div class="footer-social">
+          <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="#" title="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+          <a href="#" title="TikTok"><i class="bi bi-tiktok"></i></a>
+        </div>
+      </div>
+
+      <!-- Col 2: Navegación -->
+      <div>
+        <p class="footer-col-title">Tienda</p>
+        <div class="footer-links">
+          <a href="/index.html"><i class="bi bi-chevron-right"></i> Inicio</a>
+          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Remeras</a>
+          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Buzos</a>
+          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Gorras</a>
+          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Accesorios</a>
+          <a href="/pages/tienda/carrito.html"><i class="bi bi-chevron-right"></i> Mi carrito</a>
+          <a href="/pages/tienda/cuenta.html"><i class="bi bi-chevron-right"></i> Mi cuenta</a>
+        </div>
+      </div>
+
+      <!-- Col 3: Info de la tienda -->
+      <div>
+        <p class="footer-col-title">Local</p>
+        <div class="footer-info-row">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>Parajon Ortiz 774<br><span style="color:rgba(255,255,255,.3);font-size:.78rem">Villa Maria, Cordoba</span></span>
+        </div>
+        <div class="footer-info-row">
+          <i class="bi bi-clock-fill"></i>
+          <span>Lun a Vie: 9:00 – 18:00<br>Sáb: 10:00 – 14:00</span>
+        </div>
+        <div class="footer-info-row">
+          <i class="bi bi-whatsapp"></i>
+          <span><a href="https://wa.me/5493534180007" style="color:rgba(255,255,255,.55);transition:color .15s" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='rgba(255,255,255,.55)'">+54 9 3534180007</a></span>
+        </div>
+        <div class="footer-info-row">
+          <i class="bi bi-envelope-fill"></i>
+          <span>tiendacristianaleondejuda@gmail.com</span>
+        </div>
+      </div>
+
+      <!-- Col 4: Métodos de pago -->
+      <div>
+        <p class="footer-col-title">Medios de pago</p>
+        <div class="metodos-pago-grid">
+          <div class="metodo-badge"><span class="emoji">💳</span> Tarjeta</div>
+          <div class="metodo-badge"><span class="emoji">📱</span> MercadoPago</div>
+          <div class="metodo-badge"><span class="emoji">🏦</span> Transferencia</div>
+          <div class="metodo-badge"><span class="emoji">💵</span> Efectivo</div>
+        </div>
+        <p style="margin-top:1.1rem;margin-bottom:.5rem;font-size:.72rem;color:rgba(255,255,255,.3);letter-spacing:.06em;text-transform:uppercase">Envíos con</p>
+        <div class="metodos-pago-grid">
+          <div class="metodo-badge"><i class="bi bi-truck"></i> Andreani</div>
+          <div class="metodo-badge"><i class="bi bi-truck"></i> OCA</div>
+          <div class="metodo-badge"><i class="bi bi-truck"></i> Correo Arg.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2025 León de Judá · Todos los derechos reservados</span>
+      <span>Hecho con <i class="bi bi-heart-fill" style="color:var(--gold);font-size:.7rem"></i> y fe</span>
+    </div>
+  </footer>
+
 </body>
 </html>
