@@ -1759,14 +1759,21 @@ function filtrarTablaPedidos() {
   renderTablaPedidos(lista);
 }
 
-function condicionPagoBadge(estado, metodoPago) {
-  if (['pagado','enviado','entregado'].includes(estado)) {
+function condicionPagoBadge(condicion) {
+  if (condicion === 'pagado') {
     return '<span class="badge badge-green"><i class="bi bi-check-circle-fill" style="font-size:.7rem"></i>&nbsp;Pagado</span>';
   }
-  if (estado === 'cancelado') {
-    return '<span class="badge badge-red">Cancelado</span>';
-  }
   return '<span class="badge badge-orange"><i class="bi bi-clock" style="font-size:.7rem"></i>&nbsp;Pendiente pago</span>';
+}
+
+async function cambiarCondicionPago(pedidoId, nuevaCondicion) {
+  const { error } = await sb.from('pedidos')
+    .update({ condicion_pago: nuevaCondicion, updated_at: new Date().toISOString() })
+    .eq('id', pedidoId);
+  if (error) { toast('Error al actualizar condición de pago', 'err'); return; }
+  toast(`Condición de pago → ${nuevaCondicion === 'pagado' ? 'Pagado ✓' : 'Pendiente pago'}`, 'ok');
+  const p = todosPedidos.find(x => x.id === pedidoId);
+  if (p) p.condicion_pago = nuevaCondicion;
 }
 
 function renderTablaPedidos(lista) {
@@ -1811,7 +1818,13 @@ function renderTablaPedidos(lista) {
       </td>
       <td style="font-weight:700">${formatearPrecio(p.total)}</td>
       <td>${estadoBadge(p.estado)}</td>
-      <td>${condicionPagoBadge(p.estado, p.metodo_pago)}</td>
+      <td onclick="event.stopPropagation()">
+        <select class="estado-select" onchange="cambiarCondicionPago('${p.id}', this.value)" title="Cambiar condición de pago"
+          style="${p.condicion_pago === 'pagado' ? 'border-color:var(--green);color:var(--green)' : 'border-color:var(--orange);color:var(--orange)'}">
+          <option value="pendiente_pago" ${(p.condicion_pago !== 'pagado') ? 'selected' : ''}>⏳ Pendiente pago</option>
+          <option value="pagado"         ${ p.condicion_pago === 'pagado'  ? 'selected' : ''}>✅ Pagado</option>
+        </select>
+      </td>
       <td>
         <select class="estado-select" onchange="cambiarEstado('${p.id}', this.value)" onclick="event.stopPropagation()" title="Cambiar estado">
           ${['pendiente','pendiente_pago','pagado','enviado','entregado','cancelado'].map(e =>
@@ -2174,6 +2187,9 @@ function despachoCard(p, estadoActual) {
   const botonAvanzar = estadoActual === 'enviado'
     ? `<button class="btn btn-primary btn-sm" onclick="avanzarEstado('${p.id}','entregado')">
         <i class="bi bi-check-lg"></i> Marcar entregado
+       </button>
+       <button class="btn btn-ghost btn-sm" onclick="revertirAPendiente('${p.id}')" title="Revertir a pendiente por error">
+         <i class="bi bi-arrow-counterclockwise"></i> Volver a pendiente
        </button>`
     : `<span style="font-size:.75rem;color:var(--green);font-weight:600"><i class="bi bi-check-circle-fill"></i> Entregado</span>`
 
@@ -2235,6 +2251,22 @@ async function guardarGuia(pedidoId) {
 async function avanzarEstado(id, nuevoEstado) {
   await cambiarEstado(id, nuevoEstado)
   cargarDespacho()
+}
+
+async function revertirAPendiente(id) {
+  if (!confirm('¿Revertir este pedido a "Pendiente"? Va a desaparecer de Despacho y volver a la sección de Pedidos.')) return;
+  const { error } = await sb.from('pedidos')
+    .update({ estado: 'pendiente', updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) { toast('Error al revertir pedido', 'err'); return; }
+  toast('Pedido revertido a Pendiente ✓', 'ok');
+  // Actualizar en memoria
+  const p = todosDespachos.find(x => x.id === id);
+  if (p) p.estado = 'pendiente';
+  const tp = todosPedidos.find(x => x.id === id);
+  if (tp) tp.estado = 'pendiente';
+  cargarDespacho();
+  cargarPedidos();
 }
 
 async function cambiarEstadoDespacho(id, estado) {
