@@ -1120,11 +1120,12 @@
               <th>Pago</th>
               <th>Total</th>
               <th>Estado</th>
+              <th>Condición pago</th>
               <th>Acción</th>
             </tr>
           </thead>
           <tbody id="pedidos-tbody">
-            <tr><td colspan="7"><div class="empty-state"><i class="bi bi-hourglass"></i><p>Cargando...</p></div></td></tr>
+            <tr><td colspan="8"><div class="empty-state"><i class="bi bi-hourglass"></i><p>Cargando...</p></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -1751,14 +1752,27 @@ async function cargarPedidos() {
 
 function filtrarTablaPedidos() {
   const estado = document.getElementById('filter-estado').value;
-  const lista  = estado ? todosPedidos.filter(p => p.estado === estado) : todosPedidos;
+  // Sin filtro: ocultar enviado/entregado (esos van a la sección Despacho)
+  const lista = estado
+    ? todosPedidos.filter(p => p.estado === estado)
+    : todosPedidos.filter(p => !['enviado','entregado'].includes(p.estado));
   renderTablaPedidos(lista);
+}
+
+function condicionPagoBadge(estado, metodoPago) {
+  if (['pagado','enviado','entregado'].includes(estado)) {
+    return '<span class="badge badge-green"><i class="bi bi-check-circle-fill" style="font-size:.7rem"></i>&nbsp;Pagado</span>';
+  }
+  if (estado === 'cancelado') {
+    return '<span class="badge badge-red">Cancelado</span>';
+  }
+  return '<span class="badge badge-orange"><i class="bi bi-clock" style="font-size:.7rem"></i>&nbsp;Pendiente pago</span>';
 }
 
 function renderTablaPedidos(lista) {
   const tbody = document.getElementById('pedidos-tbody');
   if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="bi bi-receipt"></i><p>No hay pedidos</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="bi bi-receipt"></i><p>No hay pedidos</p></div></td></tr>';
     return;
   }
 
@@ -1797,6 +1811,7 @@ function renderTablaPedidos(lista) {
       </td>
       <td style="font-weight:700">${formatearPrecio(p.total)}</td>
       <td>${estadoBadge(p.estado)}</td>
+      <td>${condicionPagoBadge(p.estado, p.metodo_pago)}</td>
       <td>
         <select class="estado-select" onchange="cambiarEstado('${p.id}', this.value)" onclick="event.stopPropagation()" title="Cambiar estado">
           ${['pendiente','pendiente_pago','pagado','enviado','entregado','cancelado'].map(e =>
@@ -1818,6 +1833,8 @@ async function cambiarEstado(pedidoId, nuevoEstado) {
   const badge = document.getElementById('badge-pendientes');
   if (pends > 0) { badge.textContent = pends; badge.style.display = 'inline'; }
   else { badge.style.display = 'none'; }
+  // Re-renderizar tabla para aplicar filtros (ej: enviado desaparece de Pedidos)
+  filtrarTablaPedidos();
   if (nuevoEstado === 'enviado' || nuevoEstado === 'entregado') {
     cargarDespacho();
   }
