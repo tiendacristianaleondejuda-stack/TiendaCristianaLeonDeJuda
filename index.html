@@ -616,38 +616,178 @@
     @keyframes t-out { from { opacity:1; } to { opacity:0; } }
 
     /* ══════════════════════════════════
-       FOOTER
+       FOOTER RICO
     ══════════════════════════════════ */
-    footer {
-      background: var(--text);
-      color: rgba(255,255,255,.5);
-      padding: 2rem 1.25rem;
-      font-size: .8rem;
-      margin-top: 2rem;
+    .footer-banner {
+      background: var(--gold);
+      color: white;
+      text-align: center;
+      padding: .75rem 1.25rem;
+      font-size: .82rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
     }
 
-    .footer-inner {
-      max-width: 1200px;
+    footer {
+      background: #141210;
+      color: rgba(255,255,255,.55);
+      font-size: .85rem;
+      margin-top: 4rem;
+    }
+
+    .footer-main {
+      max-width: 1280px;
       margin: 0 auto;
+      padding: 3.5rem 2rem 2.5rem;
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 3rem;
+    }
+
+    @media (max-width: 900px) {
+      .footer-main { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    }
+
+    @media (max-width: 520px) {
+      .footer-main { grid-template-columns: 1fr; gap: 1.75rem; padding: 2.5rem 1.25rem 2rem; }
+    }
+
+    .footer-col-logo .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.7rem;
+      color: white;
+      font-weight: 600;
+      letter-spacing: .02em;
+      display: block;
+      margin-bottom: .35rem;
+    }
+
+    .footer-col-logo .footer-tagline {
+      font-size: .78rem;
+      color: rgba(255,255,255,.35);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .footer-col-logo .footer-verse {
+      font-style: italic;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: rgba(255,255,255,.4);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-social {
+      display: flex;
+      gap: .6rem;
+    }
+
+    .footer-social a {
+      width: 34px; height: 34px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.5);
+      font-size: 1rem;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+
+    .footer-social a:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(154,123,46,.08);
+    }
+
+    .footer-col-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+
+    .footer-links {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: .5rem;
-      text-align: center;
+      gap: .55rem;
     }
 
-    .footer-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.2rem;
-      color: white;
+    .footer-links a {
+      color: rgba(255,255,255,.5);
+      font-size: .84rem;
+      transition: color .15s;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .footer-links a:hover { color: var(--gold-light, #c9a84c); }
+    .footer-links a i { font-size: .8rem; opacity: .6; }
+
+    .footer-info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: .6rem;
+      margin-bottom: .7rem;
+      font-size: .83rem;
+      line-height: 1.5;
+    }
+
+    .footer-info-row i {
+      color: var(--gold);
+      font-size: .95rem;
+      margin-top: .1rem;
+      flex-shrink: 0;
+    }
+
+    /* Métodos de pago */
+    .metodos-pago-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    .metodo-badge {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: .4rem .7rem;
+      font-size: .75rem;
+      color: rgba(255,255,255,.65);
       font-weight: 500;
     }
 
-    .footer-verse {
-      font-style: italic;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: .95rem;
-      color: rgba(255,255,255,.35);
+    .metodo-badge i, .metodo-badge span.emoji { font-size: 1rem; }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.06);
+      padding: 1.25rem 2rem;
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .5rem;
+      font-size: .75rem;
+      color: rgba(255,255,255,.25);
+    }
+
+    @media (max-width: 520px) {
+      .footer-bottom { flex-direction: column; text-align: center; padding: 1rem 1.25rem; }
     }
   </style>
 </head>
@@ -711,10 +851,10 @@
     <button class="cat-btn active" data-cat="">Todos</button>
     <button class="cat-btn" data-cat="remeras">Remeras</button>
     <button class="cat-btn" data-cat="pantalones">Pantalones</button>
-    <button class="cat-btn" data-cat="gorras">Gorras</button>
+    <button class="cat-btn" data-cat="vestidos">Vestidos</button>
     <button class="cat-btn" data-cat="buzos">Buzos</button>
     <button class="cat-btn" data-cat="accesorios">Accesorios</button>
-    <button class="cat-btn" data-cat="musculosas">Musculosas</button>
+    <button class="cat-btn" data-cat="calzado">Calzado</button>
   </div>
 
   <!-- ─── PRODUCTOS ─── -->
@@ -733,11 +873,88 @@
   </section>
 
   <!-- ─── FOOTER ─── -->
+
+  <!-- Banner envío gratis -->
+  <div class="footer-banner">
+    <i class="bi bi-truck"></i>
+    Envío a todo el país · Andreani, OCA y Correo Argentino
+  </div>
+
   <footer>
-    <div class="footer-inner">
-      <div class="footer-logo">León de Judá</div>
-      <p class="footer-verse">"Porque para mí el vivir es Cristo" — Filipenses 1:21</p>
-      <p>© 2025 León de Judá — Todos los derechos reservados</p>
+    <div class="footer-main">
+
+      <!-- Col 1: Marca -->
+      <div class="footer-col-logo">
+        <span class="footer-logo">León de Judá</span>
+        <p class="footer-tagline">Ropa Cristiana</p>
+        <p class="footer-verse">"Revestíos de toda la armadura de Dios" — Efesios 6:11</p>
+        <div class="footer-social">
+          <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="#" title="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+          <a href="#" title="TikTok"><i class="bi bi-tiktok"></i></a>
+        </div>
+      </div>
+
+      <!-- Col 2: Navegación -->
+      <div>
+        <p class="footer-col-title">Tienda</p>
+        <div class="footer-links">
+          <a href="/index.html"><i class="bi bi-chevron-right"></i> Inicio</a>
+          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Remeras</a>
+          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Buzos</a>
+          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Gorras</a>
+          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Accesorios</a>
+          <a href="/pages/tienda/carrito.html"><i class="bi bi-chevron-right"></i> Mi carrito</a>
+          <a href="/pages/tienda/cuenta.html"><i class="bi bi-chevron-right"></i> Mi cuenta</a>
+        </div>
+      </div>
+
+      <!-- Col 3: Info de la tienda -->
+      <div>
+        <p class="footer-col-title">Local</p>
+        <div class="footer-info-row">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>Parajon Ortiz 774<br><span style="color:rgba(255,255,255,.3);font-size:.78rem">Villa Maria, Cordoba</span></span>
+        </div>
+        <div class="footer-info-row">
+          <i class="bi bi-clock-fill"></i>
+          <span>Lun a Vie: 9:00 – 18:00<br>Sáb: 10:00 – 14:00</span>
+        </div>
+        <div class="footer-info-row">
+          <i class="bi bi-whatsapp"></i>
+          <span><a href="https://wa.me/5493534180007" style="color:rgba(255,255,255,.55);transition:color .15s" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='rgba(255,255,255,.55)'">+54 9 3534180007</a></span>
+        </div>
+        <div class="footer-info-row">
+          <i class="bi bi-envelope-fill"></i>
+          <span>tiendacristianaleondejuda@gmail.com
+</span>
+        </div>
+      </div>
+
+      <!-- Col 4: Métodos de pago -->
+      <div>
+        <p class="footer-col-title">Medios de pago</p>
+        <div class="metodos-pago-grid">
+          <div class="metodo-badge"><span class="emoji">💳</span> Tarjeta</div>
+          <div class="metodo-badge"><span class="emoji">📱</span> MercadoPago</div>
+          <div class="metodo-badge"><span class="emoji">🏦</span> Transferencia</div>
+          <div class="metodo-badge"><span class="emoji">💵</span> Efectivo</div>
+        </div>
+        <p style="margin-top:1.1rem;margin-bottom:.5rem;font-size:.72rem;color:rgba(255,255,255,.3);letter-spacing:.06em;text-transform:uppercase">Envíos con</p>
+        <div class="metodos-pago-grid">
+          <div class="metodo-badge"><i class="bi bi-truck"></i> Andreani</div>
+          <div class="metodo-badge"><i class="bi bi-truck"></i> OCA</div>
+          <div class="metodo-badge"><i class="bi bi-truck"></i> Correo Arg.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="footer-bottom">
+      <span>© 2025 León de Judá · Todos los derechos reservados</span>
+      <span>Hecho con <i class="bi bi-heart-fill" style="color:var(--gold);font-size:.7rem"></i> y fe</span>
     </div>
   </footer>
 
