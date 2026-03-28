@@ -31,28 +31,15 @@ async function protegerAdmin() {
 const Carrito = {
   get()    { return JSON.parse(localStorage.getItem('narvaez_carrito') || '{"items":[]}'); },
   save(c)  { localStorage.setItem('narvaez_carrito', JSON.stringify(c)); Carrito.actualizarContador(); },
- agregar(prod, talla, cantidad, extra = {}) {
-  const carrito = this.get();
-  const color = extra?.color || null;
-  const clave = `${prod.id}-${talla}${color ? '-' + color : ''}`;
-  const existente = carrito.items.find(i => i.clave === clave);
-  if (existente) {
-    existente.cantidad += cantidad;
-  } else {
-    carrito.items.push({
-      clave,
-      id:       prod.id,
-      nombre:   prod.nombre,
-      precio:   prod.precio,
-      imagen:   prod.imagen_url || (prod.imagenes_urls?.[0] || null),
-      talla,
-      color,
-      cantidad,
-    });
-  }
-  this.guardar(carrito);
-  this.actualizarContador();
-},
+  agregar(producto, talla, cantidad = 1, extra = {}) {
+    const carrito = Carrito.get();
+    const color   = extra?.color || null;
+    const clave   = producto.id + '_' + talla + (color ? '_' + color : '');
+    const existe  = carrito.items.find(i => i.clave === clave);
+    if (existe) { existe.cantidad += cantidad; }
+    else { carrito.items.push({ clave, id: producto.id, nombre: producto.nombre, precio: producto.precio, imagen: producto.imagen_url, talla, color, cantidad }); }
+    Carrito.save(carrito);
+  },
   eliminar(clave)  { const c = Carrito.get(); c.items = c.items.filter(i => i.clave !== clave); Carrito.save(c); },
   actualizarCantidad(clave, qty) { const c = Carrito.get(); const i = c.items.find(x => x.clave === clave); if (i) i.cantidad = qty; Carrito.save(c); },
   total()    { return Carrito.get().items.reduce((s, i) => s + i.precio * i.cantidad, 0); },
