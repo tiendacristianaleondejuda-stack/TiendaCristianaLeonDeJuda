@@ -37,7 +37,19 @@ const Carrito = {
     const clave   = producto.id + '_' + talla + (color ? '_' + color : '');
     const existe  = carrito.items.find(i => i.clave === clave);
     if (existe) { existe.cantidad += cantidad; }
-    else { carrito.items.push({ clave, id: producto.id, nombre: producto.nombre, precio: producto.precio, imagen: producto.imagen_url, talla, color, cantidad }); }
+    else { 
+      carrito.items.push({ 
+        clave, 
+        id: producto.id, 
+        nombre: producto.nombre, 
+        precio: producto.precio, 
+        imagen: producto.imagen_url, 
+        talla, 
+        color, 
+        cantidad,
+        imagen_color: extra?.imagen_color || null  // 👈 NUEVO CAMPO AGREGADO
+      }); 
+    }
     Carrito.save(carrito);
   },
   eliminar(clave)  { const c = Carrito.get(); c.items = c.items.filter(i => i.clave !== clave); Carrito.save(c); },
