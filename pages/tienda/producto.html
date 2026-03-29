@@ -1003,7 +1003,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ── Carrito ──────────────────────────────────────────────────
     function agregarCarrito() {
       if (!prodActual || !tallaSeleccionada) return;
-      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre } : {};
+      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre, imagen_color: colorSeleccionado.imagen_url } : {};
       Carrito.agregar(prodActual, tallaSeleccionada, cantidad, extra);
       toast(`${prodActual.nombre} (x${cantidad}) agregado ✓`);
     }
@@ -1012,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!prodActual || !tallaSeleccionada) return;
       const user = await getUsuario();
       if (!user) { location.href = '/login.html?redirect=/pages/tienda/carrito.html'; return; }
-      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre } : {};
+      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre, imagen_color: colorSeleccionado.imagen_url } : {};
       Carrito.agregar(prodActual, tallaSeleccionada, cantidad, extra);
       location.href = '/pages/tienda/carrito.html';
     }
@@ -1150,7 +1150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="footer-info-row">
           <i class="bi bi-envelope-fill"></i>
-          <span>tiendacristianaleondejuda@gmail.com</span>
+          <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="12667b777c767371607b61667b737c737e777d7c76777867767352757f737b7e3c717d7f">[email&#160;protected]</a></span>
         </div>
       </div>
 
