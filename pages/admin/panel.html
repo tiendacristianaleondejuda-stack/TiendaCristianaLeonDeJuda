@@ -1898,6 +1898,36 @@ function renderTablaPedidos(lista) {
 }
 
 async function cambiarEstado(pedidoId, nuevoEstado) {
+  // Si se va a cancelar, pedir confirmación y devolver stock
+  if (nuevoEstado === 'cancelado') {
+    const pedido = todosPedidos.find(x => x.id === pedidoId);
+    const estadoActual = pedido?.estado || '';
+    const estadosConStock = ['pagado', 'confirmado', 'enviado', 'entregado', 'pendiente_pago'];
+    const teniaStock = estadosConStock.includes(estadoActual);
+
+    const msg = teniaStock
+      ? '¿Cancelar este pedido?\n\nEl stock de los productos será devuelto automáticamente al inventario.'
+      : '¿Cancelar este pedido?';
+
+    if (!confirm(msg)) return;
+
+    // Devolver stock si corresponde
+    if (teniaStock && pedido?.pedido_items?.length) {
+      const stockItems = pedido.pedido_items.map(i => ({
+        producto_id: i.producto_id,
+        talla:       i.talla,
+        cantidad:    i.cantidad,
+      }));
+      const { error: stockError } = await sb.rpc('devolver_stock', { items: stockItems });
+      if (stockError) {
+        console.error('Error devolviendo stock:', stockError.message);
+        toast('⚠ Pedido cancelado pero hubo un error al devolver el stock', 'err');
+      } else {
+        toast('Stock devuelto al inventario ✓', 'ok');
+      }
+    }
+  }
+
   const { error } = await sb.from('pedidos').update({ estado: nuevoEstado, updated_at: new Date().toISOString() }).eq('id', pedidoId);
   if (error) { toast('Error al actualizar estado', 'err'); return; }
   toast(`Estado → ${nuevoEstado === 'pendiente_pago' ? 'Pendiente pago' : capitalizar(nuevoEstado)}`, 'ok');
@@ -1907,7 +1937,6 @@ async function cambiarEstado(pedidoId, nuevoEstado) {
   const badge = document.getElementById('badge-pendientes');
   if (pends > 0) { badge.textContent = pends; badge.style.display = 'inline'; }
   else { badge.style.display = 'none'; }
-  // Re-renderizar tabla para aplicar filtros (ej: enviado desaparece de Pedidos)
   filtrarTablaPedidos();
   if (nuevoEstado === 'enviado' || nuevoEstado === 'entregado') {
     cargarDespacho();
