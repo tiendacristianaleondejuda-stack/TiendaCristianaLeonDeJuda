@@ -475,7 +475,7 @@
       const itemsHTML = carrito.items.map(item => `
         <div class="cart-item" id="item-${item.clave}">
           <div class="cart-img">
-            <img src="${item.imagen || 'https://placehold.co/90x112/f0ede8/7a7570?text=+'}" alt="${item.nombre}"
+            <img src="${item.imagen_color || item.imagen || 'https://placehold.co/90x112/f0ede8/7a7570?text=+'}" alt="${item.nombre}"
               onerror="this.src='https://placehold.co/90x112/f0ede8/7a7570?text=+'">
           </div>
           <div class="cart-details">
@@ -633,10 +633,11 @@
 
     // 2. Crear los items del pedido
     const items = carrito.items.map(i => ({
-      pedido_id:      pedido.id,
-      producto_id:    i.id,
-      cantidad:       i.cantidad,
-      talla:          i.talla,
+      pedido_id:       pedido.id,
+      producto_id:     i.id,
+      cantidad:        i.cantidad,
+      talla:           i.talla,
+      color:           i.color || null,
       precio_unitario: i.precio,
     }));
 
