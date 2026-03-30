@@ -947,6 +947,10 @@
     <button class="nav-item" data-section="despacho" onclick="irA('despacho')">
       <i class="bi bi-truck"></i> Despacho
     </button>
+    <button class="nav-item" data-section="archivados" onclick="irA('archivados')">
+      <i class="bi bi-archive"></i> Archivados
+      <span class="badge-count" id="badge-archivados" style="display:none">0</span>
+    </button>
       <span class="nav-label">Configuración</span>
      <button class="nav-item" data-section="tarifas" onclick="irA('tarifas')">
       <i class="bi bi-calculator"></i> Tarifas de envío
@@ -1186,6 +1190,20 @@
   </div>
 </div>
 
+    <!-- ══════════ ARCHIVADOS ══════════ -->
+    <div class="section" id="section-archivados">
+      <div class="section-header">
+        <h2>Pedidos archivados</h2>
+        <button class="btn btn-ghost btn-sm" onclick="cargarArchivados()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button>
+      </div>
+      <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:1.5rem">
+        Pedidos cancelados. Podés restaurarlos a <strong>Pendiente</strong> o eliminarlos definitivamente.
+      </p>
+      <div id="archivados-wrap">
+        <p style="color:var(--text-muted);font-size:.875rem">Cargando…</p>
+      </div>
+    </div>
+
     <!-- ══════════ MENSAJES ══════════ -->
     <div class="section" id="section-mensajes">
       <div class="section-header">
@@ -1392,7 +1410,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ═══════════════════════════════════════════════════════════
 //  NAVEGACIÓN
 // ═══════════════════════════════════════════════════════════
-const TITULOS = { dashboard:'Dashboard', productos:'Productos', pedidos:'Pedidos', despacho:'Despacho', tarifas:'Tarifas de envío' };
+const TITULOS = { dashboard:'Dashboard', productos:'Productos', pedidos:'Pedidos', despacho:'Despacho', archivados:'Archivados', tarifas:'Tarifas de envío' };
 
 function irA(seccion) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1406,7 +1424,8 @@ function irA(seccion) {
   if (seccion === 'productos') cargarProductos();
   if (seccion === 'pedidos')   cargarPedidos();
   if (seccion === 'despacho')  cargarDespacho();
-  if (seccion === 'tarifas')   cargarTarifas();
+  if (seccion === 'tarifas')    cargarTarifas();
+  if (seccion === 'archivados') cargarArchivados();
 }
 
 function abrirSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('open'); }
@@ -1809,14 +1828,15 @@ async function cargarPedidos() {
   }
 
   filtrarTablaPedidos();
+  actualizarBadgeArchivados();
 }
 
 function filtrarTablaPedidos() {
   const estado = document.getElementById('filter-estado').value;
-  // Sin filtro: ocultar enviado/entregado (esos van a la sección Despacho)
+  // Sin filtro: ocultar enviado/entregado/cancelado (cancelados van a Archivados)
   const lista = estado
     ? todosPedidos.filter(p => p.estado === estado)
-    : todosPedidos.filter(p => !['enviado','entregado'].includes(p.estado));
+    : todosPedidos.filter(p => !['enviado','entregado','cancelado'].includes(p.estado));
   renderTablaPedidos(lista);
 }
 
@@ -1898,36 +1918,6 @@ function renderTablaPedidos(lista) {
 }
 
 async function cambiarEstado(pedidoId, nuevoEstado) {
-  // Si se va a cancelar, pedir confirmación y devolver stock
-  if (nuevoEstado === 'cancelado') {
-    const pedido = todosPedidos.find(x => x.id === pedidoId);
-    const estadoActual = pedido?.estado || '';
-    const estadosConStock = ['pagado', 'confirmado', 'enviado', 'entregado', 'pendiente_pago'];
-    const teniaStock = estadosConStock.includes(estadoActual);
-
-    const msg = teniaStock
-      ? '¿Cancelar este pedido?\n\nEl stock de los productos será devuelto automáticamente al inventario.'
-      : '¿Cancelar este pedido?';
-
-    if (!confirm(msg)) return;
-
-    // Devolver stock si corresponde
-    if (teniaStock && pedido?.pedido_items?.length) {
-      const stockItems = pedido.pedido_items.map(i => ({
-        producto_id: i.producto_id,
-        talla:       i.talla,
-        cantidad:    i.cantidad,
-      }));
-      const { error: stockError } = await sb.rpc('devolver_stock', { items: stockItems });
-      if (stockError) {
-        console.error('Error devolviendo stock:', stockError.message);
-        toast('⚠ Pedido cancelado pero hubo un error al devolver el stock', 'err');
-      } else {
-        toast('Stock devuelto al inventario ✓', 'ok');
-      }
-    }
-  }
-
   const { error } = await sb.from('pedidos').update({ estado: nuevoEstado, updated_at: new Date().toISOString() }).eq('id', pedidoId);
   if (error) { toast('Error al actualizar estado', 'err'); return; }
   toast(`Estado → ${nuevoEstado === 'pendiente_pago' ? 'Pendiente pago' : capitalizar(nuevoEstado)}`, 'ok');
@@ -1937,10 +1927,10 @@ async function cambiarEstado(pedidoId, nuevoEstado) {
   const badge = document.getElementById('badge-pendientes');
   if (pends > 0) { badge.textContent = pends; badge.style.display = 'inline'; }
   else { badge.style.display = 'none'; }
+  // Re-renderizar tabla para aplicar filtros (ej: enviado desaparece de Pedidos)
   filtrarTablaPedidos();
-  if (nuevoEstado === 'enviado' || nuevoEstado === 'entregado') {
-    cargarDespacho();
-  }
+  if (nuevoEstado === 'enviado' || nuevoEstado === 'entregado') cargarDespacho();
+  if (nuevoEstado === 'cancelado') actualizarBadgeArchivados();
 }
 
 let adminChatPedidoId      = null;
@@ -2848,6 +2838,125 @@ function recolectarColores() {
     if (nombre && url) colores.push({ nombre, imagen_url: url });
   });
   return colores;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ARCHIVADOS
+// ═══════════════════════════════════════════════════════════
+let pedidosArchivados = [];
+
+async function cargarArchivados() {
+  const wrap = document.getElementById('archivados-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '<p style="color:var(--text-muted);font-size:.875rem">Cargando…</p>';
+
+  const { data, error } = await sb
+    .from('pedidos')
+    .select('*, pedido_items(*, productos(nombre, imagen_url))')
+    .eq('estado', 'cancelado')
+    .order('updated_at', { ascending: false });
+
+  if (error) { toast('Error al cargar archivados', 'err'); return; }
+  pedidosArchivados = data || [];
+  actualizarBadgeArchivados();
+  renderArchivados();
+}
+
+function actualizarBadgeArchivados() {
+  const cancelados = todosPedidos.filter(p => p.estado === 'cancelado').length;
+  const badge = document.getElementById('badge-archivados');
+  if (!badge) return;
+  if (cancelados > 0) { badge.textContent = cancelados; badge.style.display = 'inline'; }
+  else { badge.style.display = 'none'; }
+}
+
+function renderArchivados() {
+  const wrap = document.getElementById('archivados-wrap');
+  if (!wrap) return;
+
+  if (!pedidosArchivados.length) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <i class="bi bi-archive"></i>
+        <p>No hay pedidos archivados.</p>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div style="overflow-x:auto;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)">
+      <table style="width:100%;border-collapse:collapse;font-size:.875rem">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:.6rem .75rem;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border)">Cliente</th>
+            <th style="text-align:left;padding:.6rem .75rem;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border)">Fecha</th>
+            <th style="text-align:left;padding:.6rem .75rem;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border)">Total</th>
+            <th style="text-align:left;padding:.6rem .75rem;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border)">Productos</th>
+            <th style="padding:.6rem .75rem;border-bottom:1px solid var(--border)"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pedidosArchivados.map(p => {
+            const nombre = p.nombre_cliente
+              ? p.nombre_cliente
+              : `<span style="color:var(--text-muted);font-style:italic;font-size:.8rem">Sin nombre</span>`;
+            const items = (p.pedido_items || []).map(i => `${i.productos?.nombre || '—'} (${i.talla||'U'}) x${i.cantidad}`).join(' · ');
+            return `
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:.65rem .75rem">
+                  <div style="font-weight:700;font-size:.875rem">${nombre}</div>
+                  <div style="font-family:monospace;font-size:.65rem;color:var(--text-muted)"># ${p.id.substring(0,8).toUpperCase()}</div>
+                </td>
+                <td style="padding:.65rem .75rem;color:var(--text-muted);font-size:.8rem;white-space:nowrap">${fmtFecha(p.updated_at || p.created_at)}</td>
+                <td style="padding:.65rem .75rem;font-weight:700">${formatearPrecio(p.total)}</td>
+                <td style="padding:.65rem .75rem;font-size:.78rem;color:var(--text-muted);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${items || '—'}</td>
+                <td style="padding:.65rem .75rem;white-space:nowrap">
+                  <div style="display:flex;gap:.4rem">
+                    <button class="btn btn-ghost btn-sm" onclick="restaurarPedido('${p.id}')" title="Restaurar a Pendiente">
+                      <i class="bi bi-arrow-counterclockwise"></i> Restaurar
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="eliminarPedido('${p.id}')" title="Eliminar definitivamente">
+                      <i class="bi bi-trash3"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.75rem;color:var(--text-muted);margin-top:.75rem">
+      <i class="bi bi-info-circle"></i> Restaurar mueve el pedido a <strong>Pendiente</strong>. Eliminar lo borra permanentemente de la base de datos.
+    </p>`;
+}
+
+async function restaurarPedido(pedidoId) {
+  if (!confirm('¿Restaurar este pedido a estado Pendiente?')) return;
+  const { error } = await sb.from('pedidos')
+    .update({ estado: 'pendiente', updated_at: new Date().toISOString() })
+    .eq('id', pedidoId);
+  if (error) { toast('Error al restaurar pedido', 'err'); return; }
+  toast('Pedido restaurado a Pendiente ✓', 'ok');
+  // Quitar de archivados localmente
+  pedidosArchivados = pedidosArchivados.filter(p => p.id !== pedidoId);
+  // Recargar pedidos para que aparezca en la lista principal
+  await cargarPedidos();
+  renderArchivados();
+  actualizarBadgeArchivados();
+}
+
+async function eliminarPedido(pedidoId) {
+  if (!confirm('¿Eliminar este pedido definitivamente?\n\nEsta acción NO se puede deshacer.')) return;
+  // Primero eliminar items del pedido
+  await sb.from('pedido_items').delete().eq('pedido_id', pedidoId);
+  await sb.from('mensajes').delete().eq('pedido_id', pedidoId);
+  const { error } = await sb.from('pedidos').delete().eq('id', pedidoId);
+  if (error) { toast('Error al eliminar pedido', 'err'); return; }
+  toast('Pedido eliminado ✓', 'ok');
+  pedidosArchivados = pedidosArchivados.filter(p => p.id !== pedidoId);
+  todosPedidos = todosPedidos.filter(p => p.id !== pedidoId);
+  renderArchivados();
+  actualizarBadgeArchivados();
 }
 
 // Cerrar modales al hacer clic fuera
