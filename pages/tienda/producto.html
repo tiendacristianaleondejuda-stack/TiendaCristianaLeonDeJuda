@@ -685,7 +685,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase-config.js"></script>
 
-  <script>
+    <script>
     let prodActual = null, tallaSeleccionada = null, colorSeleccionado = null, cantidad = 1;
     let imagenesGaleria = [];
     let lightboxIdx = 0;
@@ -834,8 +834,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           <p class="sec-label">Color</p>
           <div class="colores-wrap">
             ${colores.map((c, i) => {
-              const stockTotal = c.stock ?? 99;
-              const sinStock = typeof stockTotal === 'number' && stockTotal === 0;
+              // Calcular stock real sumando stock_por_talla si existe
+              const stockReal = (c.stock_por_talla && Object.keys(c.stock_por_talla).length > 0)
+                ? Object.values(c.stock_por_talla).reduce((s, v) => s + (v || 0), 0)
+                : (c.stock ?? 99);
+              const sinStock = stockReal === 0;
               return `
               <div class="color-btn ${i===0?'sel':''} ${sinStock?'sin-stock':''}"
                 title="${c.nombre}${sinStock ? ' · Sin stock' : ''}"
@@ -851,20 +854,35 @@ document.addEventListener('DOMContentLoaded', async () => {
           <p class="color-nombre-sel" id="color-nombre-sel">${colores[0]?.nombre || ''}</p>
           <p id="stock-color-info" style="font-size:.75rem;color:var(--text-muted);margin-top:-.5rem;margin-bottom:.75rem;min-height:1.2em"></p>`;
 
-        // Preseleccionar primer color con stock
-        const primerConStock = colores.find(c => (c.stock ?? 99) > 0) || colores[0];
+        // Preseleccionar primer color con stock real
+        const primerConStock = colores.find(c => {
+          const sr = (c.stock_por_talla && Object.keys(c.stock_por_talla).length > 0)
+            ? Object.values(c.stock_por_talla).reduce((s, v) => s + (v || 0), 0)
+            : (c.stock ?? 99);
+          return sr > 0;
+        }) || colores[0];
         colorSeleccionado = primerConStock;
         if (primerConStock?.imagen_url) {
           imagenesGaleria = [primerConStock.imagen_url, ...imagenesGaleria.filter(u => u !== primerConStock.imagen_url)];
         }
       }
 
-      // Stock general — solo mostrar si NO tiene colores (si tiene colores el stock se maneja por color+talle)
+      // Stock general — si hay colores, calcularlo sumando todos los colores+talles
       const totalStock = tieneColores
         ? (data.colores || []).reduce((s, c) => s + (c.stock || 0), 0)
         : (data.stock ?? 0);
+
       let stockTagHTML = '';
-      if (!tieneColores) {
+      if (tieneColores) {
+        // Con colores: mostrar disponibilidad general
+        if (totalStock === 0) {
+          stockTagHTML = '<span class="stock-info-tag stock-none"><i class="bi bi-x-circle-fill"></i> Sin stock</span>';
+        } else if (totalStock <= 5) {
+          stockTagHTML = `<span class="stock-info-tag stock-low"><i class="bi bi-exclamation-circle-fill"></i> Últimas unidades</span>`;
+        }
+        // Si hay stock suficiente con colores, no mostrar nada (el stock se ve por color+talle)
+      } else {
+        // Sin colores: mostrar stock general del producto
         if (totalStock === 0) {
           stockTagHTML = '<span class="stock-info-tag stock-none"><i class="bi bi-x-circle-fill"></i> Sin stock</span>';
         } else if (totalStock <= 5) {
@@ -968,14 +986,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ── Colores ──────────────────────────────────────────────────
+    function calcularStockTotalColor(color) {
+      // Si tiene stock_por_talla, sumar todos los talles
+      if (color.stock_por_talla && Object.keys(color.stock_por_talla).length > 0) {
+        return Object.values(color.stock_por_talla).reduce((s, v) => s + (v || 0), 0);
+      }
+      // Fallback al stock simple
+      return color.stock ?? 99;
+    }
+
     function selColor(idx, btn) {
       const colores = prodActual?.colores || [];
       const color   = colores[idx];
       if (!color) return;
 
-      // Verificar stock total del color
-      const stockTotal = color.stock ?? 99;
-      if (typeof stockTotal === 'number' && stockTotal === 0) return;
+      // Verificar stock real del color (sumando todos sus talles)
+      const stockReal = calcularStockTotalColor(color);
+      if (stockReal === 0) return;
 
       colorSeleccionado = color;
       document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('sel'));
@@ -984,11 +1011,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const label = document.getElementById('color-nombre-sel');
       if (label) label.textContent = color.nombre;
 
-      // Mostrar info de stock del color
+      // Mostrar info de stock del color solo si es bajo
       const stockInfo = document.getElementById('stock-color-info');
       if (stockInfo) {
-        if (typeof stockTotal === 'number' && stockTotal > 0 && stockTotal <= 3) {
-          stockInfo.innerHTML = `<span style="color:#92400e"><i class="bi bi-exclamation-circle-fill"></i> Últimas ${stockTotal} unidades en ${color.nombre}</span>`;
+        if (stockReal > 0 && stockReal <= 3) {
+          stockInfo.innerHTML = `<span style="color:#92400e"><i class="bi bi-exclamation-circle-fill"></i> Últimas ${stockReal} unidades en ${color.nombre}</span>`;
         } else {
           stockInfo.innerHTML = '';
         }
@@ -1173,6 +1200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(num);
     }
   </script>
+  
   <!-- ─── PRODUCTOS RELACIONADOS ─── -->
   <section class="relacionados-section" id="relacionados-section" style="display:none">
     <h2 class="relacionados-titulo">También te puede gustar</h2>
@@ -1256,6 +1284,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     </div>
 
+
+
     <div class="footer-bottom">
       <span>© 2025 León de Judá · Todos los derechos reservados</span>
-      <spa
+      <span>Hecho con <i class="bi bi-heart-fill" style="color:var(--gold);font-size:.7rem"></i> y fe</span>
+    </div>
+  </footer>
+
+</body>
+</html>
