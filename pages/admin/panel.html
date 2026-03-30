@@ -1621,7 +1621,7 @@ function editarProducto(id) {
   // Cargar colores existentes
   document.getElementById('colores-lista').innerHTML = '';
   if (prod.colores?.length) {
-    prod.colores.forEach(c => agregarColorFila(c.nombre, c.imagen_url));
+    prod.colores.forEach(c => agregarColorFila(c.nombre, c.imagen_url, c.stock_por_talla || {}));
   }
 
   renderPreviews();
@@ -1734,11 +1734,17 @@ function renderPreviews() {
   ];
 
   grid.innerHTML = todas.map((item, i) => `
-    <div class="img-preview-item">
+    <div class="img-preview-item" style="position:relative">
       <img src="${item.url}" alt="Vista previa">
       <button class="img-preview-del" onclick="quitarImagen(${i}, '${item.tipo}')">
         <i class="bi bi-x"></i>
       </button>
+      ${item.tipo === 'subida' ? `
+      <button onclick="usarUrlEnColor('${item.url}')"
+        title="Usar esta URL para un color"
+        style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.7);color:white;border:none;border-radius:4px;font-size:.6rem;padding:.15rem .35rem;cursor:pointer;white-space:nowrap">
+        <i class="bi bi-link-45deg"></i> Usar
+      </button>` : ''}
     </div>`
   ).join('');
 }
@@ -2789,28 +2795,97 @@ async function guardarTarifa(id) {
 // ═══════════════════════════════════════════════════════════
 let colorCounter = 0;
 
-function agregarColorFila(nombre = '', imagenUrl = '') {
+function agregarColorFila(nombre = '', imagenUrl = '', stockPorTalla = {}) {
   const lista = document.getElementById('colores-lista');
   const idx   = colorCounter++;
   const fila  = document.createElement('div');
   fila.id     = `color-fila-${idx}`;
-  fila.style.cssText = 'display:flex;gap:.5rem;align-items:center;background:var(--bg3);padding:.5rem .75rem;border-radius:8px;border:1px solid var(--border)';
+  fila.style.cssText = 'background:var(--bg3);padding:.75rem;border-radius:8px;border:1px solid var(--border);display:flex;flex-direction:column;gap:.5rem';
+
+  // Obtener talles del producto actualmente definidos
+  const tallasRaw = document.getElementById('prod-tallas')?.value || '';
+  const tallas = tallasRaw ? tallasRaw.split(',').map(t => t.trim()).filter(Boolean) : ['Única'];
+
+  const stockGrid = tallas.map(t => `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:.2rem">
+      <span style="font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)">${t}</span>
+      <input type="number" min="0" value="${stockPorTalla[t] ?? 0}"
+        id="color-stock-${idx}-${t}"
+        style="width:52px;padding:.3rem .2rem;font-size:.82rem;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);text-align:center">
+    </div>`).join('');
+
   fila.innerHTML = `
-    <img id="color-preview-${idx}" src="${imagenUrl || ''}"
-      style="width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg2);border:1px solid var(--border);${imagenUrl ? '' : 'display:none'}">
-    <div id="color-noimg-${idx}" style="width:36px;height:36px;border-radius:6px;background:var(--bg2);border:1px solid var(--border);flex-shrink:0;display:${imagenUrl ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:.7rem;color:var(--text-muted)"><i class="bi bi-image"></i></div>
-    <input type="text" placeholder="Nombre (ej: Negro)" value="${nombre}"
-      id="color-nombre-${idx}"
-      style="flex:1;padding:.4rem .6rem;font-size:.82rem;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)">
-    <input type="text" placeholder="URL de la imagen" value="${imagenUrl}"
-      id="color-url-${idx}"
-      oninput="actualizarPreviewColor(${idx})"
-      style="flex:2;padding:.4rem .6rem;font-size:.82rem;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)">
-    <button onclick="document.getElementById('color-fila-${idx}').remove()"
-      style="background:none;border:none;cursor:pointer;color:var(--red);font-size:1rem;padding:.25rem;flex-shrink:0">
-      <i class="bi bi-trash3"></i>
-    </button>`;
+    <div style="display:flex;gap:.5rem;align-items:center">
+      <img id="color-preview-${idx}" src="${imagenUrl || ''}"
+        style="width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg2);border:1px solid var(--border);${imagenUrl ? '' : 'display:none'}">
+      <div id="color-noimg-${idx}" style="width:36px;height:36px;border-radius:6px;background:var(--bg2);border:1px solid var(--border);flex-shrink:0;display:${imagenUrl ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:.7rem;color:var(--text-muted)"><i class="bi bi-image"></i></div>
+      <input type="text" placeholder="Nombre (ej: Negro)" value="${nombre}"
+        id="color-nombre-${idx}"
+        style="flex:1;padding:.4rem .6rem;font-size:.82rem;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)">
+      <input type="text" placeholder="URL de imagen" value="${imagenUrl}"
+        id="color-url-${idx}"
+        oninput="actualizarPreviewColor(${idx})"
+        style="flex:2;padding:.4rem .6rem;font-size:.82rem;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)">
+      <button onclick="document.getElementById('color-fila-${idx}').remove()"
+        style="background:none;border:none;cursor:pointer;color:var(--red);font-size:1rem;padding:.25rem;flex-shrink:0">
+        <i class="bi bi-trash3"></i>
+      </button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:flex-end;padding:.5rem .75rem;background:var(--bg2);border-radius:6px;border:1px solid var(--border)">
+      <span style="font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-right:.25rem;align-self:center">Stock por talle:</span>
+      ${stockGrid}
+    </div>`;
   lista.appendChild(fila);
+}
+
+function usarUrlEnColor(url) {
+  // Buscar todas las filas de colores existentes
+  const filas = document.querySelectorAll('#colores-lista > div[id^="color-fila-"]');
+
+  if (filas.length === 0) {
+    // No hay filas — preguntar si crear una nueva
+    if (confirm('No hay colores agregados todavía. ¿Querés agregar uno nuevo con esta imagen?')) {
+      agregarColorFila('', url);
+      // Actualizar preview del último color agregado
+      const nuevasFilas = document.querySelectorAll('#colores-lista > div[id^="color-fila-"]');
+      const ultima = nuevasFilas[nuevasFilas.length - 1];
+      if (ultima) {
+        const idx = ultima.id.replace('color-fila-', '');
+        actualizarPreviewColor(idx);
+      }
+    }
+    return;
+  }
+
+  if (filas.length === 1) {
+    // Solo una fila — asignar directo
+    const idx = filas[0].id.replace('color-fila-', '');
+    const input = document.getElementById(`color-url-${idx}`);
+    if (input) { input.value = url; actualizarPreviewColor(idx); }
+    toast('URL asignada al color ✓', 'ok');
+    return;
+  }
+
+  // Varias filas — mostrar lista para elegir
+  const nombres = Array.from(filas).map(f => {
+    const idx = f.id.replace('color-fila-', '');
+    return document.getElementById(`color-nombre-${idx}`)?.value.trim() || `Color ${idx}`;
+  });
+
+  const opciones = nombres.map((n, i) => `${i + 1}. ${n}`).join('\n');
+  const eleccion = prompt(`¿A qué color querés asignar esta imagen?\n\n${opciones}\n\nIngresá el número:`);
+  const num = parseInt(eleccion);
+
+  if (!num || num < 1 || num > filas.length) {
+    toast('Número inválido', 'err');
+    return;
+  }
+
+  const filaElegida = filas[num - 1];
+  const idx = filaElegida.id.replace('color-fila-', '');
+  const input = document.getElementById(`color-url-${idx}`);
+  if (input) { input.value = url; actualizarPreviewColor(idx); }
+  toast(`URL asignada a "${nombres[num-1]}" ✓`, 'ok');
 }
 
 function actualizarPreviewColor(idx) {
@@ -2830,12 +2905,22 @@ function actualizarPreviewColor(idx) {
 
 function recolectarColores() {
   const filas = document.querySelectorAll('#colores-lista > div[id^="color-fila-"]');
+  const tallasRaw = document.getElementById('prod-tallas')?.value || '';
+  const tallas = tallasRaw ? tallasRaw.split(',').map(t => t.trim()).filter(Boolean) : ['Única'];
   const colores = [];
   filas.forEach(fila => {
     const idx    = fila.id.replace('color-fila-', '');
     const nombre = document.getElementById(`color-nombre-${idx}`)?.value.trim();
     const url    = document.getElementById(`color-url-${idx}`)?.value.trim();
-    if (nombre && url) colores.push({ nombre, imagen_url: url });
+    if (!nombre || !url) return;
+    const stockPorTalla = {};
+    let stockTotal = 0;
+    tallas.forEach(t => {
+      const v = parseInt(document.getElementById(`color-stock-${idx}-${t}`)?.value) || 0;
+      stockPorTalla[t] = v;
+      stockTotal += v;
+    });
+    colores.push({ nombre, imagen_url: url, stock_por_talla: stockPorTalla, stock: stockTotal });
   });
   return colores;
 }
@@ -2947,11 +3032,21 @@ async function restaurarPedido(pedidoId) {
 
 async function eliminarPedido(pedidoId) {
   if (!confirm('¿Eliminar este pedido definitivamente?\n\nEsta acción NO se puede deshacer.')) return;
-  // Primero eliminar items del pedido
-  await sb.from('pedido_items').delete().eq('pedido_id', pedidoId);
-  await sb.from('mensajes').delete().eq('pedido_id', pedidoId);
+
+  // Eliminar en orden: items → mensajes → pedido
+  const { error: errItems } = await sb.from('pedido_items').delete().eq('pedido_id', pedidoId);
+  if (errItems) console.warn('Error borrando items:', errItems.message);
+
+  const { error: errMsgs } = await sb.from('mensajes').delete().eq('pedido_id', pedidoId);
+  if (errMsgs) console.warn('Error borrando mensajes:', errMsgs.message);
+
   const { error } = await sb.from('pedidos').delete().eq('id', pedidoId);
-  if (error) { toast('Error al eliminar pedido', 'err'); return; }
+  if (error) {
+    console.error('Error eliminando pedido:', error.message, error.code);
+    toast('Error al eliminar: ' + error.message, 'err');
+    return;
+  }
+
   toast('Pedido eliminado ✓', 'ok');
   pedidosArchivados = pedidosArchivados.filter(p => p.id !== pedidoId);
   todosPedidos = todosPedidos.filter(p => p.id !== pedidoId);
