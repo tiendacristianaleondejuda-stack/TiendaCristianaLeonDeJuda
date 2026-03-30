@@ -801,10 +801,18 @@ document.addEventListener('DOMContentLoaded', async () => {
            </div>`
         : '';
 
-      // Tallas
-      const tallas       = data.tallas?.length ? data.tallas : ['Única'];
-      const spt          = data.stock_por_talla || {};
-      const getStockTalla = t => (spt && Object.keys(spt).length) ? (spt[t] ?? 0) : (data.stock ?? 99);
+      // Tallas — si hay colores, usar stock del primer color; si no, usar stock_por_talla del producto
+      const tallas = data.tallas?.length ? data.tallas : ['Única'];
+      const primerColor = (data.colores || []).find(c => (c.stock ?? 99) > 0) || data.colores?.[0];
+      const spt = primerColor?.stock_por_talla || data.stock_por_talla || {};
+      const tieneColores = (data.colores || []).length > 0;
+
+      const getStockTalla = t => {
+        if (tieneColores && primerColor?.stock_por_talla) {
+          return primerColor.stock_por_talla[t] ?? 0;
+        }
+        return (spt && Object.keys(spt).length) ? (spt[t] ?? 0) : (data.stock ?? 99);
+      };
 
       if (tallas.length === 1 && getStockTalla(tallas[0]) > 0) tallaSeleccionada = tallas[0];
 
@@ -825,34 +833,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         coloresHTML = `
           <p class="sec-label">Color</p>
           <div class="colores-wrap">
-            ${colores.map((c, i) => `
-              <div class="color-btn ${i===0?'sel':''}" 
-                title="${c.nombre}"
-                onclick="selColor(${i}, this)"
+            ${colores.map((c, i) => {
+              const stockTotal = c.stock ?? 99;
+              const sinStock = typeof stockTotal === 'number' && stockTotal === 0;
+              return `
+              <div class="color-btn ${i===0?'sel':''} ${sinStock?'sin-stock':''}"
+                title="${c.nombre}${sinStock ? ' · Sin stock' : ''}"
+                onclick="${sinStock ? 'void(0)' : `selColor(${i}, this)`}"
                 data-nombre="${c.nombre}"
-                data-imagen="${c.imagen_url}">
+                data-imagen="${c.imagen_url}"
+                style="${sinStock ? 'opacity:.4;cursor:not-allowed;' : ''}">
                 <img src="${c.imagen_url}" alt="${c.nombre}" onerror="this.style.opacity='.3'">
                 <div class="color-check"><i class="bi bi-check-lg"></i></div>
-              </div>`).join('')}
+              </div>`;
+            }).join('')}
           </div>
-          <p class="color-nombre-sel" id="color-nombre-sel">${colores[0]?.nombre || ''}</p>`;
-        // Preseleccionar primer color
-        colorSeleccionado = colores[0];
-        // Cambiar imagen principal al primer color
-        if (colores[0]?.imagen_url) {
-          imagenesGaleria = [colores[0].imagen_url, ...imagenesGaleria.filter(u => u !== colores[0].imagen_url)];
+          <p class="color-nombre-sel" id="color-nombre-sel">${colores[0]?.nombre || ''}</p>
+          <p id="stock-color-info" style="font-size:.75rem;color:var(--text-muted);margin-top:-.5rem;margin-bottom:.75rem;min-height:1.2em"></p>`;
+
+        // Preseleccionar primer color con stock
+        const primerConStock = colores.find(c => (c.stock ?? 99) > 0) || colores[0];
+        colorSeleccionado = primerConStock;
+        if (primerConStock?.imagen_url) {
+          imagenesGaleria = [primerConStock.imagen_url, ...imagenesGaleria.filter(u => u !== primerConStock.imagen_url)];
         }
       }
 
-      // Stock general
-      const totalStock = data.stock ?? 0;
+      // Stock general — solo mostrar si NO tiene colores (si tiene colores el stock se maneja por color+talle)
+      const totalStock = tieneColores
+        ? (data.colores || []).reduce((s, c) => s + (c.stock || 0), 0)
+        : (data.stock ?? 0);
       let stockTagHTML = '';
-      if (totalStock === 0) {
-        stockTagHTML = '<span class="stock-info-tag stock-none"><i class="bi bi-x-circle-fill"></i> Sin stock</span>';
-      } else if (totalStock <= 5) {
-        stockTagHTML = `<span class="stock-info-tag stock-low"><i class="bi bi-exclamation-circle-fill"></i> Últimas unidades</span>`;
-      } else {
-        stockTagHTML = `<span class="stock-info-tag stock-ok"><i class="bi bi-check-circle-fill"></i> Disponible</span>`;
+      if (!tieneColores) {
+        if (totalStock === 0) {
+          stockTagHTML = '<span class="stock-info-tag stock-none"><i class="bi bi-x-circle-fill"></i> Sin stock</span>';
+        } else if (totalStock <= 5) {
+          stockTagHTML = `<span class="stock-info-tag stock-low"><i class="bi bi-exclamation-circle-fill"></i> Últimas unidades</span>`;
+        } else {
+          stockTagHTML = `<span class="stock-info-tag stock-ok"><i class="bi bi-check-circle-fill"></i> Disponible</span>`;
+        }
       }
 
       document.getElementById('prod-layout').innerHTML = `
@@ -893,10 +912,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             <button class="qty-btn" onclick="cambiarCantidad(1)">+</button>
           </div>
 
-          <button class="btn-agregar" id="btn-agregar" onclick="agregarCarrito()" ${totalStock===0||!tallaSeleccionada?'disabled':''}>
+          <button class="btn-agregar" id="btn-agregar" onclick="agregarCarrito()" ${(totalStock===0||!tallaSeleccionada)?'disabled':''}>
             <i class="bi bi-bag-plus"></i> Agregar al carrito
           </button>
-          <button class="btn-comprar" id="btn-comprar" onclick="comprarAhora()" ${totalStock===0||!tallaSeleccionada?'disabled':''}>
+          <button class="btn-comprar" id="btn-comprar" onclick="comprarAhora()" ${(totalStock===0||!tallaSeleccionada)?'disabled':''}>
             <i class="bi bi-credit-card"></i> Comprar ahora
           </button>
 
@@ -954,6 +973,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const color   = colores[idx];
       if (!color) return;
 
+      // Verificar stock total del color
+      const stockTotal = color.stock ?? 99;
+      if (typeof stockTotal === 'number' && stockTotal === 0) return;
+
       colorSeleccionado = color;
       document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('sel'));
       btn.classList.add('sel');
@@ -961,12 +984,72 @@ document.addEventListener('DOMContentLoaded', async () => {
       const label = document.getElementById('color-nombre-sel');
       if (label) label.textContent = color.nombre;
 
-      // Cambiar imagen principal a la del color seleccionado
+      // Mostrar info de stock del color
+      const stockInfo = document.getElementById('stock-color-info');
+      if (stockInfo) {
+        if (typeof stockTotal === 'number' && stockTotal > 0 && stockTotal <= 3) {
+          stockInfo.innerHTML = `<span style="color:#92400e"><i class="bi bi-exclamation-circle-fill"></i> Últimas ${stockTotal} unidades en ${color.nombre}</span>`;
+        } else {
+          stockInfo.innerHTML = '';
+        }
+      }
+
+      // Cambiar imagen principal al color seleccionado
       const imgMain = document.getElementById('img-main');
       if (imgMain && color.imagen_url) {
         imgMain.src = color.imagen_url;
         imagenesGaleria[0] = color.imagen_url;
       }
+
+      // Regenerar tallas con stock del color elegido
+      regenerarTallasParaColor(color);
+
+      // Resetear talla seleccionada
+      tallaSeleccionada = null;
+      cantidad = 1;
+      const qEl = document.getElementById('qty-num');
+      if (qEl) qEl.textContent = '1';
+
+      const btnAgregar = document.getElementById('btn-agregar');
+      const btnComprar = document.getElementById('btn-comprar');
+      if (btnAgregar) btnAgregar.disabled = true;
+      if (btnComprar) btnComprar.disabled = true;
+    }
+
+    function regenerarTallasParaColor(color) {
+      const wrap = document.querySelector('.tallas-wrap');
+      if (!wrap) return;
+
+      // Si el color tiene stock_por_talla, usarlo; si no, usar el stock general del producto
+      const spt = color.stock_por_talla;
+      const tallas = prodActual?.tallas?.length ? prodActual.tallas : ['Única'];
+
+      const getStock = t => {
+        if (spt && Object.keys(spt).length) return spt[t] ?? 0;
+        // Si no tiene stock_por_talla, usar el stock general del color
+        return color.stock ?? 99;
+      };
+
+      wrap.innerHTML = tallas.map(t => {
+        const st = getStock(t);
+        const sinStock = st === 0;
+        const isAuto = tallas.length === 1 && !sinStock;
+        if (isAuto) {
+          tallaSeleccionada = t;
+          const btnAgregar = document.getElementById('btn-agregar');
+          const btnComprar = document.getElementById('btn-comprar');
+          if (btnAgregar) btnAgregar.disabled = false;
+          if (btnComprar) btnComprar.disabled = false;
+        }
+        return `<button class="talla-btn ${isAuto?'sel':''} ${sinStock?'sin-stock':''}"
+          onclick="${sinStock ? 'void(0)' : `selTalla('${t}',this)`}"
+          ${sinStock ? 'disabled' : ''}
+          data-stock="${st}">${t}</button>`;
+      }).join('');
+
+      // Limpiar info de talla
+      const infoEl = document.getElementById('stock-talla-info');
+      if (infoEl) infoEl.innerHTML = '';
     }
 
     // ── Tallas ───────────────────────────────────────────────────
@@ -1003,7 +1086,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ── Carrito ──────────────────────────────────────────────────
     function agregarCarrito() {
       if (!prodActual || !tallaSeleccionada) return;
-      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre, imagen_color: colorSeleccionado.imagen_url } : {};
+      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre } : {};
       Carrito.agregar(prodActual, tallaSeleccionada, cantidad, extra);
       toast(`${prodActual.nombre} (x${cantidad}) agregado ✓`);
     }
@@ -1012,7 +1095,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!prodActual || !tallaSeleccionada) return;
       const user = await getUsuario();
       if (!user) { location.href = '/login.html?redirect=/pages/tienda/carrito.html'; return; }
-      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre, imagen_color: colorSeleccionado.imagen_url } : {};
+      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre } : {};
       Carrito.agregar(prodActual, tallaSeleccionada, cantidad, extra);
       location.href = '/pages/tienda/carrito.html';
     }
@@ -1150,7 +1233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="footer-info-row">
           <i class="bi bi-envelope-fill"></i>
-          <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="12667b777c767371607b61667b737c737e777d7c76777867767352757f737b7e3c717d7f">[email&#160;protected]</a></span>
+          <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="becad7dbd0dadfddccd7cdcad7dfd0dfd2dbd1d0dadbd4cbdadffed9d3dfd7d290ddd1d3">[email&#160;protected]</a></span>
         </div>
       </div>
 
@@ -1175,9 +1258,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     <div class="footer-bottom">
       <span>© 2025 León de Judá · Todos los derechos reservados</span>
-      <span>Hecho con <i class="bi bi-heart-fill" style="color:var(--gold);font-size:.7rem"></i> y fe</span>
-    </div>
-  </footer>
-
-</body>
-</html>
+      <spa
