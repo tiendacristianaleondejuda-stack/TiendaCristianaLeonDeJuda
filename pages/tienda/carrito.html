@@ -656,7 +656,7 @@ if (metodoPago !== 'mercadopago') {
 }
 
 // 4. Si eligió MercadoPago
-if (metodoPago === 'mercadopago') {
+if (metodoPago === 'mercadopago' || metodoPago === 'tarjeta') {
   
   const mpItems = carrito.items.map(i => ({
     title: i.nombre,
@@ -681,12 +681,17 @@ if (metodoPago === 'mercadopago') {
 
   const data = await response.json();
   
-  if (data.init_point) {
-    // Guardar el pedidoId pendiente, NO vaciar el carrito todavía
-    localStorage.setItem('mp_pedido_pendiente', pedido.id);
-    // Redirigir a Mercado Pago
-    window.location.href = data.init_point;
-    return;
+if (data.init_point) {
+  // ✅ Guardar el pedido pendiente
+  localStorage.setItem('mp_pedido_pendiente', pedido.id);
+  
+  // ✅ GUARDAR BACKUP del carrito actual (por si vuelve cancelado)
+  const carritoActual = Carrito.get();
+  localStorage.setItem('carrito_backup', JSON.stringify(carritoActual.items));
+  
+  // Redirigir a Mercado Pago
+  window.location.href = data.init_point;
+  return;
 }
 }
 
