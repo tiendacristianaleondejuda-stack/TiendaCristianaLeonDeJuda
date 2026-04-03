@@ -646,12 +646,11 @@ if (itemsError) throw itemsError;
 
 // 3. Descontar stock (solo si NO es mercadopago, ese lo maneja el webhook)
 if (metodoPago !== 'mercadopago') {
-const stockItems = carrito.items.map(i => ({
-  producto_id: i.id,
-  talla:       i.talla,
-  cantidad:    i.cantidad,
-  color:       i.color || null,
-}));
+  const stockItems = carrito.items.map(i => ({
+    producto_id: i.id,
+    talla: i.talla,
+    cantidad: i.cantidad
+  }));
   const { error: stockError } = await sb.rpc('descontar_stock', { items: stockItems });
   if (stockError) console.error('Error descontando stock:', stockError.message);
 }
@@ -691,19 +690,19 @@ if (metodoPago === 'mercadopago') {
 }
 }
 
-    // 4. Para otros métodos de pago
+    // 4. Para otros métodos de pago — notificar al admin y redirigir a pago-exitoso
+    try {
+      const fmt = n => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(n);
+      if (typeof notificarNuevoPedido === 'function') {
+        await notificarNuevoPedido(pedido.id, fmt(total));
+      }
+    } catch(e) { console.warn('Error notificando admin:', e); }
+
     Carrito.vaciar();
     cerrarModal();
 
-    document.getElementById('page-content').innerHTML = `
-      <div class="vacio">
-        <i class="bi bi-check-circle" style="color:#16a34a;opacity:1"></i>
-        <h2>¡Pedido confirmado!</h2>
-        <p>Recibimos tu pedido. Te contactaremos a la brevedad para coordinar el envío y pago.</p>
-        <a href="/index.html" class="btn-ir-tienda">
-          <i class="bi bi-bag"></i> Seguir comprando
-        </a>
-      </div>`;
+    // Redirigir a pago-exitoso con el id del pedido y método
+    window.location.href = `/pages/tienda/pago-exitoso.html?id=${pedido.id}&metodo=${metodoPago}&status=approved`;
 
   } catch (err) {
     console.error('Error al crear pedido:', err);
