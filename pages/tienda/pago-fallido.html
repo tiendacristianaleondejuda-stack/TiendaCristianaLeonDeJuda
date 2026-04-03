@@ -58,10 +58,46 @@
       <i class="bi bi-x-circle-fill"></i>
     </div>
     <h1>Pago no procesado ❌</h1>
-    <p>Hubo un problema con tu pago. Podés intentar nuevamente o elegir otro método de pago.</p>
+    <p>Cancelaste el pago o hubo un problema. No se realizó ningún cargo. Podés volver a intentarlo.</p>
     <a href="/pages/tienda/carrito.html" class="btn">
       <i class="bi bi-arrow-left"></i> Volver al carrito
     </a>
   </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-config.js"></script>
+<script>
+  (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const pedidoId = params.get('id');
+
+    if (pedidoId) {
+      // Marcar pedido como cancelado (si no está ya pagado)
+      const { data: pedido } = await sb
+        .from('pedidos')
+        .select('estado')
+        .eq('id', pedidoId)
+        .single();
+      
+      // Solo cancelar si no está pagado
+      if (pedido && pedido.estado !== 'pagado') {
+        await sb.from('pedidos').update({ estado: 'cancelado' }).eq('id', pedidoId);
+      }
+      
+      localStorage.removeItem('mp_pedido_pendiente');
+    }
+    
+    // ✅ RESTAURAR CARRITO DESDE BACKUP (si existe)
+    const carritoBackup = localStorage.getItem('carrito_backup');
+    if (carritoBackup) {
+      localStorage.setItem('carrito', carritoBackup);
+      localStorage.removeItem('carrito_backup');
+    }
+    
+    // ✅ Mostrar mensaje opcional en consola
+    console.log('Pago cancelado. Carrito restaurado.');
+  })();
+</script>
+
 </body>
 </html>
