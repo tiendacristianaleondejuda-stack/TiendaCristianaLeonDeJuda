@@ -80,53 +80,42 @@
 <script src="/js/supabase-config.js"></script>
 <script src="/js/notificaciones.js"></script>
 <script>
-  (async () => {
-    const params        = new URLSearchParams(window.location.search);
-    const pedidoId      = params.get('id');
-    const paymentStatus = params.get('status');   // 'approved' de MP o métodos manuales
-    const metodo        = params.get('metodo');   // 'transferencia', 'efectivo', 'tarjeta', 'mercadopago'
+// pago-exitoso.html - Versión que NO duplica notificaciones
 
-    if (!pedidoId) return;
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  const pedidoId = params.get('id');
+  const paymentStatus = params.get('status');
+  const metodo = params.get('metodo');
 
-    // Determinar si está aprobado
-    const aprobado = paymentStatus === 'approved';
+  if (!pedidoId) return;
 
-    // Personalizar mensaje según método de pago
-    const mensajes = {
-      transferencia: 'Tu pedido fue registrado. Te enviaremos los datos bancarios para completar la transferencia.',
-      efectivo:      'Tu pedido fue registrado. Coordinaremos el pago en efectivo al momento de la entrega.',
-      tarjeta:       'Tu pedido fue registrado. Nos contactaremos para coordinar el pago con tarjeta.',
-      mercadopago:   'Tu pago fue procesado con éxito. Recibirás un correo con los detalles de envío.',
-    };
-    const msgEl = document.getElementById('msg-descripcion');
-    if (msgEl && metodo && mensajes[metodo]) {
-      msgEl.textContent = mensajes[metodo];
+  const aprobado = paymentStatus === 'approved';
+
+  // ✅ Solo actualizar estado, NO notificar aquí para transferencia/efectivo
+  const nuevoEstado = aprobado ? 'pagado' : 'pendiente_pago';
+  await sb.from('pedidos').update({ estado: nuevoEstado }).eq('id', pedidoId);
+
+  // Vaciar carrito
+  if (typeof Carrito !== 'undefined') Carrito.vaciar();
+  else localStorage.removeItem('narvaez_carrito');
+  localStorage.removeItem('mp_pedido_pendiente');
+
+  // ✅ NOTIFICAR SOLO SI EL PAGO REQUIRIÓ MERCADOPAGO
+  // Los métodos transferencia y efectivo YA notificaron en carrito.html
+  const notificarEnEstaPagina = (metodo === 'mercadopago' || metodo === 'tarjeta');
+  
+  if (aprobado && notificarEnEstaPagina) {
+    if (typeof window.notificarNuevoPedido === 'function') {
+      try {
+        const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
+        if (pedido) {
+          await notificarNuevoPedido(pedidoId, pedido.total);
+        }
+      } catch(e) { console.warn('Error notificando admin:', e); }
     }
-
-    // Actualizar estado del pedido
-    await sb.from('pedidos')
-      .update({ estado: aprobado ? 'pagado' : 'pendiente_pago' })
-      .eq('id', pedidoId);
-
-    // Vaciar carrito
-    if (typeof Carrito !== 'undefined') Carrito.vaciar();
-    else localStorage.removeItem('narvaez_carrito');
-    localStorage.removeItem('mp_pedido_pendiente');
-
-    // Notificar admin — esperar que OneSignal cargue
-    if (aprobado) {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      if (typeof window.notificarNuevoPedido === 'function') {
-        try {
-          const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
-          if (pedido) {
-            const fmt = n => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(n);
-            await notificarNuevoPedido(pedidoId, fmt(pedido.total));
-          }
-        } catch(e) { console.warn('Error notificando admin:', e); }
-      }
-    }
-  })();
+  }
+})();
 </script>
 
 </body>
