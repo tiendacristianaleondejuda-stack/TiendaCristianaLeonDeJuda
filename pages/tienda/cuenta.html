@@ -834,7 +834,7 @@
         try {
           if (typeof notificarMensajeAdmin === 'function') {
             const preview = texto.substring(0, 50) + (texto.length > 50 ? '…' : '');
-            await notificarMensajeAdmin(nombreRemitente, preview);
+            await notificarMensajeAdmin(nombreRemitente, preview, pedidoId);
           }
         } catch(e) { /* silenciar */ }
       }
