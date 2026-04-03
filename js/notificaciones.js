@@ -137,8 +137,8 @@ async function notificarNuevoPedido(pedidoId, total) {
   await _enviarPush('pedido', { pedidoId, total });
 }
 
-async function notificarMensajeAdmin(nombre, preview) {
-  await _enviarPush('mensaje', { nombre, preview });
+async function notificarMensajeAdmin(nombre, preview, pedidoId) {
+  await _enviarPush('mensaje', { nombre, preview, pedidoId });
 }
 
 // ── Notificar al cliente cuando su pedido fue enviado ────────────
