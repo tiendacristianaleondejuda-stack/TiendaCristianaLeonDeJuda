@@ -685,7 +685,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase-config.js"></script>
 
-    <script>
+  <script>
     let prodActual = null, tallaSeleccionada = null, colorSeleccionado = null, cantidad = 1;
     let imagenesGaleria = [];
     let lightboxIdx = 0;
@@ -867,9 +867,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      // Stock general — si hay colores, calcularlo sumando todos los colores+talles
+      // Stock general — si hay colores, calcularlo sumando stock_por_talla de cada color
       const totalStock = tieneColores
-        ? (data.colores || []).reduce((s, c) => s + (c.stock || 0), 0)
+        ? (data.colores || []).reduce((s, c) => {
+            // Preferir suma de stock_por_talla (más preciso) antes que c.stock
+            const stockColor = (c.stock_por_talla && Object.keys(c.stock_por_talla).length > 0)
+              ? Object.values(c.stock_por_talla).reduce((a, v) => a + (v || 0), 0)
+              : (c.stock || 0);
+            return s + stockColor;
+          }, 0)
         : (data.stock ?? 0);
 
       let stockTagHTML = '';
@@ -1200,7 +1206,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(num);
     }
   </script>
-  
   <!-- ─── PRODUCTOS RELACIONADOS ─── -->
   <section class="relacionados-section" id="relacionados-section" style="display:none">
     <h2 class="relacionados-titulo">También te puede gustar</h2>
@@ -1283,7 +1288,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
     </div>
-
 
 
     <div class="footer-bottom">
