@@ -1405,6 +1405,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Actualizar botón de notificaciones según estado actual del permiso
   if (typeof actualizarBotonNotif === 'function') actualizarBotonNotif();
+
+  // ── Deep-link desde notificación push ──────────────────────
+  // Si la URL trae ?pedido=XXXX (enviado por OneSignal al tocar la notif),
+  // navegar a Pedidos y abrir el modal del pedido directamente.
+  const _params   = new URLSearchParams(window.location.search);
+  const _pedidoId = _params.get('pedido');
+  if (_pedidoId) {
+    // Limpiar el parámetro de la URL sin recargar la página
+    history.replaceState({}, '', window.location.pathname);
+
+    // Navegar a la sección Pedidos
+    irA('pedidos');
+
+    // Cargar los pedidos y luego abrir el modal del pedido específico
+    await cargarPedidos();
+    const _encontrado = todosPedidos.find(p => p.id === _pedidoId);
+    if (_encontrado) {
+      await verPedido(_pedidoId);
+    } else {
+      // Puede ser un pedido cancelado/archivado — buscarlo en DB igual
+      const { data: _p } = await sb
+        .from('pedidos')
+        .select('*, pedido_items(*, productos(nombre, imagen_url, colores))')
+        .eq('id', _pedidoId)
+        .maybeSingle();
+      if (_p) {
+        todosPedidos.unshift(_p);
+        await verPedido(_pedidoId);
+      } else {
+        toast('No se encontró el pedido de la notificación', 'err');
+      }
+    }
+  }
 });
 
 // ═══════════════════════════════════════════════════════════
