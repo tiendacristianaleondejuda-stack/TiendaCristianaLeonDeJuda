@@ -1424,19 +1424,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (_encontrado) {
       await verPedido(_pedidoId);
       
-    // Opcional: highlight en la tabla
-    setTimeout(() => {
-        const fila = document.querySelector(`#pedidos-tbody tr[data-pedido-id="${_pedidoId}"]`);
-        if (fila) {
-            fila.style.transition = 'background 0.3s';
-            fila.style.background = 'var(--accent-dim)';
-            fila.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            setTimeout(() => {
-                fila.style.background = '';
-            }, 2000);
-        }
-    }, 500);
-    
     } else {
       // Puede ser un pedido cancelado/archivado — buscarlo en DB igual
       const { data: _p } = await sb
@@ -1447,20 +1434,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (_p) {
         todosPedidos.unshift(_p);
         await verPedido(_pedidoId);
-
-    // Opcional: highlight en la tabla
-    setTimeout(() => {
-        const fila = document.querySelector(`#pedidos-tbody tr[data-pedido-id="${_pedidoId}"]`);
-        if (fila) {
-            fila.style.transition = 'background 0.3s';
-            fila.style.background = 'var(--accent-dim)';
-            fila.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            setTimeout(() => {
-                fila.style.background = '';
-            }, 2000);
-        }
-    }, 500);
-
       } else {
         toast('No se encontró el pedido de la notificación', 'err');
       }
