@@ -514,7 +514,7 @@
 
       if (!error && typeof notificarMensajeAdmin === 'function') {
         const preview = texto.substring(0, 50) + (texto.length > 50 ? '…' : '');
-        notificarMensajeAdmin(nombreRemitente, preview, pedidoActual.id);
+        notificarMensajeAdmin(nombreRemitente, preview, pedidoActual);
       }
 
       btnSend.disabled = false;
