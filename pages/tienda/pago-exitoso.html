@@ -68,58 +68,66 @@
     <div class="icon">
       <i class="bi bi-check-circle-fill"></i>
     </div>
-    <h1>¡Pago exitoso! ✅</h1>
-    <p>Tu pedido ha sido confirmado. Recibirás un correo con los detalles de envío.</p>
+    <h1>¡Pedido confirmado! ✅</h1>
+    <p id="msg-descripcion">Tu pedido ha sido recibido. Nos contactaremos a la brevedad para coordinar el envío.</p>
     <a href="/index.html" class="btn">
       <i class="bi bi-shop"></i> Volver a la tienda
     </a>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-  <script src="/js/supabase-config.js"></script>
-  <script src="/js/notificaciones.js"></script>
-  <script>
-    (async () => {
-      const params      = new URLSearchParams(window.location.search);
-      const pedidoId    = params.get('id');
-      const statusMP    = params.get('status');
-      const collectionSt = params.get('collection_status');
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script src="/js/supabase-config.js"></script>
+<script src="/js/notificaciones.js"></script>
+<script>
+  (async () => {
+    const params        = new URLSearchParams(window.location.search);
+    const pedidoId      = params.get('id');
+    const paymentStatus = params.get('status');   // 'approved' de MP o métodos manuales
+    const metodo        = params.get('metodo');   // 'transferencia', 'efectivo', 'tarjeta', 'mercadopago'
 
-      if (!pedidoId) return;
+    if (!pedidoId) return;
 
-      const aprobado    = statusMP === 'approved' || collectionSt === 'approved';
-      const nuevoEstado = aprobado ? 'pagado' : 'pendiente_pago';
+    // Determinar si está aprobado
+    const aprobado = paymentStatus === 'approved';
 
-      const { error } = await sb.from('pedidos')
-        .update({ estado: nuevoEstado })
-        .eq('id', pedidoId);
+    // Personalizar mensaje según método de pago
+    const mensajes = {
+      transferencia: 'Tu pedido fue registrado. Te enviaremos los datos bancarios para completar la transferencia.',
+      efectivo:      'Tu pedido fue registrado. Coordinaremos el pago en efectivo al momento de la entrega.',
+      tarjeta:       'Tu pedido fue registrado. Nos contactaremos para coordinar el pago con tarjeta.',
+      mercadopago:   'Tu pago fue procesado con éxito. Recibirás un correo con los detalles de envío.',
+    };
+    const msgEl = document.getElementById('msg-descripcion');
+    if (msgEl && metodo && mensajes[metodo]) {
+      msgEl.textContent = mensajes[metodo];
+    }
 
-      if (error) console.error('Error actualizando pedido:', error.message);
-      else console.log('Pedido actualizado a:', nuevoEstado);
+    // Actualizar estado del pedido
+    await sb.from('pedidos')
+      .update({ estado: aprobado ? 'pagado' : 'pendiente_pago' })
+      .eq('id', pedidoId);
 
-      // Vaciar carrito
-      if (typeof Carrito !== 'undefined') Carrito.vaciar();
-      else localStorage.removeItem('carrito');
-      localStorage.removeItem('mp_pedido_pendiente');
+    // Vaciar carrito
+    if (typeof Carrito !== 'undefined') Carrito.vaciar();
+    else localStorage.removeItem('narvaez_carrito');
+    localStorage.removeItem('mp_pedido_pendiente');
 
-      // Notificar admin — esperar que OneSignal y notificaciones.js carguen
-      if (aprobado) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        if (typeof window.notificarNuevoPedido === 'function') {
-          try {
-            const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
-            if (pedido) {
-              const fmt = n => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(n);
-              await notificarNuevoPedido(pedidoId, fmt(pedido.total));
-              console.log('Notificación enviada al admin');
-            }
-          } catch(e) { console.warn('Error al notificar admin:', e); }
-        } else {
-          console.warn('notificarNuevoPedido no disponible');
-        }
+    // Notificar admin — esperar que OneSignal cargue
+    if (aprobado) {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (typeof window.notificarNuevoPedido === 'function') {
+        try {
+          const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
+          if (pedido) {
+            const fmt = n => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(n);
+            await notificarNuevoPedido(pedidoId, fmt(pedido.total));
+          }
+        } catch(e) { console.warn('Error notificando admin:', e); }
       }
-    })();
-  </script>
+    }
+  })();
+</script>
+
 </body>
 </html>
