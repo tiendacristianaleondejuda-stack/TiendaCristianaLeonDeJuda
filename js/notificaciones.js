@@ -1,14 +1,11 @@
 // ================================================================
 //  notificaciones.js — OneSignal
-//  ⚠️ Depende de supabase-config.js (debe cargarse ANTES)
 // ================================================================
 
 const ONESIGNAL_APP_ID = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
 const SITE_URL         = 'https://tiendacristianaleondejuda.vercel.app';
 const ICONO_URL        = SITE_URL + '/assets/icons/icon-192x192.png';
 const ONESIGNAL_CONFIGURADO = true;
-
-// 🔴 NO DECLARES ADMIN_EMAIL aquí - ya existe en supabase-config.js
 
 // ── Inicializar OneSignal ────────────────────────────────────────
 window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -17,8 +14,10 @@ OneSignalDeferred.push(async function(OneSignal) {
   try {
     await OneSignal.init({
       appId: ONESIGNAL_APP_ID,
-      // 🔴 ELIMINADO: serviceWorkerParam: { scope: '/' },
-      notifyButton: { enable: false },
+    // ✅ Ahora — especificá la ruta explícita:
+  serviceWorkerPath: '/OneSignalSDKWorker.js',
+   serviceWorkerParam: { scope: '/' },
+    notifyButton: { enable: false },
       promptOptions: {
         slidedown: {
           prompts: [{
@@ -36,23 +35,21 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     // Etiquetar al usuario según su rol
     try {
-      // getUsuario ya está definido en supabase-config.js
-      const user = await getUsuario();
+      const user = await getUsuario?.();
       if (user) {
+        // Registrar user_id para notificaciones personalizadas al cliente
         await OneSignal.User.addTag('user_id', user.id);
 
-        // ADMIN_EMAIL ya está definido en supabase-config.js
+        // Si es admin, también registrar como admin
         if (user.email === ADMIN_EMAIL) {
-          await OneSignal.User.addTag('rol', 'admin');
+          await OneSignal.User.addTag('rol',   'admin');
           await OneSignal.User.addTag('email', user.email);
           console.info('[OneSignal] ✅ Admin registrado');
         } else {
           console.info('[OneSignal] ✅ Cliente registrado:', user.id.substring(0,8));
         }
       }
-    } catch(e) {
-      console.warn('[OneSignal] Error al etiquetar:', e.message);
-    }
+    } catch(e) {}
 
     actualizarBotonNotif();
 
@@ -98,7 +95,7 @@ async function pedirPermisoNotificaciones() {
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       window.OneSignalDeferred.push(async function(OneSignal) {
         try { await OneSignal.Notifications.requestPermission(); } catch(e) {}
-        const user = await getUsuario();
+        const user = await getUsuario?.();
         if (user) {
           await OneSignal.User.addTag('user_id', user.id);
           if (user.email === ADMIN_EMAIL) {
@@ -146,6 +143,7 @@ async function notificarMensajeAdmin(nombre, preview, pedidoId) {
   await _enviarPush('mensaje', { nombre, preview, pedidoId });
 }
 
+// ── Notificar al cliente cuando su pedido fue enviado ────────────
 async function notificarEnvioCliente(pedidoId, numeroGuia, correo, userId) {
   await _enviarPush('envio', { pedidoId, numeroGuia, correo, userId });
 }
