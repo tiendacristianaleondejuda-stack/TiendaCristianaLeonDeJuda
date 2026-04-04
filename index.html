@@ -679,6 +679,70 @@
     @keyframes t-in  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
     @keyframes t-out { from { opacity:1; } to { opacity:0; } }
 
+    /* ── Reseñas ── */
+    .prod-estrellas {
+      display: flex; align-items: center; gap: .3rem;
+      font-size: .75rem; color: var(--text-muted);
+      margin-top: .2rem;
+    }
+    .prod-estrellas .stars { color: #f59e0b; letter-spacing: .05em; font-size: .8rem; }
+    .prod-estrellas .count { font-size: .72rem; }
+
+    .resenas-wrap { margin-top: 1.25rem; border-top: 1px solid var(--border); padding-top: 1.25rem; }
+    .resenas-titulo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 600;
+      margin-bottom: .85rem;
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .resenas-promedio {
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--bg2); border-radius: 10px;
+      padding: .75rem 1rem; margin-bottom: 1rem;
+    }
+    .resenas-promedio .numero { font-size: 2rem; font-weight: 700; line-height: 1; color: var(--text); }
+    .resenas-promedio .stars  { color: #f59e0b; font-size: 1.1rem; }
+    .resenas-promedio .total  { font-size: .78rem; color: var(--text-muted); }
+
+    .resena-card {
+      background: var(--bg2); border-radius: 10px;
+      padding: .85rem 1rem; margin-bottom: .6rem;
+    }
+    .resena-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: .3rem; }
+    .resena-card-nombre { font-weight: 600; font-size: .875rem; }
+    .resena-card-fecha  { font-size: .72rem; color: var(--text-muted); }
+    .resena-card-stars  { color: #f59e0b; font-size: .85rem; margin-bottom: .3rem; }
+    .resena-card-texto  { font-size: .85rem; line-height: 1.5; color: var(--text); }
+
+    .form-resena { background: var(--bg2); border-radius: 10px; padding: 1rem; margin-top: .75rem; }
+    .form-resena-titulo { font-weight: 600; font-size: .875rem; margin-bottom: .75rem; }
+    .estrellas-selector { display: flex; gap: .35rem; margin-bottom: .75rem; }
+    .estrella-btn {
+      font-size: 1.5rem; background: none; border: none;
+      cursor: pointer; color: #d6d3d1; transition: color .15s, transform .1s;
+      line-height: 1;
+    }
+    .estrella-btn.activa, .estrella-btn:hover { color: #f59e0b; transform: scale(1.15); }
+    .resena-textarea {
+      width: 100%; padding: .65rem .85rem;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      background: var(--white); color: var(--text);
+      font-family: 'Jost', sans-serif; font-size: .875rem;
+      resize: vertical; min-height: 80px; outline: none;
+      transition: border-color .2s;
+    }
+    .resena-textarea:focus { border-color: var(--gold); }
+    .btn-enviar-resena {
+      margin-top: .6rem; width: 100%;
+      background: var(--text); color: white;
+      border: none; border-radius: 8px;
+      padding: .65rem; font-family: 'Jost', sans-serif;
+      font-size: .875rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-enviar-resena:hover    { background: #333; }
+    .btn-enviar-resena:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+
 
     /* ══════════════════════════════════
        FOOTER RICO
@@ -1228,6 +1292,10 @@
             </div>
             <p class="prod-nombre">${p.nombre}</p>
             <p class="prod-cat">${p.categoria || ''}</p>
+            <div class="prod-estrellas" id="estrellas-card-${p.id}">
+              <span class="stars">☆☆☆☆☆</span>
+              <span class="count">Sin reseñas</span>
+            </div>
             <p>
               <span class="prod-precio">${precio}</span>
               ${orig ? `<span class="prod-precio-orig">${orig}</span>` : ''}
