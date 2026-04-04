@@ -1,11 +1,11 @@
 // ================================================================
-//  notificaciones.js — OneSignal
+//  notificaciones.js — OneSignal (VERSIÓN CORREGIDA)
 // ================================================================
 
 const ONESIGNAL_APP_ID = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
 const SITE_URL         = 'https://tiendacristianaleondejuda.vercel.app';
 const ICONO_URL        = SITE_URL + '/assets/icons/icon-192x192.png';
-const ONESIGNAL_CONFIGURADO = true;
+const ADMIN_EMAIL      = 'tu-admin-email@ejemplo.com'; // 🔴 CAMBIA ESTO por el email del admin
 
 // ── Inicializar OneSignal ────────────────────────────────────────
 window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -14,7 +14,7 @@ OneSignalDeferred.push(async function(OneSignal) {
   try {
     await OneSignal.init({
       appId: ONESIGNAL_APP_ID,
-      serviceWorkerParam: { scope: '/' },
+      // 🔴 ELIMINADO: serviceWorkerParam: { scope: '/' },
       notifyButton: { enable: false },
       promptOptions: {
         slidedown: {
@@ -31,33 +31,42 @@ OneSignalDeferred.push(async function(OneSignal) {
       },
     });
 
+    // Esperar a que el Service Worker esté listo
+    await OneSignal.Notifications.addEventListener('permissionChange', () => {});
+    
     // Etiquetar al usuario según su rol
     try {
-      const user = await getUsuario?.();
-      if (user) {
-        // Registrar user_id para notificaciones personalizadas al cliente
+      // 🔴 Usar window.getUsuario si existe, sino esperar
+      const getUsuarioFn = window.getUsuario || (() => null);
+      const user = await getUsuarioFn();
+      
+      if (user && user.id) {
         await OneSignal.User.addTag('user_id', user.id);
 
-        // Si es admin, también registrar como admin
         if (user.email === ADMIN_EMAIL) {
-          await OneSignal.User.addTag('rol',   'admin');
+          await OneSignal.User.addTag('rol', 'admin');
           await OneSignal.User.addTag('email', user.email);
           console.info('[OneSignal] ✅ Admin registrado');
-        } else {
+        } else if (user.email) {
+          await OneSignal.User.addTag('rol', 'cliente');
           console.info('[OneSignal] ✅ Cliente registrado:', user.id.substring(0,8));
         }
+      } else {
+        console.info('[OneSignal] Usuario no logueado, esperando...');
       }
-    } catch(e) {}
+    } catch(e) {
+      console.warn('[OneSignal] Error al etiquetar usuario:', e.message);
+    }
 
     actualizarBotonNotif();
 
   } catch(err) {
-    console.warn('[OneSignal]', err.message);
+    console.warn('[OneSignal] Error en init:', err.message);
     actualizarBotonNotif();
   }
 });
 
-// ── Estado del botón ─────────────────────────────────────────────
+// ── Estado del botón (sin cambios) ───────────────────────────────
 function actualizarBotonNotif() {
   const btn   = document.getElementById('btn-notif');
   const icon  = document.getElementById('notif-icon');
@@ -79,39 +88,58 @@ function actualizarBotonNotif() {
   }
 }
 
-// ── Pedir permiso ────────────────────────────────────────────────
+// ── Pedir permiso (corregido) ────────────────────────────────────
 async function pedirPermisoNotificaciones() {
   const estado = Notification?.permission || 'default';
   if (estado === 'denied') {
     alert('⛔ Las notificaciones están BLOQUEADAS.\n\nPara activarlas:\n• Android Chrome: tocá el candado 🔒 en la barra → Notificaciones → Permitir\n• PC Chrome: hacé clic en el candado 🔒 → Notificaciones → Permitir\n\nDespués recargá la página.');
     return;
   }
-  if (estado === 'granted') { alert('✅ Las alertas ya están activadas en este dispositivo.'); return; }
+  if (estado === 'granted') { 
+    alert('✅ Las alertas ya están activadas en este dispositivo.'); 
+    return; 
+  }
+  
   try {
     const resultado = await Notification.requestPermission();
     if (resultado === 'granted') {
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      window.OneSignalDeferred.push(async function(OneSignal) {
-        try { await OneSignal.Notifications.requestPermission(); } catch(e) {}
-        const user = await getUsuario?.();
-        if (user) {
-          await OneSignal.User.addTag('user_id', user.id);
+      // 🔴 Usar la instancia ya inicializada
+      if (window.OneSignal) {
+        try { 
+          await window.OneSignal.Notifications.requestPermission(); 
+        } catch(e) {}
+        
+        const getUsuarioFn = window.getUsuario || (() => null);
+        const user = await getUsuarioFn();
+        if (user && user.id) {
+          await window.OneSignal.User.addTag('user_id', user.id);
           if (user.email === ADMIN_EMAIL) {
-            await OneSignal.User.addTag('rol', 'admin');
-            await OneSignal.User.addTag('email', user.email);
+            await window.OneSignal.User.addTag('rol', 'admin');
+            await window.OneSignal.User.addTag('email', user.email);
           }
         }
-      });
+      }
       actualizarBotonNotif();
       alert('✅ ¡Alertas activadas!');
     } else {
       actualizarBotonNotif();
     }
-  } catch(e) { console.warn('Error:', e.message); }
+  } catch(e) { 
+    console.warn('Error al pedir permiso:', e.message); 
+  }
 }
 
-// ── Enviar push via Edge Function de Supabase ────────────────────
+// ── Enviar push via Edge Function ────────────────────────────────
+// 🔴 Asegurar que las variables de Supabase existan
+const SUPABASE_URL = window.SUPABASE_URL || '';  // Debe definirse en otro archivo
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || ''; // Debe definirse en otro archivo
+
 async function _enviarPush(tipo, payload) {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    console.warn('[Push] Supabase no configurado');
+    return;
+  }
+  
   try {
     const edgeFnUrl = SUPABASE_URL + '/functions/v1/notify';
     const resp = await fetch(edgeFnUrl, {
@@ -141,7 +169,6 @@ async function notificarMensajeAdmin(nombre, preview, pedidoId) {
   await _enviarPush('mensaje', { nombre, preview, pedidoId });
 }
 
-// ── Notificar al cliente cuando su pedido fue enviado ────────────
 async function notificarEnvioCliente(pedidoId, numeroGuia, correo, userId) {
   await _enviarPush('envio', { pedidoId, numeroGuia, correo, userId });
 }
