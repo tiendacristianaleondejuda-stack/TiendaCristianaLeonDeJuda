@@ -628,6 +628,81 @@
       font-size: .75rem; color: rgba(255,255,255,.25);
     }
     @media (max-width: 520px) { .footer-bottom { flex-direction: column; text-align: center; padding: 1rem 1.25rem; } }
+
+    /* ── Reseñas ── */
+    .resenas-section {
+      max-width: 1280px; margin: 3rem auto 0; padding: 0 2rem;
+    }
+    @media (max-width: 768px) { .resenas-section { padding: 0 1rem; } }
+
+    .resenas-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.25rem; flex-wrap: wrap; gap: .75rem;
+    }
+    .resenas-titulo-sec {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 400;
+    }
+    .resenas-promedio-row {
+      display: flex; align-items: center; gap: 1rem;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+    }
+    .resenas-numero { font-size: 2.5rem; font-weight: 700; line-height: 1; }
+    .resenas-stars-big { color: #f59e0b; font-size: 1.3rem; letter-spacing: .05em; }
+    .resenas-total { font-size: .82rem; color: var(--text-muted); margin-top: .15rem; }
+
+    .resenas-lista { display: flex; flex-direction: column; gap: .75rem; margin-bottom: 1.5rem; }
+
+    .resena-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.25rem;
+    }
+    .resena-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: .25rem; flex-wrap: wrap; gap: .4rem; }
+    .resena-nombre { font-weight: 600; font-size: .9rem; }
+    .resena-fecha  { font-size: .75rem; color: var(--text-muted); }
+    .resena-stars  { color: #f59e0b; font-size: .95rem; margin-bottom: .4rem; }
+    .resena-texto  { font-size: .875rem; line-height: 1.6; color: #3a3632; }
+
+    .form-resena-wrap {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.25rem; margin-top: .5rem;
+    }
+    .form-resena-titulo { font-weight: 600; font-size: .95rem; margin-bottom: 1rem; }
+    .estrellas-selector { display: flex; gap: .4rem; margin-bottom: .85rem; }
+    .estrella-btn {
+      font-size: 1.8rem; background: none; border: none;
+      cursor: pointer; color: #d6d3d1; transition: color .15s, transform .1s; line-height: 1;
+    }
+    .estrella-btn.activa { color: #f59e0b; }
+    .estrella-btn:hover  { color: #f59e0b; transform: scale(1.2); }
+    .resena-textarea {
+      width: 100%; padding: .75rem 1rem;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      background: var(--bg); color: var(--text);
+      font-family: 'Jost', sans-serif; font-size: .9rem;
+      resize: vertical; min-height: 90px; outline: none;
+      transition: border-color .2s; margin-bottom: .75rem;
+    }
+    .resena-textarea:focus { border-color: var(--gold); }
+    .btn-enviar-resena {
+      width: 100%; padding: .85rem;
+      background: var(--text); color: white;
+      border: none; border-radius: 10px;
+      font-family: 'Jost', sans-serif; font-size: .9rem; font-weight: 600;
+      cursor: pointer; letter-spacing: .03em;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      transition: background .2s;
+    }
+    .btn-enviar-resena:hover    { background: #2c2520; }
+    .btn-enviar-resena:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+    .resena-aviso {
+      text-align: center; padding: 1rem;
+      background: var(--bg2); border-radius: 10px;
+      font-size: .875rem; color: var(--text-muted);
+    }
+    .resena-aviso a { color: var(--gold); font-weight: 600; }
+
   </style>
 </head>
 
@@ -760,6 +835,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const id = new URLSearchParams(location.search).get('id');
   if (!id) { location.href = '/index.html'; return; }
   await cargarProducto(id);
+  await cargarResenas(id);
 
   // Si hay colores, seleccionar automáticamente el primero con stock
   setTimeout(() => {
@@ -1206,6 +1282,162 @@ document.addEventListener('DOMContentLoaded', async () => {
       seccion.style.display = 'block';
     }
 
+
+    // ═══════════════════════════════════════════════════════════
+    //  RESEÑAS
+    // ═══════════════════════════════════════════════════════════
+    let estrellasSeleccionadas = 0;
+
+    function renderStars(n, total = 5) {
+      return '★'.repeat(Math.round(n)) + '☆'.repeat(total - Math.round(n));
+    }
+
+    async function cargarResenas(productoId) {
+      const seccion = document.getElementById('resenas-section');
+      const lista   = document.getElementById('resenas-lista');
+      const promWrap= document.getElementById('resenas-promedio-wrap');
+      const formWrap= document.getElementById('resenas-form-wrap');
+
+      // Traer reseñas aprobadas
+      const { data: resenas } = await sb.from('resenas')
+        .select('*')
+        .eq('producto_id', productoId)
+        .eq('estado', 'aprobada')
+        .order('created_at', { ascending: false });
+
+      const user = await getUsuario();
+      let yaReseno  = false;
+      let comproProd = false;
+
+      if (user) {
+        // ¿Ya dejó una reseña?
+        const { data: propia } = await sb.from('resenas')
+          .select('id').eq('producto_id', productoId).eq('user_id', user.id).maybeSingle();
+        yaReseno = !!propia;
+
+        // ¿Compró el producto? (pedido no cancelado)
+        const { data: items } = await sb.from('pedido_items')
+          .select('id, pedidos!inner(user_id, estado)')
+          .eq('producto_id', productoId)
+          .eq('pedidos.user_id', user.id)
+          .neq('pedidos.estado', 'cancelado');
+        comproProd = !!(items?.length);
+      }
+
+      const arr  = resenas || [];
+      const prom = arr.length
+        ? (arr.reduce((s, r) => s + r.estrellas, 0) / arr.length)
+        : 0;
+
+      seccion.style.display = 'block';
+
+      // Promedio
+      promWrap.innerHTML = arr.length ? `
+        <div class="resenas-promedio-row">
+          <span class="resenas-numero">${prom.toFixed(1)}</span>
+          <div>
+            <div class="resenas-stars-big">${renderStars(prom)}</div>
+            <div class="resenas-total">${arr.length} reseña${arr.length !== 1 ? 's' : ''}</div>
+          </div>
+        </div>` : '';
+
+      // Lista de reseñas
+      lista.innerHTML = arr.length
+        ? arr.map(r => `
+          <div class="resena-card">
+            <div class="resena-top">
+              <span class="resena-nombre">${r.nombre_cliente || 'Cliente'}</span>
+              <span class="resena-fecha">${new Date(r.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})}</span>
+            </div>
+            <div class="resena-stars">${renderStars(r.estrellas)}</div>
+            <p class="resena-texto">${r.comentario}</p>
+          </div>`).join('')
+        : `<p style="color:var(--text-muted);font-size:.9rem">Aún no hay reseñas para este producto. ¡Sé el primero!</p>`;
+
+      // Formulario o aviso
+      if (!user) {
+        formWrap.innerHTML = `
+          <div class="resena-aviso">
+            <a href="/login.html?redirect=${encodeURIComponent(location.href)}">Iniciá sesión</a>
+            para dejar tu reseña.
+          </div>`;
+      } else if (yaReseno) {
+        formWrap.innerHTML = `
+          <div class="resena-aviso">
+            ✅ Ya dejaste tu reseña para este producto. ¡Gracias!
+          </div>`;
+      } else if (!comproProd) {
+        formWrap.innerHTML = `
+          <div class="resena-aviso">
+            Solo pueden reseñar clientes que hayan comprado este producto.
+          </div>`;
+      } else {
+        formWrap.innerHTML = `
+          <div class="form-resena-wrap" id="form-resena">
+            <p class="form-resena-titulo">Dejá tu reseña</p>
+            <div class="estrellas-selector" id="estrellas-selector">
+              ${[1,2,3,4,5].map(n =>
+                `<button class="estrella-btn" data-val="${n}" onclick="selEstrella(${n})">★</button>`
+              ).join('')}
+            </div>
+            <textarea class="resena-textarea" id="resena-texto"
+              placeholder="Contanos tu experiencia con el producto…" maxlength="500"></textarea>
+            <button class="btn-enviar-resena" id="btn-enviar-resena"
+              onclick="enviarResena('${productoId}')">
+              <i class="bi bi-send"></i> Enviar reseña
+            </button>
+          </div>`;
+      }
+    }
+
+    function selEstrella(n) {
+      estrellasSeleccionadas = n;
+      document.querySelectorAll('.estrella-btn').forEach(btn => {
+        btn.classList.toggle('activa', parseInt(btn.dataset.val) <= n);
+      });
+    }
+
+    async function enviarResena(productoId) {
+      if (!estrellasSeleccionadas) {
+        alert('Por favor seleccioná una calificación con las estrellas.'); return;
+      }
+      const texto = document.getElementById('resena-texto')?.value.trim();
+      if (!texto) { alert('Por favor escribí un comentario.'); return; }
+
+      const btn = document.getElementById('btn-enviar-resena');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando…';
+
+      const user = await getUsuario();
+      const { data: perfil } = await sb.from('perfiles')
+        .select('nombre, apellido').eq('user_id', user.id).maybeSingle();
+      const nombre = perfil
+        ? [perfil.nombre, perfil.apellido].filter(Boolean).join(' ').trim()
+        : user.email.split('@')[0];
+
+      const { error } = await sb.from('resenas').insert({
+        producto_id:    productoId,
+        user_id:        user.id,
+        nombre_cliente: nombre,
+        estrellas:      estrellasSeleccionadas,
+        comentario:     texto,
+        estado:         'pendiente',
+      });
+
+      if (error) {
+        alert('Error al enviar la reseña. Intentá nuevamente.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send"></i> Enviar reseña';
+        return;
+      }
+
+      document.getElementById('form-resena').innerHTML = `
+        <div class="resena-aviso" style="color:var(--gold);font-weight:600">
+          ✅ ¡Gracias por tu reseña! Será publicada una vez que la revisemos.
+        </div>`;
+      estrellasSeleccionadas = 0;
+    }
+
     // ── Helpers ──────────────────────────────────────────────────
     function toast(msg) {
       const w = document.getElementById('toasts');
@@ -1220,6 +1452,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(num);
     }
   </script>
+
+<!-- ─── RESEÑAS ─── -->
+  <section class="resenas-section" id="resenas-section" style="display:none">
+    <div class="resenas-header">
+      <h2 class="resenas-titulo-sec">Reseñas del producto</h2>
+    </div>
+    <div id="resenas-promedio-wrap"></div>
+    <div class="resenas-lista" id="resenas-lista"></div>
+    <div id="resenas-form-wrap"></div>
+  </section>
+
   <!-- ─── PRODUCTOS RELACIONADOS ─── -->
   <section class="relacionados-section" id="relacionados-section" style="display:none">
     <h2 class="relacionados-titulo">También te puede gustar</h2>
