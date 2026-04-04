@@ -645,15 +645,14 @@ const { error: itemsError } = await sb.from('pedido_items').insert(items);
 if (itemsError) throw itemsError;
 
 // 3. Descontar stock (solo si NO es mercadopago, ese lo maneja el webhook)
-if (metodoPago !== 'mercadopago') {
-  const stockItems = carrito.items.map(i => ({
+const stockItems = carrito.items.map(i => ({
     producto_id: i.id,
     talla: i.talla,
+    color: i.color || null,
     cantidad: i.cantidad
   }));
   const { error: stockError } = await sb.rpc('descontar_stock', { items: stockItems });
   if (stockError) console.error('Error descontando stock:', stockError.message);
-}
 
 // 4. Si eligió MercadoPago
 if (metodoPago === 'mercadopago' || metodoPago === 'tarjeta') {
