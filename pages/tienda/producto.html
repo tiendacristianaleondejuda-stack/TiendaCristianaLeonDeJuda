@@ -761,6 +761,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!id) { location.href = '/index.html'; return; }
   await cargarProducto(id);
 
+  // Si hay colores, seleccionar automáticamente el primero con stock
+  setTimeout(() => {
+    const primeroConStock = document.querySelector('.color-btn:not(.sin-stock)');
+    if (primeroConStock) primeroConStock.click();
+  }, 50);
+
   // Cerrar lightbox con ESC
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') cerrarLightbox();
@@ -803,9 +809,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Tallas — si hay colores, usar stock del primer color; si no, usar stock_por_talla del producto
       const tallas = data.tallas?.length ? data.tallas : ['Única'];
-      const primerColor = (data.colores || []).find(c => (c.stock ?? 99) > 0) || data.colores?.[0];
-      const spt = primerColor?.stock_por_talla || data.stock_por_talla || {};
       const tieneColores = (data.colores || []).length > 0;
+
+      // Calcular stock real de un color sumando sus talles (más preciso que c.stock)
+      const stockRealColor = c => {
+        if (c.stock_por_talla && Object.keys(c.stock_por_talla).length > 0)
+          return Object.values(c.stock_por_talla).reduce((a, v) => a + (Number(v) || 0), 0);
+        return Number(c.stock) || 0;
+      };
+
+      const primerColor = tieneColores
+        ? ((data.colores || []).find(c => stockRealColor(c) > 0) || data.colores[0])
+        : null;
+      const spt = primerColor?.stock_por_talla || data.stock_por_talla || {};
 
       const getStockTalla = t => {
         if (tieneColores && primerColor?.stock_por_talla) {
@@ -834,13 +850,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           <p class="sec-label">Color</p>
           <div class="colores-wrap">
             ${colores.map((c, i) => {
-              // Calcular stock real sumando stock_por_talla si existe
               const stockReal = (c.stock_por_talla && Object.keys(c.stock_por_talla).length > 0)
-                ? Object.values(c.stock_por_talla).reduce((s, v) => s + (v || 0), 0)
-                : (c.stock ?? 99);
+                ? Object.values(c.stock_por_talla).reduce((s, v) => s + (Number(v) || 0), 0)
+                : (Number(c.stock) || 0);
               const sinStock = stockReal === 0;
               return `
-              <div class="color-btn ${i===0?'sel':''} ${sinStock?'sin-stock':''}"
+              <div class="color-btn ${sinStock?'sin-stock':''}"
                 title="${c.nombre}${sinStock ? ' · Sin stock' : ''}"
                 onclick="${sinStock ? 'void(0)' : `selColor(${i}, this)`}"
                 data-nombre="${c.nombre}"
@@ -851,14 +866,14 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>`;
             }).join('')}
           </div>
-          <p class="color-nombre-sel" id="color-nombre-sel">${colores[0]?.nombre || ''}</p>
+          <p class="color-nombre-sel" id="color-nombre-sel"></p>
           <p id="stock-color-info" style="font-size:.75rem;color:var(--text-muted);margin-top:-.5rem;margin-bottom:.75rem;min-height:1.2em"></p>`;
 
         // Preseleccionar primer color con stock real
         const primerConStock = colores.find(c => {
           const sr = (c.stock_por_talla && Object.keys(c.stock_por_talla).length > 0)
-            ? Object.values(c.stock_por_talla).reduce((s, v) => s + (v || 0), 0)
-            : (c.stock ?? 99);
+            ? Object.values(c.stock_por_talla).reduce((s, v) => s + (Number(v) || 0), 0)
+            : (Number(c.stock) || 0);
           return sr > 0;
         }) || colores[0];
         colorSeleccionado = primerConStock;
@@ -936,10 +951,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             <button class="qty-btn" onclick="cambiarCantidad(1)">+</button>
           </div>
 
-          <button class="btn-agregar" id="btn-agregar" onclick="agregarCarrito()" ${(totalStock===0||!tallaSeleccionada)?'disabled':''}>
+          <button class="btn-agregar" id="btn-agregar" onclick="agregarCarrito()" ${totalStock===0 ? 'disabled' : (!tieneColores && !tallaSeleccionada ? 'disabled' : '')}>
             <i class="bi bi-bag-plus"></i> Agregar al carrito
           </button>
-          <button class="btn-comprar" id="btn-comprar" onclick="comprarAhora()" ${(totalStock===0||!tallaSeleccionada)?'disabled':''}>
+          <button class="btn-comprar" id="btn-comprar" onclick="comprarAhora()" ${totalStock===0 ? 'disabled' : (!tieneColores && !tallaSeleccionada ? 'disabled' : '')}>
             <i class="bi bi-credit-card"></i> Comprar ahora
           </button>
 
@@ -993,12 +1008,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ── Colores ──────────────────────────────────────────────────
     function calcularStockTotalColor(color) {
-      // Si tiene stock_por_talla, sumar todos los talles
+      // Sumar todos los talles del stock_por_talla
       if (color.stock_por_talla && Object.keys(color.stock_por_talla).length > 0) {
-        return Object.values(color.stock_por_talla).reduce((s, v) => s + (v || 0), 0);
+        return Object.values(color.stock_por_talla).reduce((s, v) => s + (Number(v) || 0), 0);
       }
-      // Fallback al stock simple
-      return color.stock ?? 99;
+      return Number(color.stock) || 0;
     }
 
     function selColor(idx, btn) {
