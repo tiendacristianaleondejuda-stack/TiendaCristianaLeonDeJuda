@@ -5,7 +5,7 @@
 const ONESIGNAL_APP_ID = '98d7158a-84e7-46e1-9e64-f61678fbfd06';
 const SITE_URL         = 'https://tiendacristianaleondejuda.vercel.app';
 const ICONO_URL        = SITE_URL + '/assets/icons/icon-192x192.png';
-const ADMIN_EMAIL      = 'tu-admin-email@ejemplo.com'; // 🔴 CAMBIA ESTO por el email del admin
+const ADMIN_EMAIL      = 'tiendacristianaleondejuda@gmail.com'; // 🔴 CAMBIA ESTO por el email del admin
 
 // ── Inicializar OneSignal ────────────────────────────────────────
 window.OneSignalDeferred = window.OneSignalDeferred || [];
