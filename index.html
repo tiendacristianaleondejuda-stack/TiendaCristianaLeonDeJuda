@@ -680,70 +680,6 @@
     @keyframes t-out { from { opacity:1; } to { opacity:0; } }
 
 
-    /* ── Reseñas ── */
-    .prod-estrellas {
-      display: flex; align-items: center; gap: .3rem;
-      font-size: .75rem; color: var(--text-muted);
-      margin-top: .2rem;
-    }
-    .prod-estrellas .stars { color: #f59e0b; letter-spacing: .05em; font-size: .8rem; }
-    .prod-estrellas .count { font-size: .72rem; }
-
-    .resenas-wrap { margin-top: 1.25rem; border-top: 1px solid var(--border); padding-top: 1.25rem; }
-    .resenas-titulo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem; font-weight: 600;
-      margin-bottom: .85rem;
-      display: flex; align-items: center; gap: .75rem;
-    }
-    .resenas-promedio {
-      display: flex; align-items: center; gap: .5rem;
-      background: var(--bg2); border-radius: 10px;
-      padding: .75rem 1rem; margin-bottom: 1rem;
-    }
-    .resenas-promedio .numero { font-size: 2rem; font-weight: 700; line-height: 1; color: var(--text); }
-    .resenas-promedio .stars  { color: #f59e0b; font-size: 1.1rem; }
-    .resenas-promedio .total  { font-size: .78rem; color: var(--text-muted); }
-
-    .resena-card {
-      background: var(--bg2); border-radius: 10px;
-      padding: .85rem 1rem; margin-bottom: .6rem;
-    }
-    .resena-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: .3rem; }
-    .resena-card-nombre { font-weight: 600; font-size: .875rem; }
-    .resena-card-fecha  { font-size: .72rem; color: var(--text-muted); }
-    .resena-card-stars  { color: #f59e0b; font-size: .85rem; margin-bottom: .3rem; }
-    .resena-card-texto  { font-size: .85rem; line-height: 1.5; color: var(--text); }
-
-    .form-resena { background: var(--bg2); border-radius: 10px; padding: 1rem; margin-top: .75rem; }
-    .form-resena-titulo { font-weight: 600; font-size: .875rem; margin-bottom: .75rem; }
-    .estrellas-selector { display: flex; gap: .35rem; margin-bottom: .75rem; }
-    .estrella-btn {
-      font-size: 1.5rem; background: none; border: none;
-      cursor: pointer; color: #d6d3d1; transition: color .15s, transform .1s;
-      line-height: 1;
-    }
-    .estrella-btn.activa, .estrella-btn:hover { color: #f59e0b; transform: scale(1.15); }
-    .resena-textarea {
-      width: 100%; padding: .65rem .85rem;
-      border: 1.5px solid var(--border); border-radius: 8px;
-      background: var(--white); color: var(--text);
-      font-family: 'Jost', sans-serif; font-size: .875rem;
-      resize: vertical; min-height: 80px; outline: none;
-      transition: border-color .2s;
-    }
-    .resena-textarea:focus { border-color: var(--gold); }
-    .btn-enviar-resena {
-      margin-top: .6rem; width: 100%;
-      background: var(--text); color: white;
-      border: none; border-radius: 8px;
-      padding: .65rem; font-family: 'Jost', sans-serif;
-      font-size: .875rem; font-weight: 600;
-      cursor: pointer; transition: background .2s;
-    }
-    .btn-enviar-resena:hover    { background: #333; }
-    .btn-enviar-resena:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
-
     /* ══════════════════════════════════
        FOOTER RICO
     ══════════════════════════════════ */
@@ -1088,13 +1024,6 @@
   </footer>
 
 
-  <!-- ─── MODAL PRODUCTO DETALLE (con reseñas) ─── -->
-  <div class="modal-overlay" id="modal-producto-detalle" style="align-items:flex-end;padding:0">
-    <div class="modal-box" style="max-width:100%;width:100%;border-radius:20px 20px 0 0;max-height:92vh;overflow-y:auto">
-      <div class="modal-handle" style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:.75rem auto .5rem"></div>
-      <div id="modal-prod-detalle-body" style="padding:0 1.25rem 2rem"></div>
-    </div>
-  </div>
 
   <!-- ─── MODAL TALLA ─── -->
   <div class="modal-overlay" id="modal-talla">
@@ -1299,11 +1228,10 @@
             </div>
             <p class="prod-nombre">${p.nombre}</p>
             <p class="prod-cat">${p.categoria || ''}</p>
-            <div class="prod-estrellas" id="estrellas-card-${p.id}">
-              <span class="stars">☆☆☆☆☆</span>
-              <span class="count">Sin reseñas</span>
-            </div>
             <p>
+              <span class="prod-precio">${precio}</span>
+              ${orig ? `<span class="prod-precio-orig">${orig}</span>` : ''}
+            </p>
               <span class="prod-precio">${precio}</span>
               ${orig ? `<span class="prod-precio-orig">${orig}</span>` : ''}
             </p>
@@ -1311,10 +1239,7 @@
       }).join('');
     }
 
-    function irA(id) {
-      const prod = todos.find(p => p.id === id);
-      if (prod) abrirDetalleProd(prod);
-    }
+    function irA(id) { window.location.href = `/pages/tienda/producto.html?id=${id}`; }
 
     function abrirModal(prod) {
       prodModal = prod; tallaModal = null;
@@ -1365,217 +1290,7 @@
     }
 
 
-    // ── Promedios de reseñas en cards ───────────────────────────
-    async function cargarPromediosResenas(ids) {
-      if (!ids.length) return;
-      const { data } = await sb.from('resenas')
-        .select('producto_id, estrellas')
-        .in('producto_id', ids)
-        .eq('estado', 'aprobada');
-      if (!data) return;
-      // Agrupar por producto
-      const map = {};
-      data.forEach(r => {
-        if (!map[r.producto_id]) map[r.producto_id] = [];
-        map[r.producto_id].push(r.estrellas);
-      });
-      ids.forEach(id => {
-        const el = document.getElementById('estrellas-card-' + id);
-        if (!el) return;
-        const lista = map[id];
-        if (!lista?.length) return;
-        const prom = lista.reduce((a,b) => a+b, 0) / lista.length;
-        el.innerHTML = `
-          <span class="stars">${renderStars(prom)}</span>
-          <span class="count">${prom.toFixed(1)} (${lista.length})</span>`;
-      });
-    }
-
-    function renderStars(prom) {
-      return [1,2,3,4,5].map(i =>
-        i <= Math.round(prom) ? '★' : '☆'
-      ).join('');
-    }
-
-    // ── Modal detalle producto con reseñas ───────────────────────
-    async function abrirDetalleProd(prod) {
-      const overlay = document.getElementById('modal-producto-detalle');
-      const body    = document.getElementById('modal-prod-detalle-body');
-      overlay.classList.add('open');
-
-      const img    = prod.imagen_url || 'https://placehold.co/400x530/e4dac8/78716c?text=Foto';
-      const precio = formatearPrecio(prod.precio);
-      const orig   = prod.precio_original ? formatearPrecio(prod.precio_original) : '';
-
-      body.innerHTML = `
-        <div style="display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start">
-          <img src="${img}" alt="${prod.nombre}"
-            style="width:90px;height:115px;object-fit:cover;border-radius:10px;flex-shrink:0"
-            onerror="this.src='https://placehold.co/90x115/e4dac8/78716c?text=Foto'">
-          <div style="flex:1">
-            <p style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;margin-bottom:.25rem">${prod.nombre}</p>
-            <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.4rem">${prod.categoria || ''}</p>
-            <p>
-              <span style="font-size:1.1rem;font-weight:700;color:var(--gold)">${precio}</span>
-              ${orig ? `<span style="font-size:.85rem;color:var(--text-muted);text-decoration:line-through;margin-left:.4rem">${orig}</span>` : ''}
-            </p>
-            ${prod.descripcion ? `<p style="font-size:.82rem;color:var(--text-muted);margin-top:.4rem;line-height:1.5">${prod.descripcion}</p>` : ''}
-          </div>
-        </div>
-        <button class="btn-confirm" style="margin-bottom:1rem" onclick="cerrarDetalle();abrirModal(${JSON.stringify(prod).replace(/"/g,'&quot;')})">
-          <i class="bi bi-bag-plus"></i> Agregar al carrito
-        </button>
-
-        <div class="resenas-wrap" id="resenas-wrap-modal">
-          <p style="color:var(--text-muted);font-size:.85rem">Cargando reseñas…</p>
-        </div>`;
-
-      overlay.addEventListener('click', e => { if (e.target === overlay) cerrarDetalle(); }, { once: true });
-
-      // Cargar reseñas
-      await cargarResenasModal(prod.id);
-    }
-
-    function cerrarDetalle() {
-      document.getElementById('modal-producto-detalle').classList.remove('open');
-    }
-
-    async function cargarResenasModal(productoId) {
-      const wrap = document.getElementById('resenas-wrap-modal');
-      if (!wrap) return;
-
-      const user = await getUsuario();
-
-      // Traer reseñas aprobadas
-      const { data: resenas } = await sb.from('resenas')
-        .select('*')
-        .eq('producto_id', productoId)
-        .eq('estado', 'aprobada')
-        .order('created_at', { ascending: false });
-
-      // Verificar si el usuario ya reseñó este producto
-      let yaReseno = false;
-      let comproProd = false;
-      if (user) {
-        const { data: propias } = await sb.from('resenas')
-          .select('id').eq('producto_id', productoId).eq('user_id', user.id).maybeSingle();
-        yaReseno = !!propias;
-
-        // Verificar si compró el producto
-        const { data: items } = await sb.from('pedido_items')
-          .select('id, pedidos!inner(user_id, estado)')
-          .eq('producto_id', productoId)
-          .eq('pedidos.user_id', user.id)
-          .neq('pedidos.estado', 'cancelado');
-        comproProd = !!(items?.length);
-      }
-
-      const lista = resenas || [];
-      const prom  = lista.length
-        ? (lista.reduce((a,b) => a + b.estrellas, 0) / lista.length)
-        : 0;
-
-      wrap.innerHTML = `
-        <div class="resenas-titulo">
-          <i class="bi bi-chat-square-quote" style="color:var(--gold)"></i>
-          Reseñas
-        </div>
-
-        ${lista.length > 0 ? `
-        <div class="resenas-promedio">
-          <span class="numero">${prom.toFixed(1)}</span>
-          <div>
-            <div class="stars">${renderStars(prom)}</div>
-            <div class="total">${lista.length} reseña${lista.length !== 1 ? 's' : ''}</div>
-          </div>
-        </div>` : ''}
-
-        ${lista.length === 0
-          ? `<p style="font-size:.85rem;color:var(--text-muted);margin-bottom:.75rem">Aún no hay reseñas para este producto.</p>`
-          : lista.map(r => `
-            <div class="resena-card">
-              <div class="resena-card-top">
-                <span class="resena-card-nombre">${r.nombre_cliente || 'Cliente'}</span>
-                <span class="resena-card-fecha">${new Date(r.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})}</span>
-              </div>
-              <div class="resena-card-stars">${'★'.repeat(r.estrellas)}${'☆'.repeat(5-r.estrellas)}</div>
-              <p class="resena-card-texto">${r.comentario}</p>
-            </div>`).join('')
-        }
-
-        ${!user ? `
-          <p style="font-size:.82rem;color:var(--text-muted);text-align:center;padding:.75rem;background:var(--bg2);border-radius:8px">
-            <a href="/login.html" style="color:var(--gold);font-weight:600">Iniciá sesión</a> para dejar tu reseña.
-          </p>`
-        : yaReseno ? `
-          <p style="font-size:.82rem;color:var(--text-muted);text-align:center;padding:.75rem;background:var(--bg2);border-radius:8px">
-            ✅ Ya dejaste tu reseña para este producto. ¡Gracias!
-          </p>`
-        : !comproProd ? `
-          <p style="font-size:.82rem;color:var(--text-muted);text-align:center;padding:.75rem;background:var(--bg2);border-radius:8px">
-            Solo pueden reseñar clientes que compraron este producto.
-          </p>`
-        : `
-          <div class="form-resena" id="form-resena">
-            <p class="form-resena-titulo">Dejá tu reseña</p>
-            <div class="estrellas-selector" id="estrellas-selector">
-              ${[1,2,3,4,5].map(n =>
-                `<button class="estrella-btn" data-val="${n}" onclick="selEstrella(${n})">★</button>`
-              ).join('')}
-            </div>
-            <textarea class="resena-textarea" id="resena-texto" placeholder="Contanos tu experiencia con el producto…" maxlength="500"></textarea>
-            <button class="btn-enviar-resena" id="btn-enviar-resena" onclick="enviarResena('${productoId}')">
-              Enviar reseña
-            </button>
-          </div>`
-        }`;
-    }
-
-    let estrellasSeleccionadas = 0;
-
-    function selEstrella(n) {
-      estrellasSeleccionadas = n;
-      document.querySelectorAll('.estrella-btn').forEach(btn => {
-        btn.classList.toggle('activa', parseInt(btn.dataset.val) <= n);
-      });
-    }
-
-    async function enviarResena(productoId) {
-      if (!estrellasSeleccionadas) { alert('Por favor seleccioná una calificación.'); return; }
-      const texto = document.getElementById('resena-texto').value.trim();
-      if (!texto) { alert('Por favor escribí un comentario.'); return; }
-
-      const btn = document.getElementById('btn-enviar-resena');
-      btn.disabled = true;
-      btn.textContent = 'Enviando…';
-
-      const user = await getUsuario();
-      const { data: perfil } = await sb.from('perfiles').select('nombre, apellido').eq('user_id', user.id).maybeSingle();
-      const nombre = perfil ? [perfil.nombre, perfil.apellido].filter(Boolean).join(' ').trim() : null;
-
-      const { error } = await sb.from('resenas').insert({
-        producto_id:   productoId,
-        user_id:       user.id,
-        nombre_cliente: nombre || user.email.split('@')[0],
-        estrellas:     estrellasSeleccionadas,
-        comentario:    texto,
-        estado:        'pendiente',
-      });
-
-      if (error) {
-        alert('Error al enviar la reseña. Intentá nuevamente.');
-        btn.disabled = false;
-        btn.textContent = 'Enviar reseña';
-        return;
-      }
-
-      document.getElementById('form-resena').innerHTML = `
-        <p style="text-align:center;padding:1rem;font-size:.9rem;color:var(--gold);font-weight:600">
-          ✅ ¡Gracias por tu reseña! Será publicada una vez que la revisemos.
-        </p>`;
-      estrellasSeleccionadas = 0;
-    }
-
+  
     function bindEventos() {
       document.querySelectorAll('.cat-btn').forEach(btn => {
         btn.addEventListener('click', () => {
