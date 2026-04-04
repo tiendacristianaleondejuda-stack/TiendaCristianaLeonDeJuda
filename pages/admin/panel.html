@@ -3302,6 +3302,50 @@ async function eliminarPedido(pedidoId) {
   actualizarBadgeArchivados();
 }
 
+// ── Swipe para abrir/cerrar sidebar en móvil ─────────────────
+(function() {
+  let xInicio = null;
+  let yInicio = null;
+  const UMBRAL        = 60;  // píxeles mínimos para considerar swipe
+  const ZONA_BORDE    = 30;  // píxeles desde el borde izquierdo para activar apertura
+  const MAX_VERTICAL  = 80;  // si el dedo se movió mucho verticalmente, ignorar
+
+  document.addEventListener('touchstart', e => {
+    xInicio = e.touches[0].clientX;
+    yInicio = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    if (xInicio === null) return;
+
+    const xFin    = e.changedTouches[0].clientX;
+    const yFin    = e.changedTouches[0].clientY;
+    const deltaX  = xFin - xInicio;
+    const deltaY  = Math.abs(yFin - yInicio);
+
+    // Ignorar si el movimiento fue más vertical que horizontal
+    if (deltaY > MAX_VERTICAL) { xInicio = null; return; }
+
+    const sidebar  = document.querySelector('.sidebar');
+    const overlay  = document.querySelector('.sidebar-overlay');
+    const estaAbierta = sidebar.classList.contains('open');
+
+    // Swipe hacia la derecha desde el borde → abrir
+    if (deltaX > UMBRAL && xInicio < ZONA_BORDE && !estaAbierta) {
+      sidebar.classList.add('open');
+      overlay.classList.add('open');
+    }
+
+    // Swipe hacia la izquierda → cerrar
+    if (deltaX < -UMBRAL && estaAbierta) {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    }
+
+    xInicio = null;
+  }, { passive: true });
+})();
+
 // Cerrar modales al hacer clic fuera
 document.getElementById('modal-producto').addEventListener('click', e => { if (e.target === e.currentTarget) cerrarModalProducto(); });
 document.getElementById('modal-pedido').addEventListener('click', e => { if (e.target === e.currentTarget) cerrarModalPedido(); });
