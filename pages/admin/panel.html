@@ -3144,15 +3144,135 @@ function renderArchivados() {
 }
 
 async function restaurarPedido(pedidoId) {
-  if (!confirm('¿Restaurar este pedido a estado Pendiente?')) return;
+  if (!confirm('¿Restaurar este pedido a estado Pendiente?\n\nEsto volverá a descontar el stock de los productos.')) return;
+
+  const pedido = pedidosArchivados.find(p => p.id === pedidoId);
+
+  // ── Verificar stock disponible antes de restaurar ────────────
+  if (pedido) {
+    const items = pedido.pedido_items || [];
+    const sinStock = [];
+
+    for (const item of items) {
+      const talla  = item.talla || 'Única';
+      const color  = item.color || null;
+
+      const { data: prod } = await sb
+        .from('productos')
+        .select('nombre, stock, stock_por_talla, colores')
+        .eq('id', item.producto_id)
+        .single();
+
+      if (!prod) continue;
+
+      // Buscar stock disponible según si tiene color o no
+      let stockDisponible;
+      if (color && prod.colores?.length > 0) {
+        const colorData = prod.colores.find(c => c.nombre === color);
+        stockDisponible = colorData?.stock_por_talla?.[talla] ?? colorData?.stock ?? 0;
+      } else {
+        stockDisponible = prod.stock_por_talla?.[talla] ?? prod.stock ?? 0;
+      }
+
+      if (stockDisponible < item.cantidad) {
+        sinStock.push({
+          nombre:      prod.nombre,
+          talla,
+          color,
+          pedido:      item.cantidad,
+          disponible:  stockDisponible,
+        });
+      }
+    }
+
+    // ── Si hay productos sin stock suficiente, avisar al admin ──
+    if (sinStock.length > 0) {
+      const detalle = sinStock.map(s =>
+        `• ${s.nombre} — Talla: ${s.talla}${s.color ? ' / Color: ' + s.color : ''}\n` +
+        `  Pedido: ${s.pedido} unidad${s.pedido !== 1 ? 'es' : ''} · Disponible: ${s.disponible}`
+      ).join('\n\n');
+
+      const mensaje =
+        `⚠️ STOCK INSUFICIENTE\n\n` +
+        `Los siguientes productos no tienen stock suficiente:\n\n${detalle}\n\n` +
+        `¿Querés restaurar el pedido de todas formas y avisarle al cliente?`;
+
+      const continuar = confirm(mensaje);
+      if (!continuar) return;
+
+      // Mostrar resumen para copiar y enviarle al cliente
+      const textoCliente =
+        `Hola! Te informamos que al querer reactivar tu pedido, ` +
+        `algunos productos ya no tienen stock disponible:\n\n` +
+        sinStock.map(s =>
+          `• ${s.nombre} (Talla ${s.talla}${s.color ? ' / ' + s.color : ''}): ` +
+          `solo quedan ${s.disponible} unidad${s.disponible !== 1 ? 'es' : ''} ` +
+          `(vos pediste ${s.pedido})`
+        ).join('\n') +
+        `\n\nPor favor contactanos para coordinar una solución. ¡Gracias!`;
+
+      // Copiar al portapapeles automáticamente
+      try { await navigator.clipboard.writeText(textoCliente); } catch(e) {}
+
+      // Mostrar el texto en un alert para que el admin lo vea
+      alert(
+        `📋 MENSAJE LISTO PARA ENVIARLE AL CLIENTE\n` +
+        `(ya fue copiado al portapapeles)\n\n` +
+        `─────────────────────────────────\n` +
+        textoCliente +
+        `\n─────────────────────────────────\n\n` +
+        `Podés pegarlo en el chat del pedido o por WhatsApp.`
+      );
+    }
+  }
+
+  // ── Restaurar el pedido ──────────────────────────────────────
   const { error } = await sb.from('pedidos')
     .update({ estado: 'pendiente', updated_at: new Date().toISOString() })
     .eq('id', pedidoId);
   if (error) { toast('Error al restaurar pedido', 'err'); return; }
+
+  // ── Descontar stock (lo que haya disponible) ─────────────────
+  if (pedido) {
+    const items = pedido.pedido_items || [];
+    for (const item of items) {
+      const talla    = item.talla || 'Única';
+      const color    = item.color || null;
+      const cantidad = item.cantidad || 0;
+
+      const { data: prod } = await sb
+        .from('productos')
+        .select('stock, stock_por_talla, colores')
+        .eq('id', item.producto_id)
+        .single();
+
+      if (!prod) continue;
+
+      const nuevoStock = Math.max(0, (prod.stock || 0) - cantidad);
+      const spt = { ...(prod.stock_por_talla || {}) };
+      spt[talla] = Math.max(0, (spt[talla] || 0) - cantidad);
+
+      let coloresActualizados = prod.colores || [];
+      if (color && coloresActualizados.length > 0) {
+        coloresActualizados = coloresActualizados.map(c => {
+          if (c.nombre !== color) return c;
+          const sptColor = { ...(c.stock_por_talla || {}) };
+          sptColor[talla] = Math.max(0, (sptColor[talla] || 0) - cantidad);
+          const nuevoStockColor = Object.values(sptColor).reduce((a, b) => a + b, 0);
+          return { ...c, stock_por_talla: sptColor, stock: nuevoStockColor };
+        });
+      }
+
+      await sb.from('productos').update({
+        stock:           nuevoStock,
+        stock_por_talla: spt,
+        colores:         coloresActualizados,
+      }).eq('id', item.producto_id);
+    }
+  }
+
   toast('Pedido restaurado a Pendiente ✓', 'ok');
-  // Quitar de archivados localmente
   pedidosArchivados = pedidosArchivados.filter(p => p.id !== pedidoId);
-  // Recargar pedidos para que aparezca en la lista principal
   await cargarPedidos();
   renderArchivados();
   actualizarBadgeArchivados();
