@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /pages/admin/
+Disallow: /js/supabase-config.js
+
+Sitemap: https://tiendacristianaleondejuda.vercel.app/sitemap.xml
