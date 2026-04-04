@@ -2000,19 +2000,71 @@ function renderTablaPedidos(lista) {
 }
 
 async function cambiarEstado(pedidoId, nuevoEstado) {
-  const { error } = await sb.from('pedidos').update({ estado: nuevoEstado, updated_at: new Date().toISOString() }).eq('id', pedidoId);
+  const pedido = todosPedidos.find(x => x.id === pedidoId);
+  const estadoAnterior = pedido?.estado;
+
+  const { error } = await sb.from('pedidos')
+    .update({ estado: nuevoEstado, updated_at: new Date().toISOString() })
+    .eq('id', pedidoId);
   if (error) { toast('Error al actualizar estado', 'err'); return; }
+
+  // ── Restaurar stock al cancelar ──────────────────────────────
+  if (nuevoEstado === 'cancelado' && estadoAnterior !== 'cancelado' && pedido) {
+    const items = pedido.pedido_items || [];
+    for (const item of items) {
+      const productoId = item.producto_id;
+      const talla      = item.talla || 'Única';
+      const color      = item.color || null;
+      const cantidad   = item.cantidad || 0;
+
+      // Traer producto actual con su stock
+      const { data: prod } = await sb
+        .from('productos')
+        .select('stock, stock_por_talla, colores')
+        .eq('id', productoId)
+        .single();
+
+      if (!prod) continue;
+
+      // Actualizar stock general
+      const nuevoStock = (prod.stock || 0) + cantidad;
+
+      // Actualizar stock_por_talla
+      const spt = { ...(prod.stock_por_talla || {}) };
+      spt[talla] = (spt[talla] || 0) + cantidad;
+
+      // Actualizar stock dentro de colores (si aplica)
+      let coloresActualizados = prod.colores || [];
+      if (color && coloresActualizados.length > 0) {
+        coloresActualizados = coloresActualizados.map(c => {
+          if (c.nombre !== color) return c;
+          const sptColor = { ...(c.stock_por_talla || {}) };
+          sptColor[talla] = (sptColor[talla] || 0) + cantidad;
+          const nuevoStockColor = Object.values(sptColor).reduce((a, b) => a + b, 0);
+          return { ...c, stock_por_talla: sptColor, stock: nuevoStockColor };
+        });
+      }
+
+      await sb.from('productos').update({
+        stock:           nuevoStock,
+        stock_por_talla: spt,
+        colores:         coloresActualizados,
+      }).eq('id', productoId);
+    }
+    toast('Stock restaurado ✓', 'ok');
+  }
+
   toast(`Estado → ${nuevoEstado === 'pendiente_pago' ? 'Pendiente pago' : capitalizar(nuevoEstado)}`, 'ok');
-  const p = todosPedidos.find(x => x.id === pedidoId);
-  if (p) p.estado = nuevoEstado;
+  if (pedido) pedido.estado = nuevoEstado;
+
   const pends = todosPedidos.filter(x => x.estado === 'pendiente').length;
   const badge = document.getElementById('badge-pendientes');
   if (pends > 0) { badge.textContent = pends; badge.style.display = 'inline'; }
   else { badge.style.display = 'none'; }
-  // Re-renderizar tabla para aplicar filtros (ej: enviado desaparece de Pedidos)
+
   filtrarTablaPedidos();
   if (nuevoEstado === 'enviado' || nuevoEstado === 'entregado') cargarDespacho();
-  if (nuevoEstado === 'cancelado') actualizarBadgeArchivados();
+  if (nuevoEstado === 'cancelado') { cargarArchivados(); actualizarBadgeArchivados(); }
 }
 
 let adminChatPedidoId      = null;
