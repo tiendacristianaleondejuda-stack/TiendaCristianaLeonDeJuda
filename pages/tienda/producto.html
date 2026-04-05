@@ -1209,7 +1209,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ── Carrito ──────────────────────────────────────────────────
     function agregarCarrito() {
       if (!prodActual || !tallaSeleccionada) return;
-      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre } : {};
+      const extra = colorSeleccionado
+        ? { color: colorSeleccionado.nombre, imagen_color: colorSeleccionado.imagen_url }
+        : {};
       Carrito.agregar(prodActual, tallaSeleccionada, cantidad, extra);
       toast(`${prodActual.nombre} (x${cantidad}) agregado ✓`);
       // Resetear cantidad a 1 después de agregar
