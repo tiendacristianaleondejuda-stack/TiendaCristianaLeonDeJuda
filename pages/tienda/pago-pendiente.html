@@ -3,114 +3,279 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pago exitoso - León de Judá</title>
+  <title>Pago pendiente — León de Judá</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg:         #f5f0e8;
+      --bg2:        #ede6d6;
+      --card:       #faf7f2;
+      --text:       #1c1917;
+      --muted:      #78716c;
+      --border:     #ddd5c0;
+      --gold:       #9a7b2e;
+      --gold-light: #c9a84c;
+      --orange:     #92400e;
+      --orange-bg:  #fef3c7;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f0e8;
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
+      padding: 2rem 1rem 4rem;
     }
-    .card {
-      max-width: 480px;
-      background: white;
-      border-radius: 24px;
-      padding: 2rem;
-      text-align: center;
-      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 20% 0%, rgba(154,123,46,.07) 0%, transparent 55%);
+      pointer-events: none; z-index: 0;
     }
-    .icon {
-      width: 80px;
-      height: 80px;
-      background: #dcfce7;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem;
+
+    * { position: relative; z-index: 1; }
+
+    .navbar {
+      max-width: 560px; margin: 0 auto 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .icon i { font-size: 2.5rem; color: #166534; }
-    h1 { font-size: 1.6rem; margin-bottom: 0.75rem; color: #1c1917; }
-    p { color: #78716c; margin-bottom: 1.5rem; line-height: 1.5; }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: #1c1917;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 50px;
+
+    .navbar-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 600; color: var(--text);
       text-decoration: none;
-      font-weight: 600;
-      transition: background 0.2s;
     }
-    .btn:hover { background: #2c2520; }
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white;
+
+    .navbar-logo small {
+      display: block; font-size: .52rem; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--gold);
+      font-family: 'Jost', sans-serif; font-weight: 500;
+    }
+
+    .wrap { max-width: 560px; margin: 0 auto; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      animation: fadeUp .5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .icon-circle {
+      width: 72px; height: 72px;
+      background: var(--orange-bg);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-right: 0.5rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem;
+      animation: pop .4s cubic-bezier(.34,1.56,.64,1) .2s both;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes pop {
+      from { opacity: 0; transform: scale(.5); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .icon-circle i { font-size: 2rem; color: var(--orange); }
+
+    .titulo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 500; margin-bottom: .6rem;
+    }
+
+    .subtitulo {
+      color: var(--muted); font-size: .9rem; line-height: 1.6;
+      max-width: 360px; margin: 0 auto 1.5rem;
+    }
+
+    .pedido-id-tag {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 50px; padding: .4rem 1rem;
+      font-size: .78rem; color: var(--muted); font-family: monospace;
+    }
+
+    .pedido-id-tag strong { color: var(--gold); }
+
+    /* Timeline de estado */
+    .timeline-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      animation: fadeUp .5s ease .15s both;
+    }
+
+    .timeline-titulo {
+      font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 1rem; display: flex; align-items: center; gap: .4rem;
+    }
+
+    .timeline-titulo i { color: var(--gold); }
+
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+
+    .tl-item {
+      display: flex; gap: .85rem; align-items: flex-start;
+      padding-bottom: 1rem; position: relative;
+    }
+
+    .tl-item:last-child { padding-bottom: 0; }
+
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: 11px; top: 24px;
+      width: 2px; height: calc(100% - 12px);
+      background: var(--border);
+    }
+
+    .tl-item:last-child::before { display: none; }
+
+    .tl-dot {
+      width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 800;
+      border: 2px solid var(--border);
+      background: var(--bg2); color: var(--muted);
+    }
+
+    .tl-dot.activo {
+      background: var(--orange-bg); border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .tl-dot.done {
+      background: #dcfce7; border-color: #166534; color: #166534;
+    }
+
+    .tl-info { padding-top: .15rem; }
+    .tl-label { font-weight: 600; font-size: .875rem; margin-bottom: .1rem; }
+    .tl-desc  { font-size: .78rem; color: var(--muted); line-height: 1.4; }
+
+    .btns {
+      display: flex; gap: .75rem; flex-wrap: wrap;
+      animation: fadeUp .5s ease .25s both;
+    }
+
+    .btn {
+      flex: 1; min-width: 140px;
+      display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+      padding: .85rem 1.25rem;
+      border-radius: 10px;
+      font-family: 'Jost', sans-serif; font-size: .875rem; font-weight: 600;
+      text-decoration: none; cursor: pointer; border: none;
+      transition: all .2s;
+    }
+
+    .btn-primary { background: var(--text); color: white; }
+    .btn-primary:hover { background: #2c2520; transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: var(--bg2); color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover { border-color: var(--text); }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="icon">
-      <i class="bi bi-check-circle-fill"></i>
+
+  <div class="wrap">
+
+    <nav class="navbar">
+      <a href="/index.html" class="navbar-logo">
+        León de Judá
+        <small>Ropa Cristiana</small>
+      </a>
+    </nav>
+
+    <div class="card">
+      <div class="icon-circle">
+        <i class="bi bi-hourglass-split"></i>
+      </div>
+      <h1 class="titulo">Pago en verificación</h1>
+      <p class="subtitulo">
+        Tu pedido está registrado. Estamos verificando el pago y te notificaremos cuando se confirme.
+      </p>
+      <div class="pedido-id-tag">
+        <i class="bi bi-receipt"></i>
+        Pedido <strong id="pedido-id-short">—</strong>
+      </div>
     </div>
-    <h1>¡Pago exitoso! ✅</h1>
-    <p>Tu pedido ha sido confirmado. Recibirás un correo con los detalles de envío.</p>
-    <a href="/index.html" class="btn">
-      <i class="bi bi-shop"></i> Volver a la tienda
-    </a>
+
+    <div class="timeline-wrap">
+      <p class="timeline-titulo"><i class="bi bi-list-check"></i> Estado del proceso</p>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot done"><i class="bi bi-check"></i></div>
+          <div class="tl-info">
+            <p class="tl-label">Pedido registrado</p>
+            <p class="tl-desc">Tu pedido fue recibido correctamente en nuestro sistema.</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot activo"><i class="bi bi-hourglass-split"></i></div>
+          <div class="tl-info">
+            <p class="tl-label">Verificando pago</p>
+            <p class="tl-desc">MercadoPago está procesando la confirmación del pago. Puede demorar unos minutos.</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">3</div>
+          <div class="tl-info">
+            <p class="tl-label">Preparación del pedido</p>
+            <p class="tl-desc">Una vez confirmado el pago comenzaremos a preparar tus productos.</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">4</div>
+          <div class="tl-info">
+            <p class="tl-label">Envío</p>
+            <p class="tl-desc">Recibirás el número de seguimiento cuando despachemos tu pedido.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btns">
+      <a href="/pages/tienda/cuenta.html" class="btn btn-primary">
+        <i class="bi bi-person"></i> Ver mis pedidos
+      </a>
+      <a href="/index.html" class="btn btn-ghost">
+        <i class="bi bi-shop"></i> Ir a la tienda
+      </a>
+    </div>
+
   </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-config.js"></script>
 <script>
-  (async () => {
-    const params = new URLSearchParams(window.location.search);
-    const pedidoId = params.get('id');
-    // MercadoPago agrega estos params en la URL de retorno
-    const paymentId     = params.get('payment_id');
-    const paymentStatus = params.get('status'); // 'approved', 'pending', etc.
+(async () => {
+  const params   = new URLSearchParams(window.location.search);
+  const pedidoId = params.get('id');
 
-    if (!pedidoId) return;
-
-    // Si MercadoPago confirma que fue aprobado, marcar como confirmado
-    // Si no, dejar en pendiente_pago y avisar
-    const aprobado = paymentStatus === 'approved';
-
-    await sb.from('pedidos')
-      .update({ estado: aprobado ? 'pagado' : 'pendiente_pago' })
-      .eq('id', pedidoId);
-
-    // Vaciar carrito siempre (el pedido quedó registrado)
-    if (typeof Carrito !== 'undefined') Carrito.vaciar();
-    else localStorage.removeItem('carrito');
+  if (pedidoId) {
+    document.getElementById('pedido-id-short').textContent =
+      '# ' + pedidoId.substring(0, 8).toUpperCase();
     localStorage.removeItem('mp_pedido_pendiente');
-
-    // Notificar admin solo si está confirmado
-    if (aprobado && typeof window.notificarNuevoPedido === 'function') {
-      try {
-        const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
-        if (pedido) {
-          const fmt = n => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(n);
-          await notificarNuevoPedido(pedidoId, fmt(pedido.total));
-        }
-      } catch(e) {}
-    }
-  })();
+    if (typeof Carrito !== 'undefined') Carrito.vaciar();
+    else localStorage.removeItem('narvaez_carrito');
+  }
+})();
 </script>
 
 </body>
