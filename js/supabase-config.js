@@ -43,7 +43,7 @@ const Carrito = {
         id: producto.id, 
         nombre: producto.nombre, 
         precio: producto.precio, 
-        imagen: producto.imagen_url, 
+        imagen: extra?.imagen_color || producto.imagen_url, 
         talla, 
         color, 
         cantidad,
