@@ -1212,14 +1212,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       const extra = colorSeleccionado ? { color: colorSeleccionado.nombre } : {};
       Carrito.agregar(prodActual, tallaSeleccionada, cantidad, extra);
       toast(`${prodActual.nombre} (x${cantidad}) agregado ✓`);
+      // Resetear cantidad a 1 después de agregar
+      cantidad = 1;
+      document.getElementById('qty-num').textContent = '1';
     }
 
     async function comprarAhora() {
       if (!prodActual || !tallaSeleccionada) return;
       const user = await getUsuario();
       if (!user) { location.href = '/login.html?redirect=/pages/tienda/carrito.html'; return; }
-      const extra = colorSeleccionado ? { color: colorSeleccionado.nombre } : {};
+      const extra = colorSeleccionado
+        ? { color: colorSeleccionado.nombre, imagen_color: colorSeleccionado.imagen_url }
+        : {};
       Carrito.agregar(prodActual, tallaSeleccionada, cantidad, extra);
+      cantidad = 1;
       location.href = '/pages/tienda/carrito.html';
     }
 
