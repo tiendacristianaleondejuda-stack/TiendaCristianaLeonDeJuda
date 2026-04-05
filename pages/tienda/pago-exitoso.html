@@ -3,118 +3,564 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pago exitoso - León de Judá</title>
+  <title>Pedido confirmado — León de Judá</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg:         #f5f0e8;
+      --bg2:        #ede6d6;
+      --card:       #faf7f2;
+      --text:       #1c1917;
+      --muted:      #78716c;
+      --border:     #ddd5c0;
+      --gold:       #9a7b2e;
+      --gold-light: #c9a84c;
+      --green:      #166534;
+      --green-bg:   #dcfce7;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f0e8;
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
+      padding: 2rem 1rem 4rem;
     }
-    .card {
-      max-width: 480px;
-      background: white;
-      border-radius: 24px;
-      padding: 2rem;
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(154,123,46,.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 100%, rgba(74,222,128,.05) 0%, transparent 55%);
+      pointer-events: none; z-index: 0;
+    }
+
+    * { position: relative; z-index: 1; }
+
+    /* ── Navbar mínimo ── */
+    .navbar {
+      max-width: 640px; margin: 0 auto 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .navbar-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 600; color: var(--text);
+      text-decoration: none; letter-spacing: .02em;
+    }
+
+    .navbar-logo small {
+      display: block; font-size: .52rem; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--gold);
+      font-family: 'Jost', sans-serif; font-weight: 500;
+    }
+
+    /* ── Card principal ── */
+    .wrap { max-width: 640px; margin: 0 auto; }
+
+    /* ── Hero confirmación ── */
+    .hero-confirm {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem 2rem;
       text-align: center;
-      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+      animation: fadeUp .5s ease both;
     }
-    .icon {
-      width: 80px;
-      height: 80px;
-      background: #dcfce7;
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .check-circle {
+      width: 72px; height: 72px;
+      background: var(--green-bg);
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem;
+      animation: pop .4s cubic-bezier(.34,1.56,.64,1) .2s both;
     }
-    .icon i { font-size: 2.5rem; color: #166534; }
-    h1 { font-size: 1.6rem; margin-bottom: 0.75rem; color: #1c1917; }
-    p { color: #78716c; margin-bottom: 1.5rem; line-height: 1.5; }
+
+    @keyframes pop {
+      from { opacity: 0; transform: scale(.5); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .check-circle i { font-size: 2rem; color: var(--green); }
+
+    .confirm-titulo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 500; margin-bottom: .5rem;
+    }
+
+    .confirm-sub {
+      color: var(--muted); font-size: .9rem; line-height: 1.6;
+      max-width: 400px; margin: 0 auto 1.5rem;
+    }
+
+    .pedido-id-tag {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 50px; padding: .4rem 1rem;
+      font-size: .78rem; color: var(--muted); font-family: monospace;
+      letter-spacing: .04em;
+    }
+
+    .pedido-id-tag strong { color: var(--gold); }
+
+    /* ── Método de pago badge ── */
+    .metodo-tag {
+      display: inline-flex; align-items: center; gap: .4rem;
+      margin-top: .75rem;
+      background: #fef3c7; color: #92400e;
+      border-radius: 50px; padding: .35rem .85rem;
+      font-size: .78rem; font-weight: 600;
+    }
+
+    .metodo-tag.pagado { background: var(--green-bg); color: var(--green); }
+
+    /* ── Secciones ── */
+    .seccion {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      animation: fadeUp .5s ease both;
+    }
+
+    .seccion:nth-child(2) { animation-delay: .1s; }
+    .seccion:nth-child(3) { animation-delay: .2s; }
+    .seccion:nth-child(4) { animation-delay: .3s; }
+
+    .sec-header {
+      padding: .85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      font-size: .7rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted);
+      display: flex; align-items: center; gap: .5rem;
+    }
+
+    .sec-header i { font-size: .85rem; color: var(--gold); }
+
+    /* ── Productos del pedido ── */
+    .item-lista { padding: .5rem 0; }
+
+    .item-row {
+      display: flex; align-items: center; gap: .85rem;
+      padding: .65rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .item-row:last-child { border-bottom: none; }
+
+    .item-img {
+      width: 52px; height: 65px;
+      border-radius: 8px; overflow: hidden;
+      background: var(--bg2); flex-shrink: 0;
+    }
+
+    .item-img img { width: 100%; height: 100%; object-fit: cover; }
+
+    .item-info { flex: 1; min-width: 0; }
+    .item-nombre { font-weight: 600; font-size: .875rem; margin-bottom: .15rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-detalle { font-size: .75rem; color: var(--muted); }
+    .item-precio { font-weight: 700; font-size: .9rem; color: var(--gold); flex-shrink: 0; }
+
+    /* ── Totales ── */
+    .totales { padding: .85rem 1.25rem; }
+
+    .total-row {
+      display: flex; justify-content: space-between;
+      font-size: .875rem; padding: .3rem 0;
+      color: var(--muted);
+    }
+
+    .total-row.final {
+      font-weight: 700; font-size: 1rem; color: var(--text);
+      border-top: 1px solid var(--border);
+      margin-top: .35rem; padding-top: .65rem;
+    }
+
+    /* ── Info envío ── */
+    .info-grid {
+      padding: 1rem 1.25rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: .65rem;
+    }
+
+    @media (max-width: 480px) { .info-grid { grid-template-columns: 1fr; } }
+
+    .info-item-label { font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: .2rem; }
+    .info-item-val   { font-size: .875rem; font-weight: 500; }
+
+    /* ── Próximos pasos ── */
+    .pasos-lista { padding: .85rem 1.25rem; display: flex; flex-direction: column; gap: .6rem; }
+
+    .paso {
+      display: flex; align-items: flex-start; gap: .75rem;
+      font-size: .875rem;
+    }
+
+    .paso-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--gold); color: white;
+      font-size: .7rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: .1rem;
+    }
+
+    .paso-texto { line-height: 1.5; }
+    .paso-texto strong { display: block; font-weight: 600; margin-bottom: .1rem; }
+    .paso-texto span { color: var(--muted); font-size: .82rem; }
+
+    /* ── Botones ── */
+    .btns {
+      display: flex; gap: .75rem; flex-wrap: wrap;
+      padding: 1.25rem;
+      animation: fadeUp .5s ease .35s both;
+    }
+
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: #1c1917;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 50px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.2s;
+      flex: 1; min-width: 140px;
+      display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+      padding: .85rem 1.25rem;
+      border-radius: 10px;
+      font-family: 'Jost', sans-serif; font-size: .875rem; font-weight: 600;
+      text-decoration: none; cursor: pointer; border: none;
+      transition: all .2s; letter-spacing: .02em;
     }
-    .btn:hover { background: #2c2520; }
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-right: 0.5rem;
+
+    .btn-primary { background: var(--text); color: white; }
+    .btn-primary:hover { background: #2c2520; transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: var(--bg2); color: var(--text);
+      border: 1px solid var(--border);
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-ghost:hover { border-color: var(--text); }
+
+    /* ── Skeleton ── */
+    .skel {
+      background: linear-gradient(90deg, var(--bg2) 25%, var(--bg) 50%, var(--bg2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── Transferencia instructions ── */
+    .transferencia-box {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      font-size: .875rem;
+      line-height: 1.6;
+      animation: fadeUp .5s ease .15s both;
+      display: none;
+    }
+
+    .transferencia-box.visible { display: block; }
+    .transferencia-titulo { font-weight: 700; margin-bottom: .4rem; color: #92400e; display: flex; align-items: center; gap: .4rem; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="icon">
-      <i class="bi bi-check-circle-fill"></i>
+
+  <div class="wrap">
+
+    <!-- Navbar mínimo -->
+    <nav class="navbar">
+      <a href="/index.html" class="navbar-logo">
+        León de Judá
+        <small>Ropa Cristiana</small>
+      </a>
+      <a href="/index.html" style="font-size:.82rem;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:.3rem">
+        <i class="bi bi-arrow-left"></i> Tienda
+      </a>
+    </nav>
+
+    <!-- Hero -->
+    <div class="hero-confirm">
+      <div class="check-circle">
+        <i class="bi bi-check-lg"></i>
+      </div>
+      <h1 class="confirm-titulo">¡Pedido confirmado!</h1>
+      <p class="confirm-sub" id="confirm-sub">
+        Tu pedido fue recibido. Te contactaremos a la brevedad para coordinar el envío.
+      </p>
+      <div class="pedido-id-tag">
+        <i class="bi bi-receipt"></i>
+        Pedido <strong id="pedido-id-short">—</strong>
+      </div>
+      <div>
+        <span class="metodo-tag" id="metodo-tag" style="display:none"></span>
+      </div>
     </div>
-    <h1>¡Pedido confirmado! ✅</h1>
-    <p id="msg-descripcion">Tu pedido ha sido recibido. Nos contactaremos a la brevedad para coordinar el envío.</p>
-    <a href="/index.html" class="btn">
-      <i class="bi bi-shop"></i> Volver a la tienda
-    </a>
-  </div>
+
+    <!-- Box instrucciones transferencia -->
+    <div class="transferencia-box" id="transferencia-box">
+      <p class="transferencia-titulo"><i class="bi bi-bank"></i> Instrucciones para transferencia</p>
+      <p>Por favor realizá la transferencia al siguiente alias y envianos el comprobante por WhatsApp:</p>
+      <p style="margin-top:.5rem;font-weight:700;font-size:1rem;color:#92400e" id="alias-transferencia">—</p>
+      <p style="margin-top:.4rem;font-size:.8rem;color:#92400e">Una vez confirmado el pago, procesaremos tu pedido.</p>
+    </div>
+
+    <!-- Productos -->
+    <div class="seccion" id="seccion-productos" style="display:none">
+      <div class="sec-header">
+        <i class="bi bi-bag"></i> Productos
+      </div>
+      <div class="item-lista" id="items-lista">
+        <!-- skeleton -->
+        <div class="item-row">
+          <div class="skel item-img"></div>
+          <div class="item-info">
+            <div class="skel" style="height:12px;width:70%;margin-bottom:6px"></div>
+            <div class="skel" style="height:10px;width:40%"></div>
+          </div>
+          <div class="skel" style="height:14px;width:60px"></div>
+        </div>
+      </div>
+      <div class="totales" id="totales-wrap" style="display:none">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span id="tot-subtotal">—</span>
+        </div>
+        <div class="total-row">
+          <span>Envío</span>
+          <span style="color:var(--muted)">A confirmar</span>
+        </div>
+        <div class="total-row final">
+          <span>Total</span>
+          <span id="tot-total">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datos de envío -->
+    <div class="seccion" id="seccion-envio" style="display:none">
+      <div class="sec-header">
+        <i class="bi bi-geo-alt"></i> Datos de envío
+      </div>
+      <div class="info-grid" id="info-envio"></div>
+    </div>
+
+    <!-- Próximos pasos -->
+    <div class="seccion" id="seccion-pasos" style="display:none">
+      <div class="sec-header">
+        <i class="bi bi-list-check"></i> Próximos pasos
+      </div>
+      <div class="pasos-lista" id="pasos-lista"></div>
+    </div>
+
+    <!-- Botones -->
+    <div class="btns">
+      <a href="/pages/tienda/cuenta.html" class="btn btn-ghost">
+        <i class="bi bi-person"></i> Ver mis pedidos
+      </a>
+      <a href="/index.html" class="btn btn-primary">
+        <i class="bi bi-shop"></i> Seguir comprando
+      </a>
+    </div>
+
+  </div><!-- /wrap -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script src="/js/supabase-config.js"></script>
 <script src="/js/notificaciones.js"></script>
+
 <script>
-// pago-exitoso.html - Versión que NO duplica notificaciones
+function fmt(n) {
+  return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n || 0);
+}
+
+const PASOS = {
+  efectivo: [
+    { titulo: 'Coordinamos el pago',  desc: 'Te contactaremos por WhatsApp para confirmar el pago en efectivo.' },
+    { titulo: 'Preparamos tu pedido', desc: 'Una vez confirmado el pago, comenzamos a preparar tus productos.' },
+    { titulo: 'Enviamos',             desc: 'Recibirás el número de seguimiento cuando despachemos tu pedido.' },
+  ],
+  transferencia: [
+    { titulo: 'Realizá la transferencia', desc: 'Transferí al alias indicado y envianos el comprobante por WhatsApp.' },
+    { titulo: 'Confirmamos el pago',      desc: 'Verificamos la transferencia y actualizamos el estado de tu pedido.' },
+    { titulo: 'Enviamos',                 desc: 'Recibirás el número de seguimiento cuando despachemos tu pedido.' },
+  ],
+  mercadopago: [
+    { titulo: 'Pago procesado',       desc: 'Tu pago fue acreditado exitosamente por MercadoPago.' },
+    { titulo: 'Preparamos tu pedido', desc: 'Ya estamos preparando tus productos.' },
+    { titulo: 'Enviamos',             desc: 'Recibirás el número de seguimiento cuando despachemos tu pedido.' },
+  ],
+  tarjeta: [
+    { titulo: 'Pago acreditado',      desc: 'Tu pago con tarjeta fue procesado exitosamente.' },
+    { titulo: 'Preparamos tu pedido', desc: 'Ya estamos preparando tus productos.' },
+    { titulo: 'Enviamos',             desc: 'Recibirás el número de seguimiento cuando despachemos tu pedido.' },
+  ],
+};
 
 (async () => {
-  const params = new URLSearchParams(window.location.search);
-  const pedidoId = params.get('id');
+  const params        = new URLSearchParams(window.location.search);
+  const pedidoId      = params.get('id');
   const paymentStatus = params.get('status');
-  const metodo = params.get('metodo');
+  const metodo        = params.get('metodo') || 'efectivo';
 
   if (!pedidoId) return;
 
   const aprobado = paymentStatus === 'approved';
 
-  // ✅ Solo actualizar estado, NO notificar aquí para transferencia/efectivo
+  // ── Actualizar estado del pedido ────────────────────────────
   const nuevoEstado = aprobado ? 'pagado' : 'pendiente_pago';
   await sb.from('pedidos').update({ estado: nuevoEstado }).eq('id', pedidoId);
 
-  // Vaciar carrito
+  // ── Vaciar carrito ───────────────────────────────────────────
   if (typeof Carrito !== 'undefined') Carrito.vaciar();
   else localStorage.removeItem('narvaez_carrito');
   localStorage.removeItem('mp_pedido_pendiente');
 
-  // ✅ NOTIFICAR SOLO SI EL PAGO REQUIRIÓ MERCADOPAGO
-  // Los métodos transferencia y efectivo YA notificaron en carrito.html
-  const notificarEnEstaPagina = (metodo === 'mercadopago' || metodo === 'tarjeta');
-  
-  if (aprobado && notificarEnEstaPagina) {
-    if (typeof window.notificarNuevoPedido === 'function') {
-      try {
-        const { data: pedido } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
-        if (pedido) {
-          await notificarNuevoPedido(pedidoId, pedido.total);
-        }
-      } catch(e) { console.warn('Error notificando admin:', e); }
-    }
+  // ── Notificar admin (solo MP/tarjeta) ───────────────────────
+  const notificarAqui = metodo === 'mercadopago' || metodo === 'tarjeta';
+  if (aprobado && notificarAqui && typeof notificarNuevoPedido === 'function') {
+    try {
+      const { data: p } = await sb.from('pedidos').select('total').eq('id', pedidoId).single();
+      if (p) await notificarNuevoPedido(pedidoId, p.total);
+    } catch(e) {}
   }
+
+  // ── Mostrar ID del pedido ────────────────────────────────────
+  document.getElementById('pedido-id-short').textContent =
+    '# ' + pedidoId.substring(0, 8).toUpperCase();
+
+  // ── Descripción según método ─────────────────────────────────
+  const descs = {
+    efectivo:      'Tu pedido fue recibido. Te contactaremos por WhatsApp para coordinar el pago y el envío.',
+    transferencia: 'Tu pedido fue recibido. Realizá la transferencia y envianos el comprobante para procesar tu pedido.',
+    mercadopago:   'Tu pago fue acreditado. Ya estamos preparando tu pedido.',
+    tarjeta:       'Tu pago con tarjeta fue procesado. Ya estamos preparando tu pedido.',
+  };
+  document.getElementById('confirm-sub').textContent =
+    descs[metodo] || descs.efectivo;
+
+  // ── Badge de método ──────────────────────────────────────────
+  const iconos = { efectivo:'💵', transferencia:'🏦', mercadopago:'📱', tarjeta:'💳' };
+  const nombres = { efectivo:'Efectivo', transferencia:'Transferencia', mercadopago:'MercadoPago', tarjeta:'Tarjeta' };
+  const tag = document.getElementById('metodo-tag');
+  tag.style.display = 'inline-flex';
+  tag.innerHTML = `${iconos[metodo]||'💳'} ${nombres[metodo]||metodo}`;
+  if (metodo === 'mercadopago' || metodo === 'tarjeta') tag.classList.add('pagado');
+
+  // ── Instrucciones transferencia ──────────────────────────────
+  if (metodo === 'transferencia') {
+    const box = document.getElementById('transferencia-box');
+    box.classList.add('visible');
+    // Podés cambiar el alias acá
+    document.getElementById('alias-transferencia').textContent = 'ALIAS: leondejuda.mp';
+  }
+
+  // ── Cargar pedido completo ───────────────────────────────────
+  const { data: pedido } = await sb
+    .from('pedidos')
+    .select('*, pedido_items(*, productos(nombre, imagen_url, colores))')
+    .eq('id', pedidoId)
+    .single();
+
+  if (!pedido) return;
+
+  // Productos
+  const itemsLista = document.getElementById('items-lista');
+  const items = pedido.pedido_items || [];
+
+  itemsLista.innerHTML = items.map(item => {
+    const prod = item.productos || {};
+    const colores = prod.colores || [];
+    const imagenColor = item.color && colores.length
+      ? (colores.find(c => c.nombre === item.color)?.imagen_url || null)
+      : null;
+    const img = imagenColor || prod.imagen_url || 'https://placehold.co/52x65/ede6d6/78716c?text=+';
+    const detalle = [
+      item.talla ? `Talla ${item.talla}` : null,
+      item.color ? `Color ${item.color}` : null,
+      `x${item.cantidad}`,
+    ].filter(Boolean).join(' · ');
+
+    return `
+      <div class="item-row">
+        <div class="item-img">
+          <img src="${img}" alt="${prod.nombre || ''}"
+            onerror="this.src='https://placehold.co/52x65/ede6d6/78716c?text=+'">
+        </div>
+        <div class="item-info">
+          <p class="item-nombre">${prod.nombre || '—'}</p>
+          <p class="item-detalle">${detalle}</p>
+        </div>
+        <span class="item-precio">${fmt(item.precio_unitario * item.cantidad)}</span>
+      </div>`;
+  }).join('');
+
+  // Totales
+  document.getElementById('tot-subtotal').textContent = fmt(pedido.total);
+  document.getElementById('tot-total').textContent    = fmt(pedido.total);
+  document.getElementById('totales-wrap').style.display = 'block';
+  document.getElementById('seccion-productos').style.display = 'block';
+
+  // Datos de envío
+  const dir = pedido.direccion_envio || {};
+  const metodoPago = {
+    efectivo:'💵 Efectivo', transferencia:'🏦 Transferencia',
+    mercadopago:'📱 MercadoPago', tarjeta:'💳 Tarjeta'
+  }[pedido.metodo_pago] || pedido.metodo_pago;
+
+  document.getElementById('info-envio').innerHTML = `
+    ${pedido.nombre_cliente ? `
+    <div>
+      <p class="info-item-label">Cliente</p>
+      <p class="info-item-val">${pedido.nombre_cliente}</p>
+    </div>` : ''}
+    <div>
+      <p class="info-item-label">Método de pago</p>
+      <p class="info-item-val">${metodoPago}</p>
+    </div>
+    ${dir.direccion ? `
+    <div style="grid-column:1/-1">
+      <p class="info-item-label">Dirección</p>
+      <p class="info-item-val">${dir.direccion}${dir.ciudad ? ', ' + dir.ciudad : ''}${dir.provincia ? ', ' + dir.provincia : ''}</p>
+    </div>` : ''}
+    ${dir.telefono ? `
+    <div>
+      <p class="info-item-label">Teléfono</p>
+      <p class="info-item-val">${dir.telefono}</p>
+    </div>` : ''}
+    ${dir.notas ? `
+    <div style="grid-column:1/-1">
+      <p class="info-item-label">Notas</p>
+      <p class="info-item-val">${dir.notas}</p>
+    </div>` : ''}`;
+  document.getElementById('seccion-envio').style.display = 'block';
+
+  // Próximos pasos
+  const pasos = PASOS[metodo] || PASOS.efectivo;
+  document.getElementById('pasos-lista').innerHTML = pasos.map((p, i) => `
+    <div class="paso">
+      <div class="paso-num">${i + 1}</div>
+      <div class="paso-texto">
+        <strong>${p.titulo}</strong>
+        <span>${p.desc}</span>
+      </div>
+    </div>`).join('');
+  document.getElementById('seccion-pasos').style.display = 'block';
+
 })();
 </script>
 
