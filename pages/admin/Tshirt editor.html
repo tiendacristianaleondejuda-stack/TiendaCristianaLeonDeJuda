@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mockup Creator Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #f5f0ea;
+  --taupe: #c4b5a5;
+  --brown: #7a6355;
+  --dark: #2c2420;
+  --accent: #9b7b6b;
+  --panel: rgba(250,248,245,0.97);
+  --border: rgba(196,181,165,0.4);
+  --shadow: 0 8px 40px rgba(44,36,32,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; }
+body {
+  font-family:'Jost',sans-serif;
+  background:var(--cream);
+  color:var(--dark);
+  display:flex;
+  flex-direction:column;
+  height:100dvh;
+}
+
+/* ── HEADER ── */
+header {
+  background:var(--dark);
+  padding:0 20px;
+  height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-shrink:0;
+  z-index:50;
+}
+header h1 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.35rem;
+  font-weight:300;
+  color:var(--cream);
+  letter-spacing:.12em;
+}
+.badge-pro {
+  font-size:.65rem;
+  background:var(--accent);
+  color:#fff;
+  padding:3px 9px;
+  border-radius:20px;
+  letter-spacing:.08em;
+  font-weight:500;
+}
+
+/* ── MOBILE TABS ── */
+.mob-tabs {
+  display:none;
+  background:var(--dark);
+  height:46px;
+  flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.mob-tabs button {
+  flex:1; height:100%;
+  border:none; background:transparent;
+  color:var(--taupe);
+  font-family:'Jost',sans-serif;
+  font-size:.66rem; font-weight:500;
+  letter-spacing:.07em;
+  cursor:pointer; transition:color .2s;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px;
+  text-transform:uppercase;
+}
+.mob-tabs button.active { color:var(--cream); }
+
+/* ── APP GRID ── */
+.app {
+  display:grid;
+  grid-template-columns:296px 1fr 280px;
+  flex:1; min-height:0; overflow:hidden;
+}
+
+/* ── PANELS ── */
+.panel-left, .panel-right {
+  background:var(--panel);
+  overflow-y:auto; overflow-x:hidden;
+  display:flex; flex-direction:column; min-height:0;
+}
+.panel-left  { border-right:1px solid var(--border); }
+.panel-right { border-left:1px solid var(--border); }
+.panel-inner { padding:18px 15px; display:flex; flex-direction:column; gap:20px; }
+
+.sec-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:.75rem; font-weight:600;
+  letter-spacing:.22em; text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:9px; padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:6px;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width:3px; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+
+/* ── GARMENT GRID ── */
+.tshirt-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+}
+.tshirt-item {
+  border:2px solid transparent;
+  border-radius:9px; overflow:hidden;
+  cursor:pointer; transition:all .17s;
+  background:#fff;
+  aspect-ratio:1;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:5px 4px 3px; position:relative;
+}
+.tshirt-item:hover { border-color:var(--taupe); transform:translateY(-2px); }
+.tshirt-item.active { border-color:var(--accent); box-shadow:0 0 0 3px rgba(155,123,107,.2); }
+.tshirt-item img { width:100%; height:78%; object-fit:contain; }
+.tshirt-item span { font-size:.5rem; color:var(--brown); text-align:center; margin-top:2px; }
+
+/* ── SWATCHES ── */
+.swatches { display:flex; flex-wrap:wrap; gap:6px; }
+.swatch {
+  width:27px; height:27px; border-radius:50%;
+  cursor:pointer; border:2px solid transparent;
+  transition:all .17s;
+  box-shadow:0 2px 5px rgba(0,0,0,.12);
+}
+.swatch:hover { transform:scale(1.17); }
+.swatch.active { border-color:var(--dark); box-shadow:0 0 0 3px rgba(44,36,32,.2); }
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  border:2px dashed var(--border);
+  border-radius:11px; padding:15px;
+  text-align:center; cursor:pointer;
+  transition:all .22s;
+  background:rgba(245,240,234,.5);
+}
+.upload-zone:hover, .upload-zone.dragover {
+  border-color:var(--accent);
+  background:rgba(155,123,107,.07);
+}
+.upload-zone svg { opacity:.4; margin-bottom:5px; }
+.upload-zone p { font-size:.76rem; color:var(--brown); }
+.upload-zone small { font-size:.65rem; color:var(--taupe); }
+
+/* ── CONTROLS ── */
+.ctrl {
+  display:flex; align-items:center;
+  gap:7px; margin-bottom:8px;
+}
+.ctrl label {
+  font-size:.71rem; color:var(--brown);
+  min-width:72px; font-weight:500;
+}
+.ctrl input[type=range] {
+  flex:1; -webkit-appearance:none;
+  height:3px; border-radius:2px;
+  background:var(--border); outline:none; cursor:pointer;
+}
+.ctrl input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  width:13px; height:13px; border-radius:50%;
+  background:var(--accent); cursor:pointer;
+  box-shadow:0 1px 4px rgba(0,0,0,.18);
+}
+.ctrl .val {
+  font-size:.68rem; min-width:33px;
+  text-align:right; color:var(--accent);
+  font-weight:500; font-family:'DM Mono',monospace;
+}
+
+/* ── STYLED INPUT ── */
+.si {
+  width:100%; padding:7px 9px;
+  border:1px solid var(--border); border-radius:8px;
+  background:#fff;
+  font-family:'Jost',sans-serif; font-size:.78rem;
+  color:var(--dark); outline:none;
+  transition:border-color .2s;
+}
+.si:focus { border-color:var(--accent); }
+select.si { cursor:pointer; }
+
+/* ── TOGGLE ── */
+.tog-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:7px; }
+.tog-row > label { font-size:.75rem; font-weight:500; color:var(--brown); }
+.tog { position:relative; width:37px; height:20px; flex-shrink:0; }
+.tog input { opacity:0; width:0; height:0; }
+.tog-sl {
+  position:absolute; inset:0;
+  background:var(--border); border-radius:20px;
+  cursor:pointer; transition:.3s;
+}
+.tog-sl::before {
+  content:''; position:absolute;
+  width:14px; height:14px; left:3px; top:3px;
+  background:#fff; border-radius:50%;
+  transition:.3s; box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.tog input:checked + .tog-sl { background:var(--accent); }
+.tog input:checked + .tog-sl::before { transform:translateX(17px); }
+
+/* ── EXPORT CARDS ── */
+.exp-options { display:flex; flex-direction:column; gap:7px; }
+.exp-card {
+  border:2px solid var(--border); border-radius:10px;
+  padding:10px 12px; cursor:pointer;
+  transition:all .17s; background:#fff;
+}
+.exp-card:hover, .exp-card.active {
+  border-color:var(--accent);
+  background:rgba(155,123,107,.05);
+}
+.exp-card h4 { font-size:.79rem; font-weight:500; margin-bottom:2px; }
+.exp-card small { font-size:.65rem; color:var(--taupe); }
+.exp-card .badge {
+  display:inline-block; font-size:.6rem;
+  font-family:'DM Mono',monospace;
+  background:var(--cream); border:1px solid var(--border);
+  padding:2px 6px; border-radius:7px; margin-top:4px;
+}
+
+/* ── MOBILE CANVAS CONTROLS ── */
+.mob-canvas-bar {
+  display:none;
+}
+@media (max-width:768px) {
+  .mob-canvas-bar {
+    display:flex;
+    position:absolute;
+    top:9px; left:50%;
+    transform:translateX(-50%);
+    z-index:20;
+    background:rgba(250,248,245,.97);
+    border:1px solid var(--border);
+    border-radius:28px;
+    box-shadow:var(--shadow);
+    padding:5px 10px;
+    gap:8px;
+    align-items:center;
+    max-width:96%;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+  .mob-canvas-bar::-webkit-scrollbar { display:none; }
+  .mob-size-ctrl {
+    display:flex; align-items:center; gap:5px;
+  }
+  .mob-size-ctrl label { font-size:.6rem; color:var(--brown); font-weight:500; }
+  .mob-size-ctrl input[type=range] {
+    width:80px; -webkit-appearance:none;
+    height:3px; border-radius:2px;
+    background:var(--border); outline:none; cursor:pointer;
+  }
+  .mob-size-ctrl input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance:none;
+    width:14px; height:14px; border-radius:50%;
+    background:var(--accent); cursor:pointer;
+    box-shadow:0 1px 4px rgba(0,0,0,.18);
+  }
+  .mob-size-ctrl .val {
+    font-size:.6rem; min-width:28px;
+    color:var(--accent); font-weight:500; font-family:'DM Mono',monospace;
+  }
+  .mob-divider {
+    width:1px; height:18px; background:var(--border); flex-shrink:0;
+  }
+  .mob-swatches {
+    display:flex; gap:4px; align-items:center;
+  }
+  .mob-swatch {
+    width:18px; height:18px; border-radius:50%;
+    cursor:pointer; border:2px solid transparent;
+    flex-shrink:0; transition:transform .15s;
+  }
+  .mob-swatch.active { border-color:var(--dark); }
+  .mob-swatch:active { transform:scale(1.2); }
+}
+.blur-box {
+  width:100%; aspect-ratio:4/3;
+  border-radius:9px; overflow:hidden;
+  border:1px solid var(--border); background:#e8e2da;
+}
+.blur-box canvas { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* ── FORMAT BUTTONS ── */
+.fmt-btn {
+  flex:1; padding:7px 4px;
+  border:2px solid var(--border); border-radius:8px;
+  background:#fff; color:var(--brown);
+  font-family:'DM Mono',monospace; font-size:.72rem;
+  font-weight:500; letter-spacing:.06em;
+  cursor:pointer; transition:all .17s;
+}
+.fmt-btn:hover { border-color:var(--taupe); }
+.fmt-btn.active { border-color:var(--accent); background:rgba(155,123,107,.08); color:var(--dark); }
+
+/* ── BUTTONS ── */
+.btn-exp {
+  width:100%; padding:12px;
+  background:var(--dark); color:var(--cream);
+  border:none; border-radius:11px;
+  font-family:'Jost',sans-serif; font-size:.85rem;
+  font-weight:500; letter-spacing:.1em;
+  cursor:pointer; transition:all .22s;
+  text-transform:uppercase;
+}
+.btn-exp:hover { background:var(--accent); transform:translateY(-1px); box-shadow:0 8px 20px rgba(155,123,107,.3); }
+.btn-exp:active { transform:translateY(0); }
+
+.icon-btn {
+  width:33px; height:33px;
+  border:1px solid var(--border); border-radius:50%;
+  background:#fff; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .17s; color:var(--brown); flex-shrink:0;
+}
+.icon-btn:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+.icon-btn.dark { background:var(--dark); color:var(--cream); border-color:var(--dark); }
+.icon-btn.dark:hover { background:var(--accent); border-color:var(--accent); }
+
+/* ── CANVAS ── */
+.canvas-area {
+  display:flex; align-items:center; justify-content:center;
+  background:#e0dbd3; position:relative; overflow:hidden;
+}
+.canvas-area::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-conic-gradient(#d5cfc7 0% 25%,transparent 0% 50%) 0 0/18px 18px;
+  opacity:.22;
+}
+#mainCanvas {
+  position:relative; z-index:2;
+  max-width:92%; max-height:92%;
+  border-radius:4px;
+  box-shadow:var(--shadow), 0 2px 8px rgba(0,0,0,.1);
+  touch-action:none; cursor:crosshair;
+}
+#mainCanvas.dragging { cursor:grabbing; }
+
+.canvas-ctrls {
+  position:absolute; bottom:13px; left:50%;
+  transform:translateX(-50%); z-index:10;
+  display:flex; gap:6px;
+  background:rgba(250,248,245,.96);
+  padding:6px 10px; border-radius:30px;
+  box-shadow:var(--shadow); border:1px solid var(--border);
+  white-space:nowrap;
+}
+
+.drag-hint {
+  position:absolute; top:11px; left:50%;
+  transform:translateX(-50%); z-index:10;
+  background:rgba(44,36,32,.78);
+  color:var(--cream); font-size:.65rem;
+  padding:5px 12px; border-radius:20px;
+  letter-spacing:.06em; pointer-events:none;
+  opacity:0; transition:opacity .4s;
+}
+.drag-hint.show { opacity:1; }
+
+/* ── GITHUB ── */
+.gh-cfg { display:flex; flex-direction:column; gap:6px; }
+.gh-row2 { display:flex; gap:5px; }
+.gh-inp {
+  flex:1; padding:6px 8px;
+  border:1px solid var(--border); border-radius:7px;
+  background:#fff; font-family:'DM Mono',monospace;
+  font-size:.69rem; color:var(--dark); outline:none;
+  transition:border-color .2s; min-width:0;
+}
+.gh-inp:focus { border-color:var(--accent); }
+.gh-btn {
+  padding:7px 11px;
+  background:var(--dark); color:var(--cream);
+  border:none; border-radius:7px;
+  font-family:'Jost',sans-serif; font-size:.72rem;
+  font-weight:500; letter-spacing:.05em;
+  cursor:pointer; display:flex; align-items:center; gap:5px;
+  transition:all .17s; white-space:nowrap;
+}
+.gh-btn:hover { background:var(--accent); }
+.gh-btn.loading { opacity:.55; pointer-events:none; }
+
+.gh-status {
+  font-size:.68rem; font-family:'DM Mono',monospace;
+  line-height:1.5; padding:5px 8px; border-radius:7px; display:none;
+}
+.gh-status:not(:empty) { display:block; }
+.gh-status.error { background:rgba(220,80,60,.07); color:#a02818; border:1px solid rgba(220,80,60,.2); }
+.gh-status.info  { background:rgba(155,123,107,.07); color:var(--brown); border:1px solid var(--border); }
+
+.gh-wrap { display:none; margin-top:5px; }
+.gh-gallery { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.gh-thumb {
+  aspect-ratio:1; border-radius:8px; overflow:hidden;
+  border:2px solid var(--border); cursor:pointer;
+  transition:border-color .15s,transform .15s;
+  position:relative; background:#fff;
+}
+.gh-thumb:hover { border-color:var(--accent); transform:scale(1.04); }
+.gh-thumb img { width:100%; height:100%; object-fit:contain; display:block; padding:4px; }
+.gh-name {
+  position:absolute; bottom:0; left:0; right:0;
+  background:rgba(0,0,0,.6); color:#fff;
+  font-family:'DM Mono',monospace; font-size:7px;
+  padding:2px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  opacity:0; transition:opacity .2s;
+}
+.gh-thumb:hover .gh-name { opacity:1; }
+.gh-empty {
+  grid-column:1/-1; text-align:center; padding:16px;
+  color:var(--taupe); font-family:'DM Mono',monospace;
+  font-size:.67rem; line-height:1.7;
+}
+.gh-folder-row {
+  grid-column:1/-1; display:flex; align-items:center; gap:5px;
+  padding:3px 0; cursor:pointer; color:var(--accent);
+  font-family:'DM Mono',monospace; font-size:.67rem; transition:opacity .15s;
+}
+.gh-folder-row:hover { opacity:.7; }
+.gh-breadcrumb {
+  grid-column:1/-1; font-family:'DM Mono',monospace;
+  font-size:.64rem; color:var(--taupe);
+  display:flex; align-items:center; gap:3px;
+  padding:2px 0 5px; flex-wrap:wrap;
+}
+.gh-breadcrumb span { cursor:pointer; color:var(--accent); transition:opacity .15s; }
+.gh-breadcrumb span:hover { opacity:.7; }
+.gh-breadcrumb .sep { color:var(--border); }
+
+/* ── MISC ── */
+.dim-badge {
+  background:var(--dark); color:var(--cream);
+  font-size:.65rem; font-family:'DM Mono',monospace;
+  padding:3px 8px; border-radius:6px; letter-spacing:.04em; display:inline-block;
+}
+.q-badge { display:flex; align-items:center; gap:6px; font-size:.72rem; color:var(--brown); }
+.q-badge::before { content:''; width:7px; height:7px; border-radius:50%; background:#4caf7d; flex-shrink:0; }
+.info-txt { font-size:.67rem; color:var(--taupe); line-height:1.55; }
+input[type=color] {
+  width:27px; height:27px; border-radius:50%;
+  border:2px solid var(--border); cursor:pointer;
+  padding:0; overflow:hidden;
+}
+.txt-block { display:flex; flex-direction:column; gap:6px; }
+
+/* ── LOADING ── */
+#loadingOverlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(44,36,32,.65);
+  z-index:200; align-items:center; justify-content:center;
+  flex-direction:column; gap:13px;
+}
+#loadingOverlay.show { display:flex; }
+.spinner {
+  width:38px; height:38px;
+  border:3px solid rgba(245,240,234,.22);
+  border-top-color:var(--cream);
+  border-radius:50%; animation:spin .75s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+#loadingOverlay p { color:var(--cream); font-size:.78rem; letter-spacing:.1em; }
+
+/* ══ RESPONSIVE ══ */
+@media (max-width:768px) {
+  .mob-tabs { display:flex; }
+  .app {
+    grid-template-columns:1fr;
+    position:relative;
+    flex:1; min-height:0;
+  }
+  .panel-left, .panel-right, .canvas-area {
+    position:absolute;
+    top:0; left:0; right:0; bottom:0;
+    display:none;
+    width:100%; height:100%;
+  }
+  .panel-left  { overflow-y:auto; border-right:none; }
+  .panel-right { overflow-y:auto; border-left:none; }
+  .canvas-area { position:relative; }
+  .panel-left.mob-show, .panel-right.mob-show, .canvas-area.mob-show { display:flex; }
+  #mainCanvas { max-width:96%; max-height:87%; }
+  .canvas-ctrls { bottom:7px; }
+}
+@media (max-width:400px) {
+  .tshirt-grid { grid-template-columns:repeat(3,1fr); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mockup Creator</h1>
+  <span class="badge-pro">PRO</span>
+</header>
+
+<!-- MOBILE TABS -->
+<div class="mob-tabs" id="mobTabs">
+  <button class="active" id="tab-left" onclick="switchTab('left')">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
+    Prenda
+  </button>
+  <button id="tab-canvas" onclick="switchTab('canvas')">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    Canvas
+  </button>
+  <button id="tab-right" onclick="switchTab('right')">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+    Exportar
+  </button>
+</div>
+
+<div class="app" id="appWrap">
+
+<!-- ══ PANEL IZQUIERDO ══ -->
+<div class="panel-left mob-show" id="panelLeft">
+<div class="panel-inner">
+
+  <!-- PRENDA -->
+  <div>
+    <div class="sec-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
+      Prenda
+    </div>
+    <div class="tshirt-grid" id="tshirtGrid"></div>
+  </div>
+
+  <!-- COLOR -->
+  <div>
+    <div class="sec-title">Color de Prenda</div>
+    <div class="swatches" id="colorSwatches"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:9px;">
+      <span style="font-size:.7rem;color:var(--brown);">Personalizado:</span>
+      <input type="color" id="customColor" value="#ffffff" onchange="applyCustomColor(this.value)">
+    </div>
+  </div>
+
+  <!-- DISEÑO LOCAL -->
+  <div>
+    <div class="sec-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      Subir Diseño
+    </div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('designUpload').click()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      <p>Subir imagen del diseño</p>
+      <small>PNG transparente · Arrastrá al canvas</small>
+    </div>
+    <input type="file" id="designUpload" accept="image/*" style="display:none" onchange="loadDesignFile(event)">
+
+    <div style="margin-top:12px;">
+      <div class="ctrl"><label>Tamaño</label><input type="range" id="designSize" min="5" max="90" value="35" oninput="updateDesign()"><span class="val" id="vSize">35%</span></div>
+      <div class="ctrl"><label>Pos. X</label><input type="range" id="designX" min="0" max="100" value="50" oninput="updateDesign()"><span class="val" id="vX">50</span></div>
+      <div class="ctrl"><label>Pos. Y</label><input type="range" id="designY" min="0" max="100" value="38" oninput="updateDesign()"><span class="val" id="vY">38</span></div>
+      <div class="ctrl"><label>Rotación</label><input type="range" id="designRot" min="-45" max="45" value="0" oninput="updateDesign()"><span class="val" id="vRot">0°</span></div>
+      <div class="ctrl"><label>Opacidad</label><input type="range" id="designOpacity" min="10" max="100" value="100" oninput="updateDesign()"><span class="val" id="vOp">100%</span></div>
+    </div>
+  </div>
+
+  <!-- GITHUB -->
+  <div>
+    <div class="sec-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.82 8.21 11.41.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013.01-.4c1.02.01 2.05.14 3.01.4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.82 24 17.31 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      Mis Diseños (GitHub)
+    </div>
+    <div class="gh-cfg">
+      <div class="gh-row2">
+        <input class="gh-inp" id="ghUser" placeholder="usuario" autocomplete="off" spellcheck="false">
+        <input class="gh-inp" id="ghRepo" placeholder="repositorio" autocomplete="off" spellcheck="false">
+      </div>
+      <input class="gh-inp" id="ghFolder" placeholder="carpeta (opcional)" autocomplete="off" spellcheck="false">
+      <button class="gh-btn" id="ghLoadBtn" onclick="ghLoad()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.82 8.21 11.41.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013.01-.4c1.02.01 2.05.14 3.01.4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.82 24 17.31 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        Cargar mis diseños
+      </button>
+      <div class="gh-status" id="ghStatus"></div>
+    </div>
+    <div class="gh-wrap" id="ghWrap">
+      <div class="gh-gallery" id="ghGallery"></div>
+    </div>
+  </div>
+
+  <!-- TEXTO -->
+  <div>
+    <div class="sec-title">Texto (Opcional)</div>
+    <div class="txt-block">
+      <input type="text" class="si" id="textContent" placeholder="Tu texto aquí..." oninput="renderAll()">
+      <select class="si" id="textFont" onchange="renderAll()">
+        <option value="'Cormorant Garamond',serif">Cormorant Garamond</option>
+        <option value="'Jost',sans-serif">Jost</option>
+        <option value="Georgia,serif">Georgia</option>
+        <option value="'Courier New',monospace">Courier New</option>
+      </select>
+      <div class="ctrl" style="margin-bottom:0"><label>Tamaño</label><input type="range" id="fontSize" min="10" max="80" value="28" oninput="renderAll()"><span class="val" id="vFontSz">28</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:.7rem;color:var(--brown);">Color:</span>
+        <input type="color" id="textColor" value="#000000" onchange="renderAll()">
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ CANVAS ══ -->
+<div class="canvas-area" id="canvasArea">
+  <div class="drag-hint" id="dragHint">✦ Arrastrá el diseño para posicionarlo</div>
+
+  <!-- MOBILE QUICK CONTROLS (visible only in canvas tab) -->
+  <div class="mob-canvas-bar" id="mobCanvasBar">
+    <div class="mob-size-ctrl">
+      <label>Tam.</label>
+      <input type="range" id="mobDesignSize" min="5" max="90" value="35" oninput="syncMobSize(this.value)">
+      <span class="val" id="mobVSize">35%</span>
+    </div>
+    <div class="mob-divider"></div>
+    <div class="mob-swatches" id="mobSwatches"></div>
+  </div>
+
+  <canvas id="mainCanvas" width="800" height="800"></canvas>
+  <div class="canvas-ctrls">
+    <button class="icon-btn" title="Centrar" onclick="centerDesign()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
+    </button>
+    <button class="icon-btn" title="Limpiar diseño" onclick="clearDesign()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+    </button>
+    <button class="icon-btn" title="Deshacer" onclick="undoAction()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg>
+    </button>
+    <button class="icon-btn dark" title="Exportar" onclick="exportImage()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ══ PANEL DERECHO ══ -->
+<div class="panel-right" id="panelRight">
+<div class="panel-inner">
+
+  <!-- FONDO -->
+  <div>
+    <div class="sec-title">Fondo del Mockup</div>
+    <p class="info-txt" style="margin-bottom:8px;">Imagen en <code style="font-size:.62rem;background:var(--cream);padding:1px 4px;border-radius:4px;">imagenes/fondo.jpg</code></p>
+    <div class="ctrl"><label>Opacidad</label><input type="range" id="bgOpacity" min="10" max="100" value="100" oninput="renderAll()"><span class="val" id="vBgOp">100%</span></div>
+    <div class="ctrl"><label>Brillo</label><input type="range" id="bgBright" min="40" max="160" value="100" oninput="renderAll()"><span class="val" id="vBgBr">100%</span></div>
+  </div>
+
+  <!-- RESOLUCIÓN -->
+  <div>
+    <div class="sec-title">Resolución</div>
+    <div class="q-badge">Exportación en calidad 2K</div>
+    <p class="info-txt" style="margin-top:5px;">PNG máxima calidad, 2K en el lado mayor.</p>
+  </div>
+
+  <!-- FORMATO -->
+  <div>
+    <div class="sec-title">Destino / Formato</div>
+    <div class="exp-options">
+      <div class="exp-card active" id="card-standard" onclick="selectExport('standard')">
+        <h4>⬜ Estándar</h4>
+        <small>Cuadrado para uso general</small>
+        <div><span class="badge">2048 × 2048</span></div>
+      </div>
+      <div class="exp-card" id="card-fanpage" onclick="selectExport('fanpage')">
+        <h4>📘 Fanpage / Facebook</h4>
+        <small>Feed y portada apaisada</small>
+        <div><span class="badge">1640 × 924</span></div>
+      </div>
+      <div class="exp-card" id="card-wpa" onclick="selectExport('wpa')">
+        <h4>📱 WPA / Vertical</h4>
+        <small>Web y apps móviles</small>
+        <div><span class="badge">1024 × 1536</span></div>
+      </div>
+    </div>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:7px;">
+      <span class="dim-badge" id="currentDim">2048 × 2048</span>
+      <span class="info-txt">resolución de salida</span>
+    </div>
+  </div>
+
+  <!-- BLUR -->
+  <div>
+    <div class="sec-title">Efecto Blur</div>
+    <div class="tog-row">
+      <label>Activar blur de fondo</label>
+      <label class="tog">
+        <input type="checkbox" id="blurToggle" onchange="toggleBlur()">
+        <span class="tog-sl"></span>
+      </label>
+    </div>
+    <div id="blurControls" style="display:none;">
+      <div class="ctrl"><label>Intensidad</label><input type="range" id="blurAmount" min="1" max="30" value="8" oninput="updateBlurPreview()"><span class="val" id="vBlur">8px</span></div>
+      <p style="font-size:.65rem;color:var(--taupe);margin-bottom:5px;">Vista previa:</p>
+      <div class="blur-box"><canvas id="blurPreview"></canvas></div>
+    </div>
+  </div>
+
+  <!-- EXPORTAR -->
+  <div>
+    <div class="sec-title">Exportar</div>
+    <div style="margin-bottom:10px;">
+      <div class="sec-title" style="font-size:.67rem;margin-bottom:6px;border:none;padding:0;">Formato de archivo</div>
+      <div style="display:flex;gap:6px;">
+        <button class="fmt-btn active" id="fmt-png" onclick="selectFormat('png')">PNG</button>
+        <button class="fmt-btn" id="fmt-jpg" onclick="selectFormat('jpg')">JPG</button>
+        <button class="fmt-btn" id="fmt-webp" onclick="selectFormat('webp')">WEBP</button>
+      </div>
+      <p class="info-txt" id="fmtDesc" style="margin-top:6px;">Máxima calidad, soporta transparencia.</p>
+    </div>
+    <p class="info-txt" style="margin-bottom:9px;">Descargará la imagen con la resolución seleccionada. Cada exportación recibe un número único.</p>
+    <button class="btn-exp" onclick="exportImage()">↓ Exportar Mockup</button>
+  </div>
+
+</div>
+</div>
+
+</div><!-- /app -->
+
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Generando imagen 2K...</p>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════
+const COLORS = [
+  {name:'Blanco',      hex:'#FFFFFF'},
+  {name:'Crema',       hex:'#F5F0E8'},
+  {name:'Negro',       hex:'#1A1A1A'},
+  {name:'Carbón',      hex:'#3D3D3D'},
+  {name:'Gris',        hex:'#9E9E9E'},
+  {name:'Azul marino', hex:'#1B2A4A'},
+  {name:'Lavanda',     hex:'#B8A9D9'},
+  {name:'Rosa',        hex:'#F2C4CE'},
+  {name:'Terracota',   hex:'#C26B50'},
+  {name:'Verde salvia',hex:'#7A9E7E'},
+  {name:'Amarillo',    hex:'#F5D76E'},
+  {name:'Borgoña',     hex:'#6B1C2F'},
+];
+
+const GARMENTS = [
+  {file:'camiseta_basica.png',   label:'Básica'},
+  {file:'camiseta_oversize.png', label:'Oversize'},
+ // {file:'camiseta_vneck.png',    label:'V-Neck'},
+ // {file:'remeron.png',           label:'Remeón'},
+  {file:'buzo.png',              label:'Buzo'},
+  {file:'hoodie.png',            label:'Hoodie'},
+  {file:'gorra.png',             label:'Gorra'},
+];
+
+const EXPORT_SIZES = {
+  standard:{w:2048,h:2048,label:'2048 × 2048'},
+  fanpage: {w:1640,h:924, label:'1640 × 924'},
+  wpa:     {w:1024,h:1536,label:'1024 × 1536'},
+};
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const S = {
+  garmentColor:'#FFFFFF', garmentFile:GARMENTS[0].file, garmentIndex:0,
+  designImg:null, designSize:35, designX:50, designY:38, designRot:0, designOpacity:1,
+  bgImg:null, bgOpacity:1, bgBrightness:1,
+  blurEnabled:false, blurAmount:8,
+  exportMode:'standard', exportFormat:'png',
+  exportCounter: parseInt(localStorage.getItem('mockup_counter')||'0'),
+  garmentImgCache:{}, currentGarmentImg:null,
+  _bounds:null, history:[],
+  // drag
+  isDragging:false, dragSX:0, dragSY:0, designSX:50, designSY:38,
+};
+
+const canvas = document.getElementById('mainCanvas');
+const ctx    = canvas.getContext('2d');
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+function init() {
+  buildSwatches();
+  buildGarments();
+  setupFileDrop();
+  setupCanvasDrag();
+  loadBg();
+  loadGarment(S.garmentFile);
+  ghRestore();
+}
+
+// ═══════════════════════════════════════════════
+// UI
+// ═══════════════════════════════════════════════
+function buildSwatches() {
+  const c = document.getElementById('colorSwatches');
+  const mc = document.getElementById('mobSwatches');
+  COLORS.forEach((col,i) => {
+    // Desktop swatches
+    const el = document.createElement('div');
+    el.className = 'swatch'+(i===0?' active':'');
+    el.style.background = col.hex;
+    el.title = col.name;
+    if (col.hex==='#FFFFFF') el.style.border = '2px solid #ccc';
+    el.onclick = () => {
+      document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+      document.querySelectorAll('.mob-swatch').forEach(s=>s.classList.remove('active'));
+      el.classList.add('active');
+      if(mc) mc.querySelectorAll('.mob-swatch')[i]?.classList.add('active');
+      S.garmentColor = col.hex;
+      renderAll();
+    };
+    c.appendChild(el);
+
+    // Mobile swatches (first 8 colors only to fit)
+    if(i<8 && mc){
+      const ms = document.createElement('div');
+      ms.className = 'mob-swatch'+(i===0?' active':'');
+      ms.style.background = col.hex;
+      ms.title = col.name;
+      if (col.hex==='#FFFFFF') ms.style.border = '2px solid #ccc';
+      ms.onclick = () => {
+        document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+        document.querySelectorAll('.mob-swatch').forEach(s=>s.classList.remove('active'));
+        c.querySelectorAll('.swatch')[i]?.classList.add('active');
+        ms.classList.add('active');
+        S.garmentColor = col.hex;
+        renderAll();
+      };
+      mc.appendChild(ms);
+    }
+  });
+}
+
+function syncMobSize(val) {
+  document.getElementById('designSize').value = val;
+  document.getElementById('mobVSize').textContent = val+'%';
+  document.getElementById('vSize').textContent = val+'%';
+  S.designSize = parseInt(val);
+  renderAll();
+}
+
+function buildGarments() {
+  const g = document.getElementById('tshirtGrid');
+  GARMENTS.forEach((gm,i) => {
+    const item = document.createElement('div');
+    item.className = 'tshirt-item'+(i===0?' active':'');
+    item.title = gm.label;
+
+    const img = document.createElement('img');
+    img.src = 'imagenes/'+gm.file;
+    img.alt = gm.label;
+    img.onerror = () => { img.src = svgPlaceholder(gm.label, gm.file); };
+
+    const lbl = document.createElement('span');
+    lbl.textContent = gm.label;
+
+    item.appendChild(img); item.appendChild(lbl);
+    item.onclick = () => selectGarment(i);
+    g.appendChild(item);
+  });
+}
+
+function svgPlaceholder(label, file) {
+  const isHat = file.includes('gorra');
+  const sh = isHat
+    ? `<ellipse cx="50" cy="58" rx="42" ry="18" fill="%23e0d9d0" stroke="%23c4b5a5" stroke-width="2"/><path d="M8,58 Q50,18 92,58" fill="%23d5cec5" stroke="%23c4b5a5" stroke-width="2"/><rect x="5" y="63" width="58" height="7" rx="3" fill="%23c4b5a5"/>`
+    : `<polygon points="20,15 38,10 50,20 62,10 80,15 90,35 72,38 72,85 28,85 28,38 10,35" fill="%23e0d9d0" stroke="%23c4b5a5" stroke-width="2"/>`;
+  return `data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${sh}<text x="50" y="97" text-anchor="middle" font-size="7" fill="%239b7b6b" font-family="sans-serif">${label}</text></svg>`;
+}
+
+// ═══════════════════════════════════════════════
+// DRAG HINT
+// ═══════════════════════════════════════════════
+function showHint() {
+  if (!S.designImg) return;
+  const h = document.getElementById('dragHint');
+  h.classList.add('show');
+  setTimeout(()=>h.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════════════
+// FILE DROP (archivo soltado sobre zona o canvas)
+// ═══════════════════════════════════════════════
+function setupFileDrop() {
+  const zone = document.getElementById('uploadZone');
+  ['dragenter','dragover'].forEach(ev => {
+    zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('dragover'); });
+    canvas.addEventListener(ev, e => e.preventDefault());
+  });
+  ['dragleave','drop'].forEach(ev => zone.addEventListener(ev, ()=>zone.classList.remove('dragover')));
+  zone.addEventListener('drop', e => { e.preventDefault(); const f=e.dataTransfer.files[0]; if(f?.type.startsWith('image/')) loadFromFile(f); });
+  canvas.addEventListener('drop', e => { e.preventDefault(); const f=e.dataTransfer.files[0]; if(f?.type.startsWith('image/')) loadFromFile(f); });
+}
+
+// ═══════════════════════════════════════════════
+// CANVAS DRAG — mover diseño con mouse y touch
+// ═══════════════════════════════════════════════
+function setupCanvasDrag() {
+  canvas.addEventListener('mousedown',  onDS);
+  window.addEventListener('mousemove',  onDM);
+  window.addEventListener('mouseup',    onDE);
+  canvas.addEventListener('touchstart', onDS, {passive:false});
+  window.addEventListener('touchmove',  onDM, {passive:false});
+  window.addEventListener('touchend',   onDE);
+}
+
+function evPos(e) {
+  const r = canvas.getBoundingClientRect();
+  const sx = canvas.width/r.width, sy = canvas.height/r.height;
+  const src = e.touches?.[0] || e;
+  return { x:(src.clientX-r.left)*sx, y:(src.clientY-r.top)*sy };
+}
+
+function overDesign(px,py) {
+  if (!S.designImg||!S._bounds) return false;
+  const b=S._bounds;
+  const cx=b.x+b.w*(S.designX/100), cy=b.y+b.h*(S.designY/100);
+  const dW=b.w*(S.designSize/100), dH=(S.designImg.height/S.designImg.width)*dW;
+  return px>=cx-dW/2-12 && px<=cx+dW/2+12 && py>=cy-dH/2-12 && py<=cy+dH/2+12;
+}
+
+function onDS(e) {
+  if (!S.designImg) return;
+  const p = evPos(e);
+  if (!overDesign(p.x,p.y)) return;
+  if (e.cancelable) e.preventDefault();
+  S.isDragging=true; S.dragSX=p.x; S.dragSY=p.y;
+  S.designSX=S.designX; S.designSY=S.designY;
+  canvas.classList.add('dragging');
+}
+
+function onDM(e) {
+  if (!S.isDragging) return;
+  if (e.cancelable) e.preventDefault();
+  const p=evPos(e), b=S._bounds;
+  if (!b) return;
+  const nx = S.designSX + ((p.x-S.dragSX)/b.w)*100;
+  const ny = S.designSY + ((p.y-S.dragSY)/b.h)*100;
+  S.designX = Math.max(0,Math.min(100,nx));
+  S.designY = Math.max(0,Math.min(100,ny));
+  document.getElementById('designX').value = Math.round(S.designX);
+  document.getElementById('designY').value = Math.round(S.designY);
+  renderAll();
+}
+
+function onDE() {
+  if (S.isDragging) { S.isDragging=false; canvas.classList.remove('dragging'); }
+}
+
+// ═══════════════════════════════════════════════
+// LOAD IMAGES
+// ═══════════════════════════════════════════════
+function loadBg() {
+  const img=new Image(); img.crossOrigin='anonymous';
+  img.onload=()=>{S.bgImg=img;renderAll();};
+  img.onerror=()=>{S.bgImg=null;renderAll();};
+  img.src='imagenes/fondo.jpg?v='+Date.now();
+}
+
+function loadGarment(file) {
+  if (S.garmentImgCache[file]) { S.currentGarmentImg=S.garmentImgCache[file]; renderAll(); return; }
+  const img=new Image(); img.crossOrigin='anonymous';
+  img.onload=()=>{S.garmentImgCache[file]=img;S.currentGarmentImg=img;renderAll();};
+  img.onerror=()=>{
+    const ph=new Image();
+    ph.onload=()=>{S.garmentImgCache[file]=ph;S.currentGarmentImg=ph;renderAll();};
+    ph.src=svgPlaceholder(GARMENTS[S.garmentIndex].label,file);
+  };
+  img.src='imagenes/'+file+'?v='+Date.now();
+}
+
+function loadFromFile(file) {
+  const r=new FileReader();
+  r.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{S.designImg=img;renderAll();showHint();if(isMobile())setTimeout(()=>switchTab('canvas'),150);};
+    img.src=e.target.result;
+  };
+  r.readAsDataURL(file);
+}
+
+function loadDesignFile(ev) { const f=ev.target.files[0]; if(f) loadFromFile(f); }
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function renderAll() {
+  syncLabels();
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  if(S.blurEnabled){
+    // Draw blurred background on offscreen canvas, then composite
+    const bgOff=document.createElement('canvas'); bgOff.width=W; bgOff.height=H;
+    const bgCtx=bgOff.getContext('2d');
+    drawBg(bgCtx,W,H);
+    ctx.save();
+    ctx.filter=`blur(${S.blurAmount}px)`;
+    // Draw with extra margin to avoid blur edge artifacts
+    ctx.drawImage(bgOff,-S.blurAmount*2,-S.blurAmount*2,W+S.blurAmount*4,H+S.blurAmount*4);
+    ctx.restore();
+    ctx.filter='none';
+  } else {
+    drawBg(ctx,W,H);
+  }
+
+  drawGarment(ctx,W,H);
+  if (S.designImg) drawDesign(ctx,W,H);
+  drawText(ctx,W,H);
+  if (S.blurEnabled) updateBlurPreview();
+}
+
+function drawBg(tc,W,H) {
+  tc.save(); tc.globalAlpha=S.bgOpacity; tc.filter=`brightness(${S.bgBrightness})`;
+  if (S.bgImg) {
+    const i=S.bgImg, ia=i.width/i.height, ca=W/H;
+    let sw,sh,sx,sy;
+    if(ia>ca){sh=i.height;sw=sh*ca;sx=(i.width-sw)/2;sy=0;}
+    else{sw=i.width;sh=sw/ca;sx=0;sy=(i.height-sh)/2;}
+    tc.drawImage(i,sx,sy,sw,sh,0,0,W,H);
+  } else {
+    const g=tc.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#e8dfd6');g.addColorStop(1,'#c4b5a5');
+    tc.fillStyle=g;tc.fillRect(0,0,W,H);
+  }
+  tc.restore();
+}
+
+function drawGarment(tc,W,H) {
+  const isHat=S.garmentFile.includes('gorra');
+  let gW,gH,gx,gy;
+  if(S.currentGarmentImg){
+    // Respect real aspect ratio of the image
+    const imgAR=S.currentGarmentImg.width/S.currentGarmentImg.height;
+    if(isHat){
+      gW=W*.52; gH=gW/imgAR;
+      // Cap height for landscape canvases so hat stays proportional
+      if(gH>H*.75){gH=H*.75;gW=gH*imgAR;}
+      gx=(W-gW)/2; gy=(H-gH)/2;
+    } else {
+      gW=W*.62; gH=gW/imgAR; gx=(W-gW)/2; gy=(H-gH)/2-H*.04;
+    }
+  } else {
+    if(isHat){gW=W*.52;gH=gW*.68;gx=(W-gW)/2;gy=H*.22;}
+    else{gW=W*.62;gH=gW*1.25;gx=(W-gW)/2;gy=(H-gH)/2-H*.04;}
+  }
+  S._bounds={x:gx,y:gy,w:gW,h:gH};
+  if(!S.currentGarmentImg) return;
+  if(S.garmentColor==='#FFFFFF'){
+    tc.drawImage(S.currentGarmentImg,gx,gy,gW,gH);
+  } else {
+    const off=document.createElement('canvas'); off.width=W; off.height=H;
+    const oc=off.getContext('2d');
+    oc.drawImage(S.currentGarmentImg,gx,gy,gW,gH);
+    oc.globalCompositeOperation='multiply'; oc.fillStyle=S.garmentColor; oc.fillRect(gx,gy,gW,gH);
+    oc.globalCompositeOperation='destination-in'; oc.drawImage(S.currentGarmentImg,gx,gy,gW,gH);
+    tc.drawImage(off,0,0);
+  }
+}
+
+function drawDesign(tc,W,H) {
+  const b=S._bounds||{x:W*.19,y:H*.1,w:W*.62,h:H*.75};
+  const dW=b.w*(S.designSize/100);
+  const dH=(S.designImg.height/S.designImg.width)*dW;
+  const cx=b.x+b.w*(S.designX/100), cy=b.y+b.h*(S.designY/100);
+  tc.save(); tc.globalAlpha=S.designOpacity;
+  tc.translate(cx,cy); tc.rotate(S.designRot*Math.PI/180);
+  tc.drawImage(S.designImg,-dW/2,-dH/2,dW,dH);
+  tc.restore();
+}
+
+function drawText(tc,W,H) {
+  const txt=document.getElementById('textContent').value.trim(); if(!txt)return;
+  const sz=parseInt(document.getElementById('fontSize').value);
+  const fn=document.getElementById('textFont').value;
+  const cl=document.getElementById('textColor').value;
+  tc.save(); tc.font=`${sz}px ${fn}`; tc.fillStyle=cl; tc.textAlign='center';
+  tc.fillText(txt,W/2,H*.88); tc.restore();
+}
+
+// ═══════════════════════════════════════════════
+// BLUR
+// ═══════════════════════════════════════════════
+function toggleBlur() {
+  S.blurEnabled=document.getElementById('blurToggle').checked;
+  document.getElementById('blurControls').style.display=S.blurEnabled?'block':'none';
+  if(S.blurEnabled) updateBlurPreview();
+}
+function updateBlurPreview() {
+  const amt=parseInt(document.getElementById('blurAmount').value);
+  S.blurAmount=amt; document.getElementById('vBlur').textContent=amt+'px';
+  const pv=document.getElementById('blurPreview');
+  const pc=pv.getContext('2d');
+  const PW=pv.parentElement.offsetWidth||230;
+  const PH=Math.round(PW*3/4);
+  pv.width=PW; pv.height=PH;
+  // Draw only background blurred for the preview
+  const bgOff=document.createElement('canvas'); bgOff.width=PW; bgOff.height=PH;
+  const bgCtx=bgOff.getContext('2d');
+  drawBg(bgCtx,PW,PH);
+  pc.save();
+  pc.filter=`blur(${amt}px)`;
+  pc.drawImage(bgOff,-amt*2,-amt*2,PW+amt*4,PH+amt*4);
+  pc.restore();
+  pc.filter='none';
+}
+
+// ═══════════════════════════════════════════════
+// EXPORT 2K
+// ═══════════════════════════════════════════════
+function exportImage() {
+  document.getElementById('loadingOverlay').classList.add('show');
+  setTimeout(()=>{
+    try {
+      const sz=EXPORT_SIZES[S.exportMode], W=sz.w, H=sz.h;
+      const ec=document.createElement('canvas'); ec.width=W; ec.height=H;
+      const eC=ec.getContext('2d');
+
+      if(S.blurEnabled){
+        // Draw blurred background only
+        const bgOff=document.createElement('canvas'); bgOff.width=W; bgOff.height=H;
+        const bgCtx=bgOff.getContext('2d');
+        drawBg(bgCtx,W,H);
+        const blurPx=S.blurAmount*(W/canvas.width);
+        eC.save();
+        eC.filter=`blur(${blurPx}px)`;
+        eC.drawImage(bgOff,-blurPx*2,-blurPx*2,W+blurPx*4,H+blurPx*4);
+        eC.restore();
+        eC.filter='none';
+      } else {
+        drawBg(eC,W,H);
+      }
+
+      const isHat=S.garmentFile.includes('gorra');
+      let gW,gH,gx,gy;
+      if(S.currentGarmentImg){
+        const imgAR=S.currentGarmentImg.width/S.currentGarmentImg.height;
+        if(isHat){
+          gW=W*.52; gH=gW/imgAR;
+          // For landscape (fanpage), cap height so hat fits proportionally
+          if(gH>H*.75){gH=H*.75;gW=gH*imgAR;}
+          gx=(W-gW)/2; gy=(H-gH)/2;
+        } else {
+          gW=W*.62; gH=gW/imgAR; gx=(W-gW)/2; gy=(H-gH)/2-H*.04;
+          // For landscape formats (fanpage), scale down so garment fits vertically
+          if(gH>H*.9){gH=H*.9;gW=gH*imgAR;gx=(W-gW)/2;gy=(H-gH)/2-H*.02;}
+        }
+      } else {
+        if(isHat){gW=W*.52;gH=gW*.68;gx=(W-gW)/2;gy=H*.22;}
+        else{gW=W*.62;gH=gW*1.25;gx=(W-gW)/2;gy=(H-gH)/2-H*.04;}
+      }
+
+      if(S.currentGarmentImg){
+        if(S.garmentColor==='#FFFFFF'){
+          eC.drawImage(S.currentGarmentImg,gx,gy,gW,gH);
+        } else {
+          const off=document.createElement('canvas'); off.width=W; off.height=H;
+          const oc=off.getContext('2d');
+          oc.drawImage(S.currentGarmentImg,gx,gy,gW,gH);
+          oc.globalCompositeOperation='multiply'; oc.fillStyle=S.garmentColor; oc.fillRect(gx,gy,gW,gH);
+          oc.globalCompositeOperation='destination-in'; oc.drawImage(S.currentGarmentImg,gx,gy,gW,gH);
+          eC.drawImage(off,0,0);
+        }
+      }
+
+      if(S.designImg){
+        const b={x:gx,y:gy,w:gW,h:gH};
+        const dW=b.w*(S.designSize/100), dH=(S.designImg.height/S.designImg.width)*dW;
+        const cx=b.x+b.w*(S.designX/100), cy=b.y+b.h*(S.designY/100);
+        eC.save(); eC.globalAlpha=S.designOpacity;
+        eC.translate(cx,cy); eC.rotate(S.designRot*Math.PI/180);
+        eC.drawImage(S.designImg,-dW/2,-dH/2,dW,dH); eC.restore();
+      }
+
+      const txt=document.getElementById('textContent').value.trim();
+      if(txt){
+        const fs=parseInt(document.getElementById('fontSize').value)*(W/canvas.width);
+        eC.font=`${fs}px ${document.getElementById('textFont').value}`;
+        eC.fillStyle=document.getElementById('textColor').value;
+        eC.textAlign='center'; eC.fillText(txt,W/2,H*.88);
+      }
+
+      S.exportCounter++;
+      localStorage.setItem('mockup_counter', S.exportCounter);
+      const fmt = S.exportFormat;
+      const mimeMap = {png:'image/png', jpg:'image/jpeg', webp:'image/webp'};
+      const qualMap = {png:1.0, jpg:0.95, webp:0.92};
+      const mime = mimeMap[fmt]||'image/png';
+      const qual = qualMap[fmt]||1.0;
+      // For JPG fill background white (no transparency)
+      if(fmt==='jpg'){
+        const bg=document.createElement('canvas'); bg.width=W; bg.height=H;
+        const bc=bg.getContext('2d'); bc.fillStyle='#fff'; bc.fillRect(0,0,W,H);
+        bc.drawImage(ec,0,0); ec.width=W; ec.height=H;
+        eC.drawImage(bg,0,0);
+      }
+      const pad = String(S.exportCounter).padStart(4,'0');
+      const a=document.createElement('a');
+      a.download=`mockup_${S.exportMode}_${W}x${H}_${pad}.${fmt}`;
+      a.href=ec.toDataURL(mime,qual); a.click();
+    } catch(e) {
+      console.error(e);
+      alert('Error al exportar. Verificá que las imágenes estén en /imagenes/');
+    }
+    document.getElementById('loadingOverlay').classList.remove('show');
+  },80);
+}
+
+// ═══════════════════════════════════════════════
+// GITHUB
+// ═══════════════════════════════════════════════
+const GH_EXT=['png','jpg','jpeg','gif','webp','svg'];
+let ghPath='', ghUser='', ghRepo2='';
+
+function ghSetStatus(msg,type) {
+  const el=document.getElementById('ghStatus');
+  el.textContent=msg; el.className='gh-status '+(type||'info');
+}
+function ghIsImg(name){return GH_EXT.includes(name.split('.').pop().toLowerCase());}
+
+async function ghLoad(path) {
+  const u=document.getElementById('ghUser').value.trim();
+  const r=document.getElementById('ghRepo').value.trim();
+  const f=document.getElementById('ghFolder').value.trim();
+  if(!u||!r){ghSetStatus('Ingresá usuario y repositorio','error');return;}
+  ghUser=u; ghRepo2=r;
+  ghPath=(path===undefined)?(f||''):path;
+  const btn=document.getElementById('ghLoadBtn');
+  btn.classList.add('loading'); btn.textContent='Cargando...';
+  const url=ghPath
+    ?`https://api.github.com/repos/${u}/${r}/contents/${ghPath}`
+    :`https://api.github.com/repos/${u}/${r}/contents`;
+  try {
+    const resp=await fetch(url,{headers:{'Accept':'application/vnd.github.v3+json'}});
+    if(!resp.ok){
+      if(resp.status===404) ghSetStatus('❌ Repo no encontrado o es privado.\n👉 Settings → Make public','error');
+      else if(resp.status===403) ghSetStatus('⏳ Límite de API. Esperá 1 min.','error');
+      else ghSetStatus('Error '+resp.status,'error');
+      return;
+    }
+    const items=await resp.json();
+    localStorage.setItem('gh_user',u); localStorage.setItem('gh_repo',r); localStorage.setItem('gh_folder',f);
+    ghRender(items);
+    const ic=items.filter(i=>i.type==='file'&&ghIsImg(i.name)).length;
+    const dc=items.filter(i=>i.type==='dir').length;
+    if(!ic&&!dc) ghSetStatus('📭 No hay imágenes. Subí PNG/JPG al repo.','info');
+    else document.getElementById('ghStatus').textContent='';
+  } catch(e) { ghSetStatus('Error de red: '+e.message,'error'); }
+  finally {
+    btn.classList.remove('loading');
+    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.82 8.21 11.41.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013.01-.4c1.02.01 2.05.14 3.01.4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.82 24 17.31 24 12c0-6.63-5.37-12-12-12z"/></svg> Cargar mis diseños';
+  }
+}
+
+function ghRender(items) {
+  const wrap=document.getElementById('ghWrap'), gal=document.getElementById('ghGallery');
+  wrap.style.display='block'; gal.innerHTML='';
+  if(ghPath){
+    const bc=document.createElement('div'); bc.className='gh-breadcrumb';
+    const root=document.createElement('span'); root.textContent='/ raíz'; root.onclick=()=>ghLoad('');
+    bc.appendChild(root);
+    ghPath.split('/').filter(Boolean).forEach((pt,i,arr)=>{
+      const sep=document.createElement('span'); sep.className='sep'; sep.textContent='›'; bc.appendChild(sep);
+      const seg=document.createElement('span'); seg.textContent=pt;
+      seg.onclick=()=>ghLoad(arr.slice(0,i+1).join('/'));
+      bc.appendChild(seg);
+    });
+    gal.appendChild(bc);
+  }
+  items.filter(i=>i.type==='dir').forEach(f=>{
+    const row=document.createElement('div'); row.className='gh-folder-row';
+    row.innerHTML=`<span style="font-size:14px">📁</span>${f.name}`;
+    row.onclick=()=>ghLoad(f.path); gal.appendChild(row);
+  });
+  const imgs=items.filter(i=>i.type==='file'&&ghIsImg(i.name));
+  if(!imgs.length&&!items.filter(i=>i.type==='dir').length){
+    const e=document.createElement('div'); e.className='gh-empty';
+    e.innerHTML='📭 Sin imágenes en esta carpeta.'; gal.appendChild(e); return;
+  }
+  imgs.forEach(file=>{
+    const raw=`https://raw.githubusercontent.com/${ghUser}/${ghRepo2}/HEAD/${file.path}`;
+    const th=document.createElement('div'); th.className='gh-thumb'; th.title=file.name;
+    th.innerHTML=`<img src="${raw}" loading="lazy" onerror="this.parentElement.style.opacity='.3'"><div class="gh-name">${file.name}</div>`;
+    th.onclick=()=>ghPick(raw); gal.appendChild(th);
+  });
+}
+
+function ghPick(url) {
+  const img=new Image(); img.crossOrigin='anonymous';
+  img.onload=()=>{S.designImg=img;renderAll();showHint();if(isMobile())setTimeout(()=>switchTab('canvas'),200);};
+  img.onerror=()=>alert('No se pudo cargar. Verificá que el repo sea público.');
+  img.src=url+'?t='+Date.now();
+}
+
+function ghRestore() {
+  document.getElementById('ghUser').value   = localStorage.getItem('gh_user')   || 'tiendacristianaleondejuda-stack';
+  document.getElementById('ghRepo').value   = localStorage.getItem('gh_repo')   || 'imagenes-tienda-Leon-de-Juda';
+  document.getElementById('ghFolder').value = localStorage.getItem('gh_folder') || '';
+  ['ghUser','ghRepo','ghFolder'].forEach(id=>{
+    document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter') ghLoad();});
+  });
+}
+
+// ═══════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════
+function selectGarment(i) {
+  S.garmentIndex=i; S.garmentFile=GARMENTS[i].file;
+  document.querySelectorAll('.tshirt-item').forEach((el,j)=>el.classList.toggle('active',j===i));
+  loadGarment(S.garmentFile);
+}
+function applyCustomColor(hex) {
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+  S.garmentColor=hex; renderAll();
+}
+function updateDesign() {
+  S.designSize    = parseInt(document.getElementById('designSize').value);
+  S.designX       = parseInt(document.getElementById('designX').value);
+  S.designY       = parseInt(document.getElementById('designY').value);
+  S.designRot     = parseInt(document.getElementById('designRot').value);
+  S.designOpacity = parseInt(document.getElementById('designOpacity').value)/100;
+  // Keep mobile size slider in sync
+  const mob = document.getElementById('mobDesignSize');
+  if(mob){ mob.value = S.designSize; document.getElementById('mobVSize').textContent = S.designSize+'%'; }
+  renderAll();
+}
+function selectExport(mode) {
+  S.exportMode=mode;
+  document.querySelectorAll('.exp-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('card-'+mode).classList.add('active');
+  document.getElementById('currentDim').textContent=EXPORT_SIZES[mode].label;
+}
+function selectFormat(fmt) {
+  S.exportFormat=fmt;
+  document.querySelectorAll('.fmt-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('fmt-'+fmt).classList.add('active');
+  const desc={
+    png:'Máxima calidad, soporta transparencia.',
+    jpg:'Menor peso, ideal para fondos sólidos.',
+    webp:'Excelente compresión con alta calidad.',
+  };
+  document.getElementById('fmtDesc').textContent=desc[fmt]||'';
+}
+function centerDesign() {
+  S.designX=50; S.designY=38;
+  document.getElementById('designX').value=50;
+  document.getElementById('designY').value=38;
+  renderAll();
+}
+function clearDesign() {
+  if(!S.designImg||confirm('¿Limpiar el diseño actual?')){
+    S.designImg=null;
+    document.getElementById('designUpload').value='';
+    renderAll();
+  }
+}
+function undoAction() {
+  if(S.history.length>0){Object.assign(S,S.history.pop());renderAll();}
+}
+
+// ═══════════════════════════════════════════════
+// MOBILE TABS
+// ═══════════════════════════════════════════════
+function isMobile(){return window.innerWidth<=768;}
+function switchTab(tab) {
+  if(!isMobile()) return;
+  const map={left:'panelLeft',canvas:'canvasArea',right:'panelRight'};
+  const tabMap={left:'tab-left',canvas:'tab-canvas',right:'tab-right'};
+  Object.values(map).forEach(id=>document.getElementById(id).classList.remove('mob-show'));
+  Object.values(tabMap).forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById(map[tab]).classList.add('mob-show');
+  document.getElementById(tabMap[tab]).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════
+// SYNC LABELS
+// ═══════════════════════════════════════════════
+function syncLabels() {
+  document.getElementById('vSize').textContent  = document.getElementById('designSize').value+'%';
+  document.getElementById('vX').textContent     = document.getElementById('designX').value;
+  document.getElementById('vY').textContent     = document.getElementById('designY').value;
+  document.getElementById('vRot').textContent   = document.getElementById('designRot').value+'°';
+  document.getElementById('vOp').textContent    = document.getElementById('designOpacity').value+'%';
+  document.getElementById('vFontSz').textContent= document.getElementById('fontSize').value;
+
+  const bOp=document.getElementById('bgOpacity').value;
+  document.getElementById('vBgOp').textContent=bOp+'%';
+  S.bgOpacity=parseInt(bOp)/100;
+
+  const bBr=document.getElementById('bgBright').value;
+  document.getElementById('vBgBr').textContent=bBr+'%';
+  S.bgBrightness=parseInt(bBr)/100;
+}
+
+// ═══════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
