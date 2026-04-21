@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 3D — León de Judá</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #f5f0ea;
+  --taupe: #c4b5a5;
+  --brown: #7a6355;
+  --dark: #2c2420;
+  --accent: #9b7b6b;
+  --panel: rgba(250,248,245,0.97);
+  --border: rgba(196,181,165,0.4);
+  --shadow: 0 8px 40px rgba(44,36,32,0.12);
+  --panel-w: 280px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:'Jost',sans-serif;
+  background:var(--dark);
+  color:var(--dark);
+  display:flex;
+  flex-direction:column;
+  height:100dvh;
+}
+
+/* ── HEADER ── */
+header{
+  background:var(--dark);
+  padding:0 20px;
+  height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-shrink:0;
+  z-index:50;
+  border-bottom:1px solid rgba(196,181,165,0.15);
+}
+header h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.35rem;font-weight:300;
+  color:var(--cream);letter-spacing:.12em;
+}
+.header-right{display:flex;align-items:center;gap:10px;}
+.badge-3d{
+  font-size:.6rem;background:var(--accent);color:#fff;
+  padding:3px 9px;border-radius:20px;letter-spacing:.1em;font-weight:500;
+  text-transform:uppercase;
+}
+
+/* ── LAYOUT ── */
+.app{
+  display:grid;
+  grid-template-columns:var(--panel-w) 1fr var(--panel-w);
+  flex:1;min-height:0;overflow:hidden;
+}
+
+/* ── PANELS ── */
+.panel-left,.panel-right{
+  background:var(--panel);
+  overflow-y:auto;overflow-x:hidden;
+  display:flex;flex-direction:column;min-height:0;
+}
+.panel-left{border-right:1px solid var(--border);}
+.panel-right{border-left:1px solid var(--border);}
+.panel-inner{padding:16px 14px;display:flex;flex-direction:column;gap:18px;}
+
+.sec-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:.72rem;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:9px;padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;
+}
+
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* ── GARMENT LIST ── */
+.garment-list{display:flex;flex-direction:column;gap:5px;}
+.garment-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:9px;
+  border:2px solid transparent;
+  cursor:pointer;transition:all .17s;
+  background:#fff;
+}
+.garment-item:hover{border-color:var(--taupe);}
+.garment-item.active{border-color:var(--accent);background:rgba(155,123,107,.07);}
+.garment-item .g-icon{
+  width:36px;height:36px;border-radius:6px;
+  background:var(--cream);display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.garment-item .g-info{flex:1;min-width:0;}
+.garment-item .g-name{font-size:.78rem;font-weight:500;color:var(--dark);}
+.garment-item .g-sub{font-size:.62rem;color:var(--taupe);}
+.garment-item .g-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--border);flex-shrink:0;transition:background .2s;
+}
+.garment-item.active .g-dot{background:var(--accent);}
+
+/* ── SWATCHES ── */
+.swatches{display:flex;flex-wrap:wrap;gap:6px;}
+.swatch{
+  width:26px;height:26px;border-radius:50%;
+  cursor:pointer;border:2px solid transparent;
+  transition:all .17s;box-shadow:0 2px 5px rgba(0,0,0,.12);
+}
+.swatch:hover{transform:scale(1.17);}
+.swatch.active{border-color:var(--dark);box-shadow:0 0 0 3px rgba(44,36,32,.2);}
+
+/* ── UPLOAD ZONE ── */
+.upload-zone{
+  border:2px dashed var(--border);
+  border-radius:11px;padding:14px;
+  text-align:center;cursor:pointer;
+  transition:all .22s;
+  background:rgba(245,240,234,.5);
+}
+.upload-zone:hover{border-color:var(--accent);background:rgba(155,123,107,.07);}
+.upload-zone svg{opacity:.4;margin-bottom:5px;}
+.upload-zone p{font-size:.75rem;color:var(--brown);}
+.upload-zone small{font-size:.63rem;color:var(--taupe);}
+
+/* ── CONTROLS ── */
+.ctrl{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.ctrl label{font-size:.7rem;color:var(--brown);min-width:68px;font-weight:500;}
+.ctrl input[type=range]{
+  flex:1;-webkit-appearance:none;
+  height:3px;border-radius:2px;
+  background:var(--border);outline:none;cursor:pointer;
+}
+.ctrl input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  background:var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.18);
+}
+.ctrl .val{
+  font-size:.67rem;min-width:35px;
+  text-align:right;color:var(--accent);
+  font-weight:500;font-family:'DM Mono',monospace;
+}
+
+/* ── CANVAS AREA ── */
+.canvas-area{
+  position:relative;
+  background:#1a1410;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.canvas-area::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 30%, rgba(155,123,107,.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+#threeCanvas{
+  display:block;
+  width:100%!important;height:100%!important;
+  cursor:grab;
+}
+#threeCanvas:active{cursor:grabbing;}
+
+/* ── LOADING OVERLAY ── */
+.load-overlay{
+  position:absolute;inset:0;
+  background:rgba(26,20,16,.9);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  z-index:20;transition:opacity .4s;
+}
+.load-overlay.hidden{opacity:0;pointer-events:none;}
+.spinner{
+  width:36px;height:36px;border:2px solid rgba(196,181,165,.2);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.load-txt{
+  font-family:'Cormorant Garamond',serif;
+  font-size:.9rem;color:var(--taupe);letter-spacing:.1em;
+}
+
+/* ── ERROR BOX ── */
+.error-box{
+  position:absolute;inset:0;
+  background:rgba(26,20,16,.95);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;
+  z-index:25;display:none;
+}
+.error-box.show{display:flex;}
+.error-icon{font-size:2.5rem;}
+.error-msg{
+  font-size:.8rem;color:var(--taupe);text-align:center;
+  max-width:280px;line-height:1.6;
+}
+.error-path{
+  font-family:'DM Mono',monospace;font-size:.65rem;
+  color:var(--accent);background:rgba(155,123,107,.1);
+  padding:6px 12px;border-radius:6px;word-break:break-all;text-align:center;
+}
+
+/* ── HUD INFO ── */
+.hud{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  z-index:10;
+  display:flex;gap:6px;
+  background:rgba(44,36,32,.85);
+  border:1px solid rgba(196,181,165,.2);
+  backdrop-filter:blur(10px);
+  padding:7px 14px;border-radius:30px;
+  white-space:nowrap;align-items:center;gap:10px;
+}
+.hud-item{
+  font-size:.62rem;color:var(--taupe);letter-spacing:.06em;
+  display:flex;align-items:center;gap:5px;
+}
+.hud-item svg{opacity:.6;}
+.hud-sep{width:1px;height:12px;background:rgba(196,181,165,.2);}
+
+/* ── TOP HUD ── */
+.hud-top{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  z-index:10;
+}
+.model-badge{
+  font-family:'Cormorant Garamond',serif;
+  font-size:.85rem;color:var(--cream);letter-spacing:.1em;
+  background:rgba(44,36,32,.75);
+  border:1px solid rgba(196,181,165,.2);
+  backdrop-filter:blur(8px);
+  padding:5px 16px;border-radius:20px;
+}
+
+/* ── BUTTONS ── */
+.btn-primary{
+  width:100%;padding:11px;
+  background:var(--dark);color:var(--cream);
+  border:none;border-radius:11px;
+  font-family:'Jost',sans-serif;font-size:.82rem;
+  font-weight:500;letter-spacing:.1em;
+  cursor:pointer;transition:all .22s;text-transform:uppercase;
+}
+.btn-primary:hover{background:var(--accent);transform:translateY(-1px);box-shadow:0 8px 20px rgba(155,123,107,.3);}
+.btn-primary:active{transform:translateY(0);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+.btn-record{
+  width:100%;padding:11px;
+  background:linear-gradient(135deg,#8b1a1a,#c0392b);
+  color:#fff;border:none;border-radius:11px;
+  font-family:'Jost',sans-serif;font-size:.82rem;
+  font-weight:500;letter-spacing:.1em;
+  cursor:pointer;transition:all .22s;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-record:hover{background:linear-gradient(135deg,#a01f1f,#e74c3c);transform:translateY(-1px);}
+.btn-record:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.rec-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#ff4444;animation:blink 1s infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+
+.btn-row{display:flex;gap:6px;}
+.btn-sm{
+  flex:1;padding:8px 6px;
+  border:1px solid var(--border);border-radius:9px;
+  background:#fff;color:var(--brown);
+  font-family:'Jost',sans-serif;font-size:.7rem;
+  font-weight:500;cursor:pointer;transition:all .17s;
+  letter-spacing:.05em;
+}
+.btn-sm:hover{border-color:var(--accent);background:rgba(155,123,107,.06);color:var(--dark);}
+
+/* ── PROGRESS BAR ── */
+.progress-wrap{margin-top:8px;display:none;}
+.progress-wrap.show{display:block;}
+.progress-bar{
+  height:3px;background:var(--border);border-radius:3px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;background:var(--accent);border-radius:3px;
+  transition:width .1s;width:0%;
+}
+.progress-label{
+  font-size:.62rem;color:var(--taupe);margin-top:5px;
+  font-family:'DM Mono',monospace;letter-spacing:.05em;
+}
+
+/* ── INFO TEXT ── */
+.info-txt{font-size:.68rem;color:var(--taupe);line-height:1.55;}
+.info-box{
+  background:rgba(155,123,107,.08);
+  border:1px solid rgba(155,123,107,.2);
+  border-radius:8px;padding:9px 11px;
+}
+.info-box p{font-size:.68rem;color:var(--brown);line-height:1.55;}
+
+/* ── DESIGN PREVIEW ── */
+.design-preview{
+  width:100%;aspect-ratio:1;
+  border-radius:9px;overflow:hidden;
+  border:1px solid var(--border);
+  background:repeating-conic-gradient(#e8e2da 0% 25%,transparent 0% 50%) 0 0/14px 14px;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:8px;
+}
+.design-preview img{max-width:90%;max-height:90%;object-fit:contain;}
+.design-preview .no-design{font-size:.65rem;color:var(--taupe);}
+
+/* ── TOGGLE ── */
+.tog-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.tog-row>label{font-size:.74rem;font-weight:500;color:var(--brown);}
+.tog{position:relative;width:37px;height:20px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;}
+.tog-sl{
+  position:absolute;inset:0;
+  background:var(--border);border-radius:20px;
+  cursor:pointer;transition:.3s;
+}
+.tog-sl::before{
+  content:'';position:absolute;
+  width:14px;height:14px;left:3px;top:3px;
+  background:#fff;border-radius:50%;
+  transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.tog input:checked+.tog-sl{background:var(--accent);}
+.tog input:checked+.tog-sl::before{transform:translateX(17px);}
+
+/* ── COLOR SECTION ── */
+.color-custom-row{display:flex;align-items:center;gap:8px;margin-top:9px;}
+.color-custom-row span{font-size:.7rem;color:var(--brown);}
+input[type=color]{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid var(--border);cursor:pointer;padding:0;
+  background:none;outline:none;
+}
+
+/* ── EXPORT QUALITY ── */
+.quality-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.quality-card{
+  border:2px solid var(--border);border-radius:9px;
+  padding:8px 10px;cursor:pointer;
+  transition:all .17s;background:#fff;text-align:center;
+}
+.quality-card:hover,.quality-card.active{border-color:var(--accent);background:rgba(155,123,107,.06);}
+.quality-card h4{font-size:.72rem;font-weight:500;margin-bottom:2px;}
+.quality-card small{font-size:.6rem;color:var(--taupe);}
+
+/* ── DURATION SELECTOR ── */
+.dur-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.dur-btn{
+  padding:5px 10px;border-radius:7px;
+  border:1px solid var(--border);background:#fff;
+  font-family:'DM Mono',monospace;font-size:.68rem;
+  color:var(--brown);cursor:pointer;transition:all .15s;
+}
+.dur-btn.active{border-color:var(--accent);background:rgba(155,123,107,.08);color:var(--dark);}
+
+/* ── BG OPTIONS ── */
+.bg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.bg-opt{
+  aspect-ratio:1;border-radius:7px;
+  border:2px solid transparent;cursor:pointer;
+  transition:all .15s;overflow:hidden;
+}
+.bg-opt:hover,.bg-opt.active{border-color:var(--accent);}
+.bg-opt div{width:100%;height:100%;border-radius:5px;}
+
+/* ── STATUS ── */
+.status-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.62rem;font-family:'DM Mono',monospace;
+  padding:3px 9px;border-radius:20px;letter-spacing:.04em;
+}
+.status-chip.ok{background:rgba(39,174,96,.12);color:#27ae60;}
+.status-chip.warn{background:rgba(155,123,107,.12);color:var(--accent);}
+.status-chip.err{background:rgba(192,57,43,.12);color:#c0392b;}
+
+@media(max-width:900px){
+  .app{grid-template-columns:220px 1fr 220px;}
+}
+@media(max-width:700px){
+  .app{grid-template-columns:1fr;}
+  .panel-left,.panel-right{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mockup 3D · León de Judá</h1>
+  <div class="header-right">
+    <span id="modelStatus" class="status-chip warn">Sin modelo</span>
+    <span class="badge-3d">3D Studio</span>
+  </div>
+</header>
+
+<div class="app">
+
+<!-- ══ PANEL IZQUIERDO ══ -->
+<div class="panel-left">
+<div class="panel-inner">
+
+  <!-- PRENDAS -->
+  <div>
+    <div class="sec-title">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
+      Prenda 3D
+    </div>
+    <div class="garment-list" id="garmentList"></div>
+    <div class="info-box" style="margin-top:10px;">
+      <p>📁 Los modelos deben estar en <code style="font-size:.6rem;background:rgba(0,0,0,.06);padding:1px 4px;border-radius:3px;">modelos/</code> en tu repositorio.</p>
+    </div>
+  </div>
+
+  <!-- COLOR DE PRENDA -->
+  <div>
+    <div class="sec-title">Color de Prenda</div>
+    <div class="swatches" id="colorSwatches"></div>
+    <div class="color-custom-row">
+      <span>Personalizado:</span>
+      <input type="color" id="customColor" value="#ffffff" onchange="setGarmentColor(this.value)">
+    </div>
+  </div>
+
+  <!-- DISEÑO / LOGO -->
+  <div>
+    <div class="sec-title">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      Diseño / Logo
+    </div>
+    <div class="upload-zone" onclick="document.getElementById('designUpload').click()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      <p>Subir imagen del diseño</p>
+      <small>PNG con transparencia recomendado</small>
+    </div>
+    <input type="file" id="designUpload" accept="image/*" style="display:none" onchange="loadDesign(event)">
+    <div class="design-preview" id="designPreview">
+      <span class="no-design">Sin diseño cargado</span>
+    </div>
+  </div>
+
+  <!-- CONTROLES DE DISEÑO -->
+  <div id="designControls" style="display:none;">
+    <div class="sec-title">Ajuste del Diseño</div>
+    <div class="ctrl"><label>Escala</label><input type="range" id="dScale" min="5" max="80" value="30" oninput="updateDecal()"><span class="val" id="vScale">30%</span></div>
+    <div class="ctrl"><label>Pos. X</label><input type="range" id="dX" min="-50" max="50" value="0" oninput="updateDecal()"><span class="val" id="vDX">0</span></div>
+    <div class="ctrl"><label>Pos. Y</label><input type="range" id="dY" min="-50" max="50" value="10" oninput="updateDecal()"><span class="val" id="vDY">10</span></div>
+    <div class="ctrl"><label>Opacidad</label><input type="range" id="dOp" min="10" max="100" value="100" oninput="updateDecal()"><span class="val" id="vDOp">100%</span></div>
+    <div class="btn-row">
+      <button class="btn-sm" onclick="clearDesign()">✕ Quitar diseño</button>
+      <button class="btn-sm" onclick="centerDecal()">⊕ Centrar</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ CANVAS 3D ══ -->
+<div class="canvas-area">
+
+  <div class="load-overlay" id="loadOverlay">
+    <div class="spinner"></div>
+    <div class="load-txt" id="loadTxt">Iniciando escena 3D…</div>
+  </div>
+
+  <div class="error-box" id="errorBox">
+    <div class="error-icon">⚠️</div>
+    <div class="error-msg" id="errorMsg">No se pudo cargar el modelo.</div>
+    <div class="error-path" id="errorPath"></div>
+    <button class="btn-sm" style="margin-top:8px;" onclick="dismissError()">Cerrar</button>
+  </div>
+
+  <canvas id="threeCanvas"></canvas>
+
+  <div class="hud-top">
+    <div class="model-badge" id="modelBadge">— Sin modelo cargado —</div>
+  </div>
+
+  <div class="hud">
+    <div class="hud-item">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/></svg>
+      Arrastrar para rotar
+    </div>
+    <div class="hud-sep"></div>
+    <div class="hud-item">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4"/></svg>
+      Scroll para zoom
+    </div>
+    <div class="hud-sep"></div>
+    <div class="hud-item" id="fpsHud">— fps</div>
+  </div>
+
+</div>
+
+<!-- ══ PANEL DERECHO ══ -->
+<div class="panel-right">
+<div class="panel-inner">
+
+  <!-- CÁMARA Y ESCENA -->
+  <div>
+    <div class="sec-title">Escena 3D</div>
+    <div class="ctrl"><label>Zoom</label><input type="range" id="cZoom" min="50" max="200" value="100" oninput="setCameraZoom(this.value)"><span class="val" id="vZoom">100%</span></div>
+    <div class="ctrl"><label>Alt. cámara</label><input type="range" id="cHeight" min="-30" max="30" value="0" oninput="setCameraHeight(this.value)"><span class="val" id="vCH">0</span></div>
+    <div class="ctrl"><label>Luz frontal</label><input type="range" id="lFront" min="0" max="200" value="100" oninput="setLight('front',this.value)"><span class="val" id="vLF">100%</span></div>
+    <div class="ctrl"><label>Luz arriba</label><input type="range" id="lTop" min="0" max="200" value="80" oninput="setLight('top',this.value)"><span class="val" id="vLT">80%</span></div>
+    <div class="ctrl"><label>Ambiente</label><input type="range" id="lAmb" min="0" max="150" value="60" oninput="setLight('amb',this.value)"><span class="val" id="vLA">60%</span></div>
+  </div>
+
+  <!-- FONDO -->
+  <div>
+    <div class="sec-title">Fondo de Escena</div>
+    <div class="bg-grid" id="bgGrid"></div>
+    <div class="color-custom-row" style="margin-top:8px;">
+      <span>Color libre:</span>
+      <input type="color" id="bgColor" value="#1a1410" onchange="setBackground(this.value)">
+    </div>
+  </div>
+
+  <!-- ROTACIÓN -->
+  <div>
+    <div class="sec-title">Rotación Automática</div>
+    <div class="tog-row">
+      <label>Auto-rotación 360°</label>
+      <label class="tog"><input type="checkbox" id="autoRotate" checked onchange="toggleAutoRotate()"><span class="tog-sl"></span></label>
+    </div>
+    <div class="ctrl"><label>Velocidad</label><input type="range" id="rotSpeed" min="1" max="30" value="8" oninput="setRotSpeed(this.value)"><span class="val" id="vRS">8</span></div>
+    <div class="btn-row">
+      <button class="btn-sm" onclick="resetCamera()">⟳ Reset vista</button>
+      <button class="btn-sm" onclick="snapFront()">⊡ Vista frontal</button>
+    </div>
+  </div>
+
+  <!-- EXPORTAR VIDEO -->
+  <div>
+    <div class="sec-title">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      Exportar Video
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <div style="font-size:.68rem;color:var(--brown);margin-bottom:6px;font-weight:500;">Duración:</div>
+      <div class="dur-btns" id="durBtns">
+        <button class="dur-btn" onclick="setDuration(3)">3s</button>
+        <button class="dur-btn active" onclick="setDuration(5)">5s</button>
+        <button class="dur-btn" onclick="setDuration(8)">8s</button>
+        <button class="dur-btn" onclick="setDuration(10)">10s</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <div style="font-size:.68rem;color:var(--brown);margin-bottom:6px;font-weight:500;">Calidad:</div>
+      <div class="quality-grid">
+        <div class="quality-card active" id="q-720" onclick="setQuality(720)">
+          <h4>HD 720p</h4><small>Rápido · ~8MB</small>
+        </div>
+        <div class="quality-card" id="q-1080" onclick="setQuality(1080)">
+          <h4>FHD 1080p</h4><small>Alta · ~20MB</small>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-record" id="recBtn" onclick="startRecording()">
+      <div class="rec-dot" style="animation:none;background:rgba(255,255,255,.6);"></div>
+      Grabar vuelta 360°
+    </button>
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">Preparando…</div>
+    </div>
+
+    <div class="info-box" style="margin-top:10px;">
+      <p>📹 Se exporta en <strong>WebM</strong> (compatible con redes sociales). Para convertir a MP4 podés usar <em>cloudconvert.com</em> gratis.</p>
+    </div>
+  </div>
+
+  <!-- EXPORTAR IMAGEN -->
+  <div>
+    <div class="sec-title">Exportar Imagen</div>
+    <button class="btn-primary" onclick="exportImage()">
+      Captura PNG actual
+    </button>
+  </div>
+
+</div>
+</div>
+
+</div><!-- /app -->
+
+<!-- Three.js r128 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIG — ajustá los nombres de tus prendas acá
+// ═══════════════════════════════════════════════════════
+const BASE_URL = 'https://raw.githubusercontent.com/tiendacristianaleondejuda-stack/TiendaCristianaLeonDeJuda/main/pages/admin/modelos/';
+
+const GARMENTS = [
+  { id:'remera',    name:'Remera Básica',    sub:'Cuello redondo',   file:'remera.glb',       icon:'👕' },
+  { id:'remera-v',  name:'Remera V-neck',    sub:'Cuello en V',      file:'remera-v.glb',     icon:'👕' },
+  { id:'hoodie',    name:'Hoodie',           sub:'Con capucha',      file:'hoodie.glb',       icon:'🧥' },
+  { id:'campera',   name:'Campera',          sub:'Con cierre',       file:'campera.glb',      icon:'🧥' },
+  { id:'buzo',      name:'Buzo',             sub:'Sin capucha',      file:'buzo.glb',         icon:'👔' },
+  { id:'musculosa', name:'Musculosa',        sub:'Sin mangas',       file:'musculosa.glb',    icon:'👕' },
+];
+
+const COLORS = [
+  '#ffffff','#f5f0ea','#2c2420','#1a1a2e','#e8d5b0',
+  '#c0392b','#2980b9','#27ae60','#8e44ad','#f39c12',
+  '#e8e8e8','#7f8c8d','#34495e','#d4a574','#a8d8ea',
+];
+
+const BG_PRESETS = [
+  { color:'#1a1410', label:'Oscuro' },
+  { color:'#0d0d0d', label:'Negro' },
+  { color:'#f5f0ea', label:'Crema' },
+  { color:'#2c3e50', label:'Marino' },
+  { color:'#1a2a1a', label:'Verde' },
+  { color:'#2a1a2a', label:'Violeta' },
+  { color:'#ffffff', label:'Blanco' },
+  { color:'transparent', label:'Trans.' },
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const S = {
+  garmentColor: '#ffffff',
+  bgColor: '#1a1410',
+  transparent: false,
+  designTex: null,
+  designScale: 0.30,
+  designX: 0,
+  designY: 0.10,
+  designOpacity: 1,
+  recordDuration: 5,
+  recordQuality: 720,
+  rotSpeed: 8,
+  autoRotate: true,
+  currentGarment: null,
+};
+
+// ═══════════════════════════════════════════════════════
+// THREE.JS SCENE
+// ═══════════════════════════════════════════════════════
+let scene, camera, renderer, controls;
+let currentModel = null;
+let designMesh = null;
+let animId = null;
+let lights = {};
+let frameCount = 0, lastFpsTime = performance.now();
+
+function initScene() {
+  const canvas = document.getElementById('threeCanvas');
+  const area = canvas.parentElement;
+
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true, preserveDrawingBuffer:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+  resizeRenderer();
+
+  // Scene
+  scene = new THREE.Scene();
+  setBackground(S.bgColor);
+
+  // Camera
+  camera = new THREE.PerspectiveCamera(35, area.clientWidth/area.clientHeight, 0.01, 100);
+  camera.position.set(0, 0.1, 3.2);
+
+  // Lights
+  lights.ambient = new THREE.AmbientLight(0xfff8f0, 0.6);
+  scene.add(lights.ambient);
+
+  lights.front = new THREE.DirectionalLight(0xffffff, 1.0);
+  lights.front.position.set(0, 1, 3);
+  lights.front.castShadow = true;
+  scene.add(lights.front);
+
+  lights.top = new THREE.DirectionalLight(0xfff0e0, 0.8);
+  lights.top.position.set(0, 4, 0);
+  scene.add(lights.top);
+
+  lights.left = new THREE.DirectionalLight(0xe8f0ff, 0.3);
+  lights.left.position.set(-3, 1, 1);
+  scene.add(lights.left);
+
+  lights.right = new THREE.DirectionalLight(0xffe8e0, 0.3);
+  lights.right.position.set(3, 1, 1);
+  scene.add(lights.right);
+
+  // Ground shadow plane
+  const groundGeo = new THREE.PlaneGeometry(10, 10);
+  const groundMat = new THREE.ShadowMaterial({ opacity:0.15 });
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI/2;
+  ground.position.y = -1.1;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // Simple orbit controls (manual)
+  setupOrbitControls();
+
+  // Resize observer
+  new ResizeObserver(resizeRenderer).observe(area);
+
+  // Animate
+  animate();
+  updateLoadText('Escena lista. Elegí una prenda.');
+  setTimeout(()=>hideLoader(), 600);
+}
+
+function resizeRenderer() {
+  const area = renderer.domElement.parentElement;
+  const w = area.clientWidth, h = area.clientHeight;
+  renderer.setSize(w, h, false);
+  if(camera){ camera.aspect = w/h; camera.updateProjectionMatrix(); }
+}
+
+// ─── Manual Orbit Controls ───
+let orbit = { active:false, lastX:0, lastY:0, rotX:0, rotY:0, zoom:3.2 };
+
+function setupOrbitControls() {
+  const el = renderer.domElement;
+  el.addEventListener('mousedown', e=>{ orbit.active=true; orbit.lastX=e.clientX; orbit.lastY=e.clientY; });
+  el.addEventListener('touchstart', e=>{ orbit.active=true; orbit.lastX=e.touches[0].clientX; orbit.lastY=e.touches[0].clientY; });
+  window.addEventListener('mouseup', ()=>{ orbit.active=false; });
+  window.addEventListener('touchend', ()=>{ orbit.active=false; });
+  window.addEventListener('mousemove', e=>{ if(!orbit.active) return; orbitMove(e.clientX-orbit.lastX, e.clientY-orbit.lastY); orbit.lastX=e.clientX; orbit.lastY=e.clientY; });
+  window.addEventListener('touchmove', e=>{ if(!orbit.active) return; orbitMove(e.touches[0].clientX-orbit.lastX, e.touches[0].clientY-orbit.lastY); orbit.lastX=e.touches[0].clientX; orbit.lastY=e.touches[0].clientY; });
+  el.addEventListener('wheel', e=>{ orbit.zoom = Math.max(0.8, Math.min(8, orbit.zoom + e.deltaY*0.005)); }, {passive:true});
+}
+
+function orbitMove(dx, dy) {
+  if(!currentModel) return;
+  currentModel.rotation.y += dx * 0.012;
+  orbit.rotX = Math.max(-0.6, Math.min(0.6, (orbit.rotX||0) + dy * 0.008));
+  currentModel.rotation.x = orbit.rotX;
+}
+
+// ─── Animate Loop ───
+function animate() {
+  animId = requestAnimationFrame(animate);
+
+  // Auto-rotate
+  if(S.autoRotate && currentModel) {
+    currentModel.rotation.y += (S.rotSpeed / 1000) * 0.3;
+  }
+
+  // Camera zoom
+  camera.position.z = orbit.zoom;
+
+  // FPS
+  frameCount++;
+  const now = performance.now();
+  if(now - lastFpsTime > 1000) {
+    document.getElementById('fpsHud').textContent = frameCount + ' fps';
+    frameCount = 0; lastFpsTime = now;
+  }
+
+  renderer.render(scene, camera);
+}
+
+// ═══════════════════════════════════════════════════════
+// GLB LOADER (manual fetch + parse via GLTFLoader polyfill)
+// ═══════════════════════════════════════════════════════
+// Since THREE r128 GLTFLoader isn't on the base CDN,
+// we load it from jsDelivr
+let GLTFLoaderReady = false;
+let gltfLoader = null;
+
+function loadGLTFScript() {
+  return new Promise((resolve, reject) => {
+    if(GLTFLoaderReady){ resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
+    s.onload = ()=>{ gltfLoader = new THREE.GLTFLoader(); GLTFLoaderReady=true; resolve(); };
+    s.onerror = ()=>reject(new Error('No se pudo cargar GLTFLoader'));
+    document.head.appendChild(s);
+  });
+}
+
+async function loadGarment(garment) {
+  showLoader('Cargando ' + garment.name + '…');
+  hideError();
+
+  try {
+    await loadGLTFScript();
+  } catch(e) {
+    showError('No se pudo cargar el módulo GLTFLoader. Verificá tu conexión.', '');
+    return;
+  }
+
+  // Remove previous model
+  if(currentModel) { scene.remove(currentModel); currentModel = null; }
+
+  const url = BASE_URL + garment.file;
+
+  gltfLoader.load(
+    url,
+    (gltf) => {
+      const model = gltf.scene;
+
+      // Center & scale model
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 2.0 / maxDim;
+      model.scale.setScalar(scale);
+      model.position.sub(center.multiplyScalar(scale));
+      model.position.y -= 0.05;
+
+      // Apply garment color + enable shadows
+      model.traverse(child => {
+        if(child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          applyColorToMesh(child, S.garmentColor);
+        }
+      });
+
+      scene.add(model);
+      currentModel = model;
+      S.currentGarment = garment;
+
+      // Re-apply design if exists
+      if(S.designTex) applyDesignToModel();
+
+      document.getElementById('modelBadge').textContent = garment.name;
+      document.getElementById('modelStatus').className = 'status-chip ok';
+      document.getElementById('modelStatus').textContent = '● Cargado';
+
+      hideLoader();
+    },
+    (progress) => {
+      if(progress.total > 0) {
+        const pct = Math.round((progress.loaded / progress.total) * 100);
+        updateLoadText('Cargando modelo… ' + pct + '%');
+      }
+    },
+    (error) => {
+      console.error(error);
+      showError(
+        'No se encontró el archivo "' + garment.file + '" en la carpeta /modelos/.\n\nVerificá que el archivo exista en tu repositorio de GitHub.',
+        BASE_URL + garment.file
+      );
+      document.getElementById('modelStatus').className = 'status-chip err';
+      document.getElementById('modelStatus').textContent = '✕ Error';
+    }
+  );
+}
+
+// ─── Apply color to mesh ───
+function applyColorToMesh(mesh, hex) {
+  if(!mesh.material) return;
+  const color = new THREE.Color(hex);
+  const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+  mats.forEach(mat => {
+    if(mat.color) mat.color.set(color);
+    mat.needsUpdate = true;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// DESIGN / DECAL OVERLAY
+// ═══════════════════════════════════════════════════════
+function applyDesignToModel() {
+  // Remove previous design mesh
+  if(designMesh) { scene.remove(designMesh); designMesh = null; }
+  if(!S.designTex || !currentModel) return;
+
+  const box = new THREE.Box3().setFromObject(currentModel);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+
+  const scaleF = S.designScale * size.x;
+  const aspect = S.designTex.image ? (S.designTex.image.width / S.designTex.image.height) : 1;
+
+  const geo = new THREE.PlaneGeometry(scaleF * aspect, scaleF);
+  const mat = new THREE.MeshBasicMaterial({
+    map: S.designTex,
+    transparent: true,
+    depthWrite: false,
+    depthTest: true,
+    opacity: S.designOpacity,
+    side: THREE.FrontSide,
+  });
+
+  designMesh = new THREE.Mesh(geo, mat);
+
+  // Position on front of model
+  designMesh.position.set(
+    center.x + S.designX * size.x * 0.01,
+    center.y + size.y * S.designY,
+    center.z + size.z * 0.52 // slightly in front
+  );
+
+  // Attach to model so it rotates with it
+  currentModel.add(designMesh);
+
+  // Adjust position relative to model
+  designMesh.position.set(
+    S.designX * 0.01,
+    S.designY,
+    size.z * 0.52 / currentModel.scale.x
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// RECORDING — WebM via MediaRecorder
+// ═══════════════════════════════════════════════════════
+let mediaRecorder = null;
+let recordedChunks = [];
+let recordingActive = false;
+
+async function startRecording() {
+  if(recordingActive) return;
+  if(!currentModel) { alert('Primero cargá una prenda 3D'); return; }
+
+  // Set export quality
+  const q = S.recordQuality;
+  const area = renderer.domElement.parentElement;
+  const aspect = area.clientWidth / area.clientHeight;
+  const w = q === 1080 ? 1080 : 720;
+  const h = Math.round(w / aspect);
+
+  // Resize renderer to export size
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+
+  recordedChunks = [];
+  recordingActive = true;
+
+  const btn = document.getElementById('recBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="rec-dot"></div> Grabando…';
+
+  document.getElementById('progressWrap').classList.add('show');
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('progressLabel').textContent = 'Iniciando grabación…';
+
+  // Was auto-rotating? Force it on
+  const wasAuto = S.autoRotate;
+  S.autoRotate = true;
+
+  // Save current rotation
+  const startRotY = currentModel.rotation.y;
+
+  // Stream from canvas
+  const stream = renderer.domElement.captureStream(60);
+  const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+    ? 'video/webm;codecs=vp9'
+    : 'video/webm';
+
+  mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: q === 1080 ? 8_000_000 : 4_000_000 });
+  mediaRecorder.ondataavailable = e => { if(e.data.size > 0) recordedChunks.push(e.data); };
+  mediaRecorder.onstop = () => finishRecording(wasAuto, w, h, area);
+
+  mediaRecorder.start(100);
+
+  // Progress tracking
+  const duration = S.recordDuration * 1000;
+  const startTime = performance.now();
+  const progressInterval = setInterval(() => {
+    const elapsed = performance.now() - startTime;
+    const pct = Math.min(100, (elapsed / duration) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent =
+      `Grabando… ${(elapsed/1000).toFixed(1)}s / ${S.recordDuration}s`;
+    if(elapsed >= duration) clearInterval(progressInterval);
+  }, 100);
+
+  setTimeout(() => {
+    clearInterval(progressInterval);
+    mediaRecorder.stop();
+  }, duration);
+}
+
+function finishRecording(wasAuto, w, h, area) {
+  recordingActive = false;
+  S.autoRotate = wasAuto;
+
+  // Restore renderer size
+  renderer.setSize(area.clientWidth, area.clientHeight, false);
+  camera.aspect = area.clientWidth / area.clientHeight;
+  camera.updateProjectionMatrix();
+
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressLabel').textContent = 'Procesando video…';
+
+  setTimeout(() => {
+    const blob = new Blob(recordedChunks, { type:'video/webm' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mockup3d_${S.currentGarment?.id||'prenda'}_${S.recordQuality}p_${S.recordDuration}s.webm`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    const btn = document.getElementById('recBtn');
+    btn.disabled = false;
+    btn.innerHTML = '<div class="rec-dot" style="animation:none;background:rgba(255,255,255,.6);"></div> Grabar vuelta 360°';
+    document.getElementById('progressLabel').textContent = '✓ Video descargado exitosamente';
+    setTimeout(() => document.getElementById('progressWrap').classList.remove('show'), 3000);
+  }, 300);
+}
+
+// ═══════════════════════════════════════════════════════
+// IMAGE EXPORT
+// ═══════════════════════════════════════════════════════
+function exportImage() {
+  if(!currentModel) { alert('Primero cargá una prenda'); return; }
+  renderer.render(scene, camera);
+  const a = document.createElement('a');
+  a.download = `mockup3d_${S.currentGarment?.id||'prenda'}.png`;
+  a.href = renderer.domElement.toDataURL('image/png');
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// UI ACTIONS
+// ═══════════════════════════════════════════════════════
+function setGarmentColor(hex) {
+  S.garmentColor = hex;
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active', s.dataset.color===hex));
+  if(!currentModel) return;
+  currentModel.traverse(child => {
+    if(child.isMesh) applyColorToMesh(child, hex);
+  });
+}
+
+function setBackground(val) {
+  S.bgColor = val;
+  S.transparent = val === 'transparent';
+  if(S.transparent) {
+    renderer.setClearColor(0x000000, 0);
+    scene.background = null;
+  } else {
+    const c = new THREE.Color(val);
+    scene.background = c;
+    renderer.setClearColor(c, 1);
+  }
+  document.querySelectorAll('.bg-opt').forEach(b=>b.classList.toggle('active', b.dataset.color===val));
+}
+
+function setCameraZoom(v) {
+  document.getElementById('vZoom').textContent = v+'%';
+  orbit.zoom = 1.0 + (200-v) * 0.02;
+}
+
+function setCameraHeight(v) {
+  document.getElementById('vCH').textContent = v;
+  camera.position.y = v * 0.02;
+}
+
+function setLight(type, v) {
+  const map = { front:'vLF', top:'vLT', amb:'vLA' };
+  document.getElementById(map[type]).textContent = v+'%';
+  const intensity = v / 100;
+  if(type==='front') lights.front.intensity = intensity;
+  if(type==='top') lights.top.intensity = intensity * 0.8;
+  if(type==='amb') lights.ambient.intensity = intensity * 0.6;
+}
+
+function toggleAutoRotate() {
+  S.autoRotate = document.getElementById('autoRotate').checked;
+}
+
+function setRotSpeed(v) {
+  S.rotSpeed = parseInt(v);
+  document.getElementById('vRS').textContent = v;
+}
+
+function resetCamera() {
+  orbit.zoom = 3.2;
+  orbit.rotX = 0;
+  camera.position.set(0, 0.1, 3.2);
+  if(currentModel) { currentModel.rotation.set(0,0,0); }
+}
+
+function snapFront() {
+  if(currentModel) {
+    currentModel.rotation.set(0, 0, 0);
+    orbit.rotX = 0;
+  }
+}
+
+function setDuration(d) {
+  S.recordDuration = d;
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.toggle('active', parseInt(b.textContent)===d));
+}
+
+function setQuality(q) {
+  S.recordQuality = q;
+  document.querySelectorAll('.quality-card').forEach(c=>c.classList.toggle('active', c.id==='q-'+q));
+}
+
+// ─── Design ───
+function loadDesign(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const tex = new THREE.Texture(img);
+      tex.needsUpdate = true;
+      S.designTex = tex;
+      applyDesignToModel();
+
+      // Preview
+      const prev = document.getElementById('designPreview');
+      prev.innerHTML = `<img src="${e.target.result}" alt="diseño">`;
+      document.getElementById('designControls').style.display = 'block';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateDecal() {
+  S.designScale = parseInt(document.getElementById('dScale').value) / 100;
+  S.designX = parseInt(document.getElementById('dX').value) / 100;
+  S.designY = parseInt(document.getElementById('dY').value) / 100;
+  S.designOpacity = parseInt(document.getElementById('dOp').value) / 100;
+  document.getElementById('vScale').textContent = document.getElementById('dScale').value+'%';
+  document.getElementById('vDX').textContent = document.getElementById('dX').value;
+  document.getElementById('vDY').textContent = document.getElementById('dY').value;
+  document.getElementById('vDOp').textContent = document.getElementById('dOp').value+'%';
+  applyDesignToModel();
+}
+
+function clearDesign() {
+  S.designTex = null;
+  if(designMesh && currentModel) { currentModel.remove(designMesh); designMesh = null; }
+  document.getElementById('designPreview').innerHTML = '<span class="no-design">Sin diseño cargado</span>';
+  document.getElementById('designControls').style.display = 'none';
+  document.getElementById('designUpload').value = '';
+}
+
+function centerDecal() {
+  document.getElementById('dX').value = 0;
+  document.getElementById('dY').value = 10;
+  S.designX = 0; S.designY = 0.10;
+  updateDecal();
+}
+
+// ─── Loader helpers ───
+function showLoader(txt) {
+  document.getElementById('loadOverlay').classList.remove('hidden');
+  updateLoadText(txt);
+}
+function hideLoader() {
+  document.getElementById('loadOverlay').classList.add('hidden');
+}
+function updateLoadText(t) {
+  document.getElementById('loadTxt').textContent = t;
+}
+function showError(msg, path) {
+  const box = document.getElementById('errorBox');
+  box.classList.add('show');
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('errorPath').textContent = path;
+  hideLoader();
+}
+function hideError() {
+  document.getElementById('errorBox').classList.remove('show');
+}
+function dismissError() {
+  hideError();
+}
+
+// ═══════════════════════════════════════════════════════
+// BUILD UI
+// ═══════════════════════════════════════════════════════
+function buildGarmentList() {
+  const list = document.getElementById('garmentList');
+  GARMENTS.forEach((g,i) => {
+    const el = document.createElement('div');
+    el.className = 'garment-item' + (i===0?' active':'');
+    el.innerHTML = `
+      <div class="g-icon">${g.icon}</div>
+      <div class="g-info">
+        <div class="g-name">${g.name}</div>
+        <div class="g-sub">${g.sub}</div>
+      </div>
+      <div class="g-dot"></div>`;
+    el.onclick = () => {
+      document.querySelectorAll('.garment-item').forEach(x=>x.classList.remove('active'));
+      el.classList.add('active');
+      loadGarment(g);
+    };
+    list.appendChild(el);
+  });
+}
+
+function buildSwatches() {
+  const wrap = document.getElementById('colorSwatches');
+  COLORS.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'swatch' + (c==='#ffffff'?' active':'');
+    el.style.background = c;
+    el.dataset.color = c;
+    if(c==='#ffffff') el.style.border='2px solid #ccc';
+    el.onclick = () => setGarmentColor(c);
+    wrap.appendChild(el);
+  });
+}
+
+function buildBgGrid() {
+  const grid = document.getElementById('bgGrid');
+  BG_PRESETS.forEach(bg => {
+    const el = document.createElement('div');
+    el.className = 'bg-opt' + (bg.color===S.bgColor?' active':'');
+    el.dataset.color = bg.color;
+    el.title = bg.label;
+    const inner = document.createElement('div');
+    if(bg.color==='transparent') {
+      inner.style.background = 'repeating-conic-gradient(#ccc 0% 25%,#fff 0% 50%) 0 0/10px 10px';
+    } else {
+      inner.style.background = bg.color;
+    }
+    inner.style.border = bg.color==='#ffffff' ? '1px solid #eee' : 'none';
+    el.appendChild(inner);
+    el.onclick = () => setBackground(bg.color);
+    grid.appendChild(el);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function init() {
+  buildGarmentList();
+  buildSwatches();
+  buildBgGrid();
+  initScene();
+
+  // Auto-load first garment
+  setTimeout(() => loadGarment(GARMENTS[0]), 800);
+}
+
+window.addEventListener('load', init);
+window.addEventListener('resize', resizeRenderer);
+</script>
+</body>
+</html>
