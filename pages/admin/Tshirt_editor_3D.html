@@ -73,11 +73,9 @@ header h1{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:30
 /* CANVAS AREA */
 .canvas-area{position:relative;background:#1a1410;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .canvas-area::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(155,123,107,.08) 0%,transparent 70%);pointer-events:none;}
-/* Three canvas fills the back; overlay canvas sits on top */
+/* Three canvas fills the back */
 #threeCanvas{position:absolute;inset:0;width:100%!important;height:100%!important;cursor:grab;display:block;}
 #threeCanvas:active{cursor:grabbing;}
-/* Overlay 2D canvas for design compositing */
-#overlayCanvas{position:absolute;inset:0;width:100%!important;height:100%!important;pointer-events:none;display:block;}
 
 /* LOADER */
 .load-ov{position:absolute;inset:0;background:rgba(26,20,16,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;z-index:20;transition:opacity .4s;}
@@ -273,8 +271,6 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
 
   <!-- Three.js renders here -->
   <canvas id="threeCanvas"></canvas>
-  <!-- 2D overlay for design compositing -->
-  <canvas id="overlayCanvas"></canvas>
 
   <div class="hud-top"><div class="mbadge" id="modelBadge">— Sin modelo cargado —</div></div>
   <div class="hud">
@@ -492,13 +488,11 @@ const S = {
 // ═══════════════════════════════════════
 let scene, camera, renderer;
 let currentModel = null;
+let designMesh = null;   // PlaneGeometry child of currentModel
 let lights = {};
 let orbit = { active:false, lastX:0, lastY:0, rotX:0, zoom:3.2 };
 let frameCount=0, lastFpsT=performance.now();
-
-// The overlay 2D canvas (for design rendering)
-const overlayCanvas = document.getElementById('overlayCanvas');
-const overlayCtx = overlayCanvas.getContext('2d');
+let bgTexture = null;    // THREE.Texture for background image
 
 function initScene() {
   const tc = document.getElementById('threeCanvas');
@@ -551,10 +545,8 @@ function resizeAll() {
   const area = document.getElementById('canvasArea');
   const w = area.clientWidth, h = area.clientHeight;
   renderer.setSize(w, h, false);
-  overlayCanvas.width = w; overlayCanvas.height = h;
   camera.aspect = w/h;
   camera.updateProjectionMatrix();
-  drawOverlay(); // redraw design on resize
 }
 
 // ── Orbit ──
@@ -581,69 +573,12 @@ function animate() {
   requestAnimationFrame(animate);
   if(S.autoRotate && currentModel) currentModel.rotation.y += S.rotSpeed/1000*0.3;
   camera.position.z = orbit.zoom;
-
-  // FPS
   frameCount++;
   const now=performance.now();
   if(now-lastFpsT>1000){ document.getElementById('fpsHud').textContent=frameCount+' fps'; frameCount=0; lastFpsT=now; }
-
+  // Background image: render onto scene background each frame
+  updateBgTexture();
   renderer.render(scene, camera);
-  drawOverlay(); // sync overlay every frame
-}
-
-// ═══════════════════════════════════════
-// OVERLAY — draw design on top of 3D
-// ═══════════════════════════════════════
-// We project the model's front face center into screen space,
-// then draw the design image centered there, scaled by model screen size.
-
-function drawOverlay() {
-  const W = overlayCanvas.width, H = overlayCanvas.height;
-  overlayCtx.clearRect(0,0,W,H);
-
-  if(!S.designImg || !currentModel) return;
-
-  // Get model bounding box in world space
-  const box = new THREE.Box3().setFromObject(currentModel);
-  const center = box.getCenter(new THREE.Vector3());
-  const size = box.getSize(new THREE.Vector3());
-
-  // Project center front point to screen
-  // Front of model = center + half Z in world space (after rotation it changes,
-  // so we use camera forward projection — place design at screen center of model)
-  const modelScreenPos = worldToScreen(center, W, H);
-  if(!modelScreenPos) return;
-
-  // Model screen height: project top and bottom of bounding box
-  const topWorld = new THREE.Vector3(center.x, box.max.y, center.z);
-  const botWorld = new THREE.Vector3(center.x, box.min.y, center.z);
-  const topScr = worldToScreen(topWorld, W, H);
-  const botScr = worldToScreen(botWorld, W, H);
-  const modelScreenH = topScr && botScr ? Math.abs(topScr.y - botScr.y) : H*0.6;
-  const modelScreenW = modelScreenH * (size.x / size.y);
-
-  // Design size in pixels
-  const dW = modelScreenW * S.designScale * 2.5;
-  const aspect = S.designImg.width / S.designImg.height;
-  const dH = dW / aspect;
-
-  // Position: center of model + offset
-  const cx = modelScreenPos.x + S.designOffX * modelScreenW * 0.5;
-  const cy = modelScreenPos.y + S.designOffY * modelScreenH * 0.5;
-
-  overlayCtx.save();
-  overlayCtx.globalAlpha = S.designOpacity;
-  overlayCtx.drawImage(S.designImg, cx - dW/2, cy - dH/2, dW, dH);
-  overlayCtx.restore();
-}
-
-function worldToScreen(vec3, W, H) {
-  const v = vec3.clone().project(camera);
-  // v is in NDC (-1..1)
-  return {
-    x: (v.x+1)/2 * W,
-    y: (-v.y+1)/2 * H,
-  };
 }
 
 // ═══════════════════════════════════════
@@ -665,18 +600,16 @@ function loadGLTFScript() {
 async function loadGarment(garment) {
   showLoader('Cargando ' + garment.name + '…');
   hideErr();
-
   try { await loadGLTFScript(); }
   catch(e) { showErr('No se pudo cargar el módulo 3D. Verificá la conexión.',''); return; }
 
-  if(currentModel) { scene.remove(currentModel); currentModel=null; }
+  // Remove old model (and its design child)
+  if(currentModel) { scene.remove(currentModel); currentModel=null; designMesh=null; }
 
   const url = BASE_URL + garment.file;
-
   gltfLoader.load(url,
     (gltf) => {
       const model = gltf.scene;
-      // Auto-fit
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
@@ -684,28 +617,20 @@ async function loadGarment(garment) {
       model.scale.setScalar(sc);
       model.position.sub(center.multiplyScalar(sc));
       model.position.y -= 0.05;
-
-      model.traverse(c=>{
-        if(c.isMesh){ c.castShadow=true; c.receiveShadow=true; applyColor(c,S.garmentColor); }
-      });
-
+      model.traverse(c=>{ if(c.isMesh){ c.castShadow=true; c.receiveShadow=true; applyColor(c,S.garmentColor); } });
       scene.add(model);
       currentModel = model;
       S.currentGarment = garment;
-
+      // Re-attach design if one was loaded
+      if(S.designImg) attachDesignMesh();
       document.getElementById('modelBadge').textContent = garment.name;
       document.getElementById('modelStatus').className = 'chip ok';
       document.getElementById('modelStatus').textContent = '● Cargado';
       hideLoader();
     },
-    (prog)=>{
-      if(prog.total>0) updateLoadTxt('Cargando… '+Math.round(prog.loaded/prog.total*100)+'%');
-    },
+    (prog)=>{ if(prog.total>0) updateLoadTxt('Cargando… '+Math.round(prog.loaded/prog.total*100)+'%'); },
     ()=>{
-      showErr(
-        'No se encontró "'+garment.file+'" en la carpeta /modelos/.\nVerificá que el archivo exista en tu repo de GitHub.',
-        BASE_URL+garment.file
-      );
+      showErr('No se encontró "'+garment.file+'" en /modelos/.\nVerificá que el archivo exista en tu repo.', BASE_URL+garment.file);
       document.getElementById('modelStatus').className='chip err';
       document.getElementById('modelStatus').textContent='✕ Error';
     }
@@ -720,7 +645,82 @@ function applyColor(mesh, hex) {
 }
 
 // ═══════════════════════════════════════
-// RECORDING
+// DESIGN — PlaneGeometry child of model
+// This is the KEY fix: the plane is a child of currentModel,
+// so it rotates/moves exactly with the model in 3D space.
+// ═══════════════════════════════════════
+function attachDesignMesh() {
+  // Remove previous design plane if any
+  if(designMesh) { currentModel.remove(designMesh); designMesh=null; }
+  if(!S.designImg || !currentModel) return;
+
+  // Build texture from the HTMLImageElement
+  const tex = new THREE.Texture(S.designImg);
+  tex.needsUpdate = true;
+
+  const mat = new THREE.MeshBasicMaterial({
+    map: tex,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.FrontSide,
+    opacity: S.designOpacity,
+  });
+
+  // Get model local bounding box (in model-local coords before world transform)
+  const box = new THREE.Box3().setFromObject(currentModel);
+  const size = box.getSize(new THREE.Vector3());
+  // Scale is baked into model world, so we compute local size
+  const localW = size.x / currentModel.scale.x * 0.92; // chest width
+  const localH = size.y / currentModel.scale.y * 0.92; // height
+
+  // Plane size based on scale slider
+  const planeW = localW * S.designScale * 1.4;
+  const aspect = S.designImg.width / S.designImg.height;
+  const planeH = planeW / aspect;
+
+  const geo = new THREE.PlaneGeometry(planeW, planeH);
+  designMesh = new THREE.Mesh(geo, mat);
+
+  // Position in local model space:
+  // Z: slightly in front of model front face (0.55 of half-depth)
+  const localZ = (size.z / currentModel.scale.z) * 0.28;
+  designMesh.position.set(
+    S.designOffX * localW * 0.35,
+    S.designOffY * localH * 0.35,
+    localZ
+  );
+  designMesh.renderOrder = 1;
+
+  currentModel.add(designMesh); // ← child of model, rotates with it!
+}
+
+function updateDecalMesh() {
+  if(!designMesh || !currentModel) return;
+  const box = new THREE.Box3().setFromObject(currentModel);
+  const size = box.getSize(new THREE.Vector3());
+  const localW = size.x / currentModel.scale.x * 0.92;
+  const localH = size.y / currentModel.scale.y * 0.92;
+  const localZ = (size.z / currentModel.scale.z) * 0.28;
+
+  const planeW = localW * S.designScale * 1.4;
+  const aspect = S.designImg.width / S.designImg.height;
+  const planeH = planeW / aspect;
+
+  // Update geometry
+  designMesh.geometry.dispose();
+  designMesh.geometry = new THREE.PlaneGeometry(planeW, planeH);
+
+  designMesh.position.set(
+    S.designOffX * localW * 0.35,
+    S.designOffY * localH * 0.35,
+    localZ
+  );
+  if(designMesh.material) designMesh.material.opacity = S.designOpacity;
+}
+
+// ═══════════════════════════════════════
+// RECORDING — captures the Three.js canvas directly
+// (design is already in the 3D scene as a child mesh)
 // ═══════════════════════════════════════
 let mediaRecorder=null, recChunks=[], recActive=false;
 
@@ -733,9 +733,7 @@ async function startRecording() {
   const aspect=area.clientWidth/area.clientHeight;
   const rW=q===1080?1080:720, rH=Math.round(rW/aspect);
 
-  // Temporarily resize to record
   renderer.setSize(rW,rH,false);
-  overlayCanvas.width=rW; overlayCanvas.height=rH;
   camera.aspect=rW/rH; camera.updateProjectionMatrix();
 
   recChunks=[]; recActive=true;
@@ -748,31 +746,27 @@ async function startRecording() {
 
   const wasAuto=S.autoRotate; S.autoRotate=true;
 
-  // Capture from threeCanvas only (design will be composited via export)
   const stream=renderer.domElement.captureStream(60);
   const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
   mediaRecorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:q===1080?8e6:4e6});
   mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) recChunks.push(e.data); };
-  mediaRecorder.onstop=()=>finishRec(wasAuto,rW,rH,area);
+  mediaRecorder.onstop=()=>finishRec(wasAuto,area);
   mediaRecorder.start(100);
 
   const dur=S.recordDuration*1000, t0=performance.now();
   const iv=setInterval(()=>{
     const el=performance.now()-t0;
-    const pct=Math.min(100,(el/dur)*100);
-    document.getElementById('progF').style.width=pct+'%';
+    document.getElementById('progF').style.width=Math.min(100,(el/dur)*100)+'%';
     document.getElementById('progL').textContent=`Grabando… ${(el/1000).toFixed(1)}s / ${S.recordDuration}s`;
     if(el>=dur) clearInterval(iv);
   },100);
   setTimeout(()=>{ clearInterval(iv); mediaRecorder.stop(); }, dur);
 }
 
-function finishRec(wasAuto,rW,rH,area) {
+function finishRec(wasAuto,area) {
   recActive=false; S.autoRotate=wasAuto;
   renderer.setSize(area.clientWidth,area.clientHeight,false);
-  overlayCanvas.width=area.clientWidth; overlayCanvas.height=area.clientHeight;
   camera.aspect=area.clientWidth/area.clientHeight; camera.updateProjectionMatrix();
-
   document.getElementById('progF').style.width='100%';
   document.getElementById('progL').textContent='Procesando…';
   setTimeout(()=>{
@@ -790,67 +784,40 @@ function finishRec(wasAuto,rW,rH,area) {
 }
 
 // ═══════════════════════════════════════
-// IMAGE EXPORT (composited: bg + 3D + design)
+// IMAGE EXPORT
 // ═══════════════════════════════════════
 function exportImage() {
   if(!currentModel){ alert('Primero cargá una prenda'); return; }
+  const sz=EXPORT_SIZES[S.exportMode], W=sz.w, H=sz.h;
+  const area=document.getElementById('canvasArea');
+  const origW=area.clientWidth, origH=area.clientHeight;
 
-  const sz = EXPORT_SIZES[S.exportMode];
-  const W=sz.w, H=sz.h;
+  // Render at export resolution — design is already in scene
+  renderer.setSize(W,H,false);
+  camera.aspect=W/H; camera.updateProjectionMatrix();
+  updateBgTexture();
+  renderer.render(scene,camera);
+
+  // Grab rendered frame
   const ec=document.createElement('canvas'); ec.width=W; ec.height=H;
   const ctx=ec.getContext('2d');
 
-  // 1. Draw background
-  if(S.bgImg) {
-    ctx.save();
-    ctx.globalAlpha=S.bgOpacity;
-    ctx.filter=`brightness(${S.bgBrightness})`;
+  // If we have a separate bgImg not handled by Three.js texture, composite it
+  if(S.bgImg && !scene.background) {
+    ctx.save(); ctx.globalAlpha=S.bgOpacity; ctx.filter=`brightness(${S.bgBrightness})`;
     const ia=S.bgImg.width/S.bgImg.height, ca=W/H;
     let sw,sh,sx,sy;
     if(ia>ca){sh=S.bgImg.height;sw=sh*ca;sx=(S.bgImg.width-sw)/2;sy=0;}
     else{sw=S.bgImg.width;sh=sw/ca;sx=0;sy=(S.bgImg.height-sh)/2;}
     ctx.drawImage(S.bgImg,sx,sy,sw,sh,0,0,W,H);
     ctx.restore();
-  } else if(S.bgColor!=='transparent') {
-    ctx.fillStyle=S.bgColor; ctx.fillRect(0,0,W,H);
   }
-
-  // 2. Draw Three.js render scaled to export size
-  // Render the 3D scene at export resolution temporarily
-  const area=document.getElementById('canvasArea');
-  const origW=area.clientWidth, origH=area.clientHeight;
-  renderer.setSize(W,H,false);
-  camera.aspect=W/H; camera.updateProjectionMatrix();
-  renderer.render(scene,camera);
   ctx.drawImage(renderer.domElement,0,0,W,H);
 
-  // 3. Draw design overlay at export resolution
-  if(S.designImg && currentModel) {
-    const box=new THREE.Box3().setFromObject(currentModel);
-    const center=box.getCenter(new THREE.Vector3());
-    const size=box.getSize(new THREE.Vector3());
-
-    // Project to export canvas coords
-    const scrCenter=worldToScreenEx(center,W,H);
-    const topW=worldToScreenEx(new THREE.Vector3(center.x,box.max.y,center.z),W,H);
-    const botW=worldToScreenEx(new THREE.Vector3(center.x,box.min.y,center.z),W,H);
-    const modelScreenH=Math.abs(topW.y-botW.y);
-    const modelScreenW=modelScreenH*(size.x/size.y);
-    const dW2=modelScreenW*S.designScale*2.5;
-    const aspect=S.designImg.width/S.designImg.height;
-    const dH2=dW2/aspect;
-    const cx=scrCenter.x+S.designOffX*modelScreenW*0.5;
-    const cy=scrCenter.y+S.designOffY*modelScreenH*0.5;
-    ctx.save(); ctx.globalAlpha=S.designOpacity;
-    ctx.drawImage(S.designImg,cx-dW2/2,cy-dH2/2,dW2,dH2);
-    ctx.restore();
-  }
-
-  // Restore renderer size
+  // Restore
   renderer.setSize(origW,origH,false);
   camera.aspect=origW/origH; camera.updateProjectionMatrix();
 
-  // Handle JPG (no transparency)
   let finalCanvas=ec;
   if(S.exportFormat==='jpg') {
     const jc=document.createElement('canvas'); jc.width=W; jc.height=H;
@@ -858,18 +825,12 @@ function exportImage() {
     jctx.fillStyle='#ffffff'; jctx.fillRect(0,0,W,H);
     jctx.drawImage(ec,0,0); finalCanvas=jc;
   }
-
   const mimeMap={png:'image/png',jpg:'image/jpeg',webp:'image/webp'};
   const qualMap={png:1,jpg:.95,webp:.92};
   const a=document.createElement('a');
   a.download=`mockup3d_${S.currentGarment?.id||'prenda'}_${sz.w}x${sz.h}.${S.exportFormat}`;
   a.href=finalCanvas.toDataURL(mimeMap[S.exportFormat]||'image/png',qualMap[S.exportFormat]||1);
   a.click();
-}
-
-function worldToScreenEx(vec3,W,H) {
-  const v=vec3.clone().project(camera);
-  return { x:(v.x+1)/2*W, y:(-v.y+1)/2*H };
 }
 
 // ═══════════════════════════════════════
@@ -882,10 +843,9 @@ function loadDesign(event) {
     const img=new Image();
     img.onload=()=>{
       S.designImg=img;
-      // Preview
       document.getElementById('designPreview').innerHTML=`<img src="${e.target.result}" alt="diseño">`;
       document.getElementById('designControls').style.display='block';
-      drawOverlay();
+      attachDesignMesh(); // create the 3D plane child
     };
     img.src=e.target.result;
   };
@@ -894,29 +854,27 @@ function loadDesign(event) {
 
 function clearDesign() {
   S.designImg=null;
+  if(designMesh && currentModel){ currentModel.remove(designMesh); designMesh=null; }
   document.getElementById('designPreview').innerHTML='<span class="nd">Sin diseño</span>';
   document.getElementById('designControls').style.display='none';
   document.getElementById('designUpload').value='';
-  // Reset sliders
   document.getElementById('dScale').value=20; document.getElementById('vScale').textContent='20%';
-  document.getElementById('dX').value=0; document.getElementById('vDX').textContent='0';
-  document.getElementById('dY').value=0; document.getElementById('vDY').textContent='0';
+  document.getElementById('dX').value=0;   document.getElementById('vDX').textContent='0';
+  document.getElementById('dY').value=0;   document.getElementById('vDY').textContent='0';
   document.getElementById('dOp').value=100; document.getElementById('vDOp').textContent='100%';
   S.designScale=0.20; S.designOffX=0; S.designOffY=0; S.designOpacity=1;
-  drawOverlay(); // clears the overlay
 }
 
 function updateDecal() {
-  // Scale: slider 2-70 → 0.02-0.70 fraction
-  S.designScale = parseInt(document.getElementById('dScale').value) / 100;
-  S.designOffX  = parseInt(document.getElementById('dX').value) / 100;
-  S.designOffY  = parseInt(document.getElementById('dY').value) / 100;
+  S.designScale   = parseInt(document.getElementById('dScale').value) / 100;
+  S.designOffX    = parseInt(document.getElementById('dX').value) / 100;
+  S.designOffY    = parseInt(document.getElementById('dY').value) / 100;
   S.designOpacity = parseInt(document.getElementById('dOp').value) / 100;
   document.getElementById('vScale').textContent = document.getElementById('dScale').value+'%';
   document.getElementById('vDX').textContent    = document.getElementById('dX').value;
   document.getElementById('vDY').textContent    = document.getElementById('dY').value;
   document.getElementById('vDOp').textContent   = document.getElementById('dOp').value+'%';
-  // drawOverlay is called every frame in animate(), so no explicit call needed
+  updateDecalMesh(); // update the 3D plane geometry/position
 }
 
 function centerDecal() {
@@ -924,13 +882,55 @@ function centerDecal() {
   S.designOffX=0; S.designOffY=0;
   document.getElementById('vDX').textContent='0';
   document.getElementById('vDY').textContent='0';
+  updateDecalMesh();
 }
 
 // ═══════════════════════════════════════
 // BACKGROUND
 // ═══════════════════════════════════════
+// ═══════════════════════════════════════
+// BACKGROUND
+// ═══════════════════════════════════════
+// updateBgTexture is called every frame in animate().
+// It applies S.bgImg (with opacity/brightness) as scene.background via
+// an offscreen canvas → THREE.CanvasTexture, so it renders in real-time.
+let bgOffCanvas = null, bgOffCtx = null;
+let bgCanvasTex = null;
+
+function updateBgTexture() {
+  if(!S.bgImg) return; // nothing to do, color bg is handled by setBgColor
+  // Build or reuse offscreen canvas matching renderer size
+  const rSize = renderer.getSize(new THREE.Vector2());
+  const W=rSize.x, H=rSize.y;
+  if(!bgOffCanvas || bgOffCanvas.width!==W || bgOffCanvas.height!==H) {
+    bgOffCanvas=document.createElement('canvas');
+    bgOffCanvas.width=W; bgOffCanvas.height=H;
+    bgOffCtx=bgOffCanvas.getContext('2d');
+    if(bgCanvasTex){ bgCanvasTex.dispose(); bgCanvasTex=null; }
+  }
+  bgOffCtx.clearRect(0,0,W,H);
+  bgOffCtx.save();
+  bgOffCtx.globalAlpha=S.bgOpacity;
+  bgOffCtx.filter=`brightness(${S.bgBrightness})`;
+  // Cover-fit the image
+  const ia=S.bgImg.width/S.bgImg.height, ca=W/H;
+  let sw,sh,sx,sy;
+  if(ia>ca){sh=S.bgImg.height;sw=sh*ca;sx=(S.bgImg.width-sw)/2;sy=0;}
+  else{sw=S.bgImg.width;sh=sw/ca;sx=0;sy=(S.bgImg.height-sh)/2;}
+  bgOffCtx.drawImage(S.bgImg,sx,sy,sw,sh,0,0,W,H);
+  bgOffCtx.restore();
+  if(!bgCanvasTex){
+    bgCanvasTex=new THREE.CanvasTexture(bgOffCanvas);
+    scene.background=bgCanvasTex;
+  } else {
+    bgCanvasTex.needsUpdate=true;
+  }
+}
+
 function setBgColor(val) {
   S.bgColor=val;
+  // When switching to color, clear any image texture
+  if(bgCanvasTex){ bgCanvasTex.dispose(); bgCanvasTex=null; bgOffCanvas=null; }
   if(val==='transparent') {
     renderer.setClearColor(0x000000,0); scene.background=null;
   } else {
@@ -945,7 +945,13 @@ function loadBgImage(event) {
   const reader=new FileReader();
   reader.onload=e=>{
     const img=new Image();
-    img.onload=()=>{ S.bgImg=img; document.getElementById('bgImgRow').style.display='block'; };
+    img.onload=()=>{
+      S.bgImg=img;
+      // Reset offscreen canvas so it rebuilds at correct size
+      bgOffCanvas=null; bgCanvasTex=null;
+      document.getElementById('bgImgRow').style.display='block';
+      // updateBgTexture() will fire on next frame automatically
+    };
     img.src=e.target.result;
   };
   reader.readAsDataURL(file);
@@ -953,6 +959,9 @@ function loadBgImage(event) {
 
 function clearBgImage() {
   S.bgImg=null;
+  if(bgCanvasTex){ bgCanvasTex.dispose(); bgCanvasTex=null; bgOffCanvas=null; }
+  // Restore color background
+  setBgColor(S.bgColor);
   document.getElementById('bgImgRow').style.display='none';
   document.getElementById('bgUpload').value='';
 }
@@ -962,6 +971,8 @@ function updateBgSettings() {
   S.bgBrightness=parseInt(document.getElementById('bgBr').value)/100;
   document.getElementById('vBgOp').textContent=document.getElementById('bgOp').value+'%';
   document.getElementById('vBgBr').textContent=document.getElementById('bgBr').value+'%';
+  // Force canvas rebuild
+  bgOffCanvas=null;
 }
 
 // ═══════════════════════════════════════
