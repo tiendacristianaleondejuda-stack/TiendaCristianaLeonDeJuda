@@ -6,28 +6,25 @@
 <title>Mockup 3D — León de Judá</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --cream:#f5f0ea; --taupe:#c4b5a5; --brown:#7a6355;
-  --dark:#2c2420; --accent:#9b7b6b;
+:root{
+  --cream:#f5f0ea;--taupe:#c4b5a5;--brown:#7a6355;
+  --dark:#2c2420;--accent:#9b7b6b;
   --panel:rgba(250,248,245,0.97);
   --border:rgba(196,181,165,0.4);
   --shadow:0 8px 40px rgba(44,36,32,0.12);
-  --pw:278px;
+  --pw:282px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Jost',sans-serif;background:var(--dark);color:var(--dark);display:flex;flex-direction:column;height:100dvh;}
 
-/* HEADER */
-header{background:var(--dark);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50;border-bottom:1px solid rgba(196,181,165,.15);}
+header{background:var(--dark);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(196,181,165,.15);}
 header h1{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:var(--cream);letter-spacing:.12em;}
 .hdr-r{display:flex;align-items:center;gap:10px;}
 .badge{font-size:.58rem;background:var(--accent);color:#fff;padding:3px 9px;border-radius:20px;letter-spacing:.1em;font-weight:500;text-transform:uppercase;}
 
-/* LAYOUT */
 .app{display:grid;grid-template-columns:var(--pw) 1fr var(--pw);flex:1;min-height:0;overflow:hidden;}
 
-/* PANELS */
 .panel-left,.panel-right{background:var(--panel);overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;min-height:0;}
 .panel-left{border-right:1px solid var(--border);}
 .panel-right{border-left:1px solid var(--border);}
@@ -38,7 +35,6 @@ header h1{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:30
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
-/* GARMENT LIST */
 .garment-list{display:flex;flex-direction:column;gap:5px;}
 .gi{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:9px;border:2px solid transparent;cursor:pointer;transition:all .17s;background:#fff;}
 .gi:hover{border-color:var(--taupe);}
@@ -50,60 +46,55 @@ header h1{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:30
 .gi .dot{width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .2s;}
 .gi.active .dot{background:var(--accent);}
 
-/* SWATCHES */
 .swatches{display:flex;flex-wrap:wrap;gap:6px;}
 .swatch{width:25px;height:25px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .17s;box-shadow:0 2px 5px rgba(0,0,0,.12);}
-.swatch:hover{transform:scale(1.17);}
+.swatch:hover{transform:scale(1.15);}
 .swatch.active{border-color:var(--dark);box-shadow:0 0 0 3px rgba(44,36,32,.2);}
 
-/* UPLOAD ZONE */
 .upzone{border:2px dashed var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .22s;background:rgba(245,240,234,.5);}
 .upzone:hover,.upzone.drag{border-color:var(--accent);background:rgba(155,123,107,.07);}
 .upzone svg{opacity:.4;margin-bottom:4px;}
 .upzone p{font-size:.73rem;color:var(--brown);}
 .upzone small{font-size:.61rem;color:var(--taupe);}
 
-/* CONTROLS */
 .ctrl{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
 .ctrl label{font-size:.68rem;color:var(--brown);min-width:65px;font-weight:500;}
 .ctrl input[type=range]{flex:1;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--border);outline:none;cursor:pointer;}
 .ctrl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.18);}
 .ctrl .val{font-size:.65rem;min-width:36px;text-align:right;color:var(--accent);font-weight:500;font-family:'DM Mono',monospace;}
 
-/* CANVAS AREA */
+/* UV PREVIEW */
+.uv-preview-wrap{position:relative;width:100%;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:repeating-conic-gradient(#e8e2da 0% 25%,transparent 0% 50%) 0 0/12px 12px;margin-top:7px;}
+#uvPreviewCanvas{width:100%;height:100%;display:block;}
+.uv-label{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);font-size:.55rem;font-family:'DM Mono',monospace;color:var(--taupe);background:rgba(250,248,245,.85);padding:2px 7px;border-radius:10px;white-space:nowrap;}
+
 .canvas-area{position:relative;background:#1a1410;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .canvas-area::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(155,123,107,.08) 0%,transparent 70%);pointer-events:none;}
-/* Three canvas fills the back */
 #threeCanvas{position:absolute;inset:0;width:100%!important;height:100%!important;cursor:grab;display:block;}
 #threeCanvas:active{cursor:grabbing;}
 
-/* LOADER */
 .load-ov{position:absolute;inset:0;background:rgba(26,20,16,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;z-index:20;transition:opacity .4s;}
 .load-ov.hidden{opacity:0;pointer-events:none;}
 .spinner{width:34px;height:34px;border:2px solid rgba(196,181,165,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .load-txt{font-family:'Cormorant Garamond',serif;font-size:.88rem;color:var(--taupe);letter-spacing:.1em;}
 
-/* ERROR */
 .err-box{position:absolute;inset:0;background:rgba(26,20,16,.95);display:none;flex-direction:column;align-items:center;justify-content:center;gap:11px;z-index:25;}
 .err-box.show{display:flex;}
 .err-msg{font-size:.78rem;color:var(--taupe);text-align:center;max-width:280px;line-height:1.6;}
-.err-path{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--accent);background:rgba(155,123,107,.1);padding:5px 11px;border-radius:6px;word-break:break-all;text-align:center;}
+.err-path{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--accent);background:rgba(155,123,107,.1);padding:5px 10px;border-radius:6px;word-break:break-all;text-align:center;}
 
-/* HUD */
 .hud{position:absolute;bottom:13px;left:50%;transform:translateX(-50%);z-index:10;display:flex;background:rgba(44,36,32,.85);border:1px solid rgba(196,181,165,.2);backdrop-filter:blur(10px);padding:6px 13px;border-radius:30px;white-space:nowrap;align-items:center;gap:9px;}
 .hud-i{font-size:.6rem;color:var(--taupe);letter-spacing:.05em;display:flex;align-items:center;gap:4px;}
 .hud-sep{width:1px;height:11px;background:rgba(196,181,165,.2);}
 .hud-top{position:absolute;top:13px;left:50%;transform:translateX(-50%);z-index:10;}
 .mbadge{font-family:'Cormorant Garamond',serif;font-size:.82rem;color:var(--cream);letter-spacing:.1em;background:rgba(44,36,32,.75);border:1px solid rgba(196,181,165,.2);backdrop-filter:blur(8px);padding:4px 15px;border-radius:20px;}
 
-/* STATUS */
 .chip{display:inline-flex;align-items:center;gap:5px;font-size:.6rem;font-family:'DM Mono',monospace;padding:3px 9px;border-radius:20px;letter-spacing:.04em;}
 .chip.ok{background:rgba(39,174,96,.12);color:#27ae60;}
 .chip.warn{background:rgba(155,123,107,.12);color:var(--accent);}
 .chip.err{background:rgba(192,57,43,.12);color:#c0392b;}
 
-/* BUTTONS */
 .btn-p{width:100%;padding:10px;background:var(--dark);color:var(--cream);border:none;border-radius:10px;font-family:'Jost',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:.1em;cursor:pointer;transition:all .22s;text-transform:uppercase;}
 .btn-p:hover{background:var(--accent);transform:translateY(-1px);box-shadow:0 8px 20px rgba(155,123,107,.3);}
 .btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none;}
@@ -118,24 +109,20 @@ header h1{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:30
 .btn-sm{flex:1;padding:7px 5px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--brown);font-family:'Jost',sans-serif;font-size:.68rem;font-weight:500;cursor:pointer;transition:all .17s;letter-spacing:.04em;}
 .btn-sm:hover{border-color:var(--accent);background:rgba(155,123,107,.06);color:var(--dark);}
 
-/* PROGRESS */
 .prog-w{margin-top:8px;display:none;}
 .prog-w.show{display:block;}
 .prog-b{height:3px;background:var(--border);border-radius:3px;overflow:hidden;}
 .prog-f{height:100%;background:var(--accent);border-radius:3px;transition:width .1s;width:0%;}
 .prog-l{font-size:.6rem;color:var(--taupe);margin-top:4px;font-family:'DM Mono',monospace;}
 
-/* INFO */
 .info-box{background:rgba(155,123,107,.08);border:1px solid rgba(155,123,107,.2);border-radius:8px;padding:8px 10px;}
 .info-box p{font-size:.66rem;color:var(--brown);line-height:1.55;}
 .info-txt{font-size:.65rem;color:var(--taupe);line-height:1.55;}
 
-/* DESIGN PREVIEW */
 .des-prev{width:100%;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:repeating-conic-gradient(#e8e2da 0% 25%,transparent 0% 50%) 0 0/12px 12px;display:flex;align-items:center;justify-content:center;margin-top:7px;}
 .des-prev img{max-width:88%;max-height:88%;object-fit:contain;}
 .des-prev .nd{font-size:.63rem;color:var(--taupe);}
 
-/* TOGGLE */
 .tog-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
 .tog-row>label{font-size:.72rem;font-weight:500;color:var(--brown);}
 .tog{position:relative;width:36px;height:20px;flex-shrink:0;}
@@ -145,12 +132,10 @@ header h1{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:30
 .tog input:checked+.tog-sl{background:var(--accent);}
 .tog input:checked+.tog-sl::before{transform:translateX(16px);}
 
-/* COLOR ROW */
 .col-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
 .col-row span{font-size:.68rem;color:var(--brown);}
 input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);cursor:pointer;padding:0;background:none;outline:none;}
 
-/* EXPORT CARDS */
 .exp-opts{display:flex;flex-direction:column;gap:6px;}
 .exp-card{border:2px solid var(--border);border-radius:9px;padding:8px 11px;cursor:pointer;transition:all .17s;background:#fff;}
 .exp-card:hover,.exp-card.active{border-color:var(--accent);background:rgba(155,123,107,.05);}
@@ -158,32 +143,30 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
 .exp-card small{font-size:.62rem;color:var(--taupe);}
 .exp-card .bdg{display:inline-block;font-size:.58rem;font-family:'DM Mono',monospace;background:var(--cream);border:1px solid var(--border);padding:1px 5px;border-radius:6px;margin-top:3px;}
 
-/* FORMAT BUTTONS */
 .fmt-btns{display:flex;gap:5px;}
 .fmt-btn{flex:1;padding:7px 4px;border:2px solid var(--border);border-radius:8px;background:#fff;color:var(--brown);font-family:'DM Mono',monospace;font-size:.7rem;font-weight:500;letter-spacing:.05em;cursor:pointer;transition:all .17s;}
 .fmt-btn:hover{border-color:var(--taupe);}
 .fmt-btn.active{border-color:var(--accent);background:rgba(155,123,107,.08);color:var(--dark);}
 
-/* QUALITY GRID */
 .q-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
 .q-card{border:2px solid var(--border);border-radius:8px;padding:7px 9px;cursor:pointer;transition:all .17s;background:#fff;text-align:center;}
 .q-card:hover,.q-card.active{border-color:var(--accent);background:rgba(155,123,107,.06);}
 .q-card h4{font-size:.7rem;font-weight:500;margin-bottom:2px;}
 .q-card small{font-size:.58rem;color:var(--taupe);}
 
-/* DURATION */
 .dur-btns{display:flex;gap:5px;flex-wrap:wrap;}
 .dur-btn{padding:5px 9px;border-radius:7px;border:1px solid var(--border);background:#fff;font-family:'DM Mono',monospace;font-size:.66rem;color:var(--brown);cursor:pointer;transition:all .15s;}
 .dur-btn.active{border-color:var(--accent);background:rgba(155,123,107,.08);color:var(--dark);}
 
-/* BG GRID */
 .bg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
 .bg-opt{aspect-ratio:1;border-radius:7px;border:2px solid transparent;cursor:pointer;transition:all .15s;overflow:hidden;}
 .bg-opt:hover,.bg-opt.active{border-color:var(--accent);}
 .bg-opt div{width:100%;height:100%;border-radius:5px;}
 
-/* DIM BADGE */
 .dim-badge{background:var(--dark);color:var(--cream);font-size:.63rem;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:6px;letter-spacing:.04em;display:inline-block;}
+
+/* UV mode badge */
+.uv-mode-badge{display:inline-flex;align-items:center;gap:5px;font-size:.6rem;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:20px;background:rgba(39,174,96,.12);color:#27ae60;margin-top:6px;}
 
 @media(max-width:900px){.app{grid-template-columns:220px 1fr 220px;}}
 @media(max-width:680px){.app{grid-template-columns:1fr;}.panel-left,.panel-right{display:none;}}
@@ -228,7 +211,7 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
   <div>
     <div class="st">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-      Diseño / Logo
+      Diseño / Estampa
     </div>
     <div class="upzone" id="dzDesign" onclick="document.getElementById('designUpload').click()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
@@ -239,17 +222,27 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
     <div class="des-prev" id="designPreview">
       <span class="nd">Sin diseño</span>
     </div>
+    <div id="uvModeBadge" style="display:none;" class="uv-mode-badge">✓ Modo UV — curva con el modelo</div>
   </div>
 
   <div id="designControls" style="display:none;">
-    <div class="st">Ajuste del Diseño</div>
-    <div class="ctrl"><label>Escala</label><input type="range" id="dScale" min="2" max="70" value="20" oninput="updateDecal()"><span class="val" id="vScale">20%</span></div>
-    <div class="ctrl"><label>Pos. X</label><input type="range" id="dX" min="-100" max="100" value="0" oninput="updateDecal()"><span class="val" id="vDX">0</span></div>
-    <div class="ctrl"><label>Pos. Y</label><input type="range" id="dY" min="-100" max="100" value="0" oninput="updateDecal()"><span class="val" id="vDY">0</span></div>
-    <div class="ctrl"><label>Opacidad</label><input type="range" id="dOp" min="10" max="100" value="100" oninput="updateDecal()"><span class="val" id="vDOp">100%</span></div>
+    <div class="st">Posición en UV Space</div>
+
+    <!-- UV Preview canvas -->
+    <div class="uv-preview-wrap">
+      <canvas id="uvPreviewCanvas"></canvas>
+      <span class="uv-label">Vista UV · arrastrá para posicionar</span>
+    </div>
+
+    <div style="margin-top:10px;">
+      <div class="ctrl"><label>Escala</label><input type="range" id="dScale" min="2" max="80" value="25" oninput="updateDecal()"><span class="val" id="vScale">25%</span></div>
+      <div class="ctrl"><label>Pos. U →</label><input type="range" id="dU" min="0" max="100" value="50" oninput="updateDecal()"><span class="val" id="vDU">0.50</span></div>
+      <div class="ctrl"><label>Pos. V ↑</label><input type="range" id="dV" min="0" max="100" value="60" oninput="updateDecal()"><span class="val" id="vDV">0.60</span></div>
+      <div class="ctrl"><label>Opacidad</label><input type="range" id="dOp" min="10" max="100" value="100" oninput="updateDecal()"><span class="val" id="vDOp">100%</span></div>
+    </div>
     <div class="btn-row">
       <button class="btn-sm" onclick="clearDesign()">✕ Quitar</button>
-      <button class="btn-sm" onclick="centerDecal()">⊕ Centrar</button>
+      <button class="btn-sm" onclick="centerDecal()">⊕ Centrar pecho</button>
     </div>
   </div>
 
@@ -268,10 +261,7 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
     <div class="err-path" id="errPath"></div>
     <button class="btn-sm" style="margin-top:8px;flex:none;padding:7px 18px;" onclick="hideErr()">Cerrar</button>
   </div>
-
-  <!-- Three.js renders here -->
   <canvas id="threeCanvas"></canvas>
-
   <div class="hud-top"><div class="mbadge" id="modelBadge">— Sin modelo cargado —</div></div>
   <div class="hud">
     <div class="hud-i">
@@ -292,7 +282,6 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
 <div class="panel-right">
 <div class="pi">
 
-  <!-- ESCENA -->
   <div>
     <div class="st">Escena 3D</div>
     <div class="ctrl"><label>Zoom</label><input type="range" id="cZoom" min="40" max="180" value="100" oninput="setCameraZoom(this.value)"><span class="val" id="vZoom">100%</span></div>
@@ -302,7 +291,6 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
     <div class="ctrl"><label>Ambiente</label><input type="range" id="lAmb" min="0" max="200" value="60" oninput="setLight('amb',this.value)"><span class="val" id="vLA">60%</span></div>
   </div>
 
-  <!-- FONDO -->
   <div>
     <div class="st">Fondo de Escena</div>
     <div class="bg-grid" id="bgGrid"></div>
@@ -325,7 +313,6 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
     </div>
   </div>
 
-  <!-- ROTACIÓN -->
   <div>
     <div class="st">Rotación Automática</div>
     <div class="tog-row">
@@ -339,7 +326,6 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
     </div>
   </div>
 
-  <!-- VIDEO -->
   <div>
     <div class="st">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
@@ -347,7 +333,7 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
     </div>
     <div style="margin-bottom:9px;">
       <div style="font-size:.66rem;color:var(--brown);margin-bottom:5px;font-weight:500;">Duración:</div>
-      <div class="dur-btns" id="durBtns">
+      <div class="dur-btns">
         <button class="dur-btn" onclick="setDur(3)">3s</button>
         <button class="dur-btn active" onclick="setDur(5)">5s</button>
         <button class="dur-btn" onclick="setDur(8)">8s</button>
@@ -370,11 +356,10 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
       <div class="prog-l" id="progL">Preparando…</div>
     </div>
     <div class="info-box" style="margin-top:9px;">
-      <p>📹 Exporta en <strong>WebM</strong>. Para convertir a MP4 usá <em>cloudconvert.com</em> gratis.</p>
+      <p>📹 Exporta en <strong>WebM</strong>. Convertir a MP4: <em>cloudconvert.com</em></p>
     </div>
   </div>
 
-  <!-- IMAGEN ESTÁTICA -->
   <div>
     <div class="st">Exportar Imagen</div>
     <div style="margin-bottom:8px;">
@@ -423,14 +408,13 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
 
 </div>
 </div>
-
 </div><!-- /app -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
 // CONFIG
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
 const BASE_URL = 'https://raw.githubusercontent.com/tiendacristianaleondejuda-stack/TiendaCristianaLeonDeJuda/main/pages/admin/modelos/';
 
 const GARMENTS = [
@@ -454,25 +438,30 @@ const BG_PRESETS = [
 ];
 
 const EXPORT_SIZES = {
-  'standard':       {w:2048, h:2048, label:'2048 × 2048'},
-  'instagram':      {w:1080, h:1080, label:'1080 × 1080'},
-  'instagram-story':{w:1080, h:1920, label:'1080 × 1920'},
-  'facebook':       {w:1640, h:924,  label:'1640 × 924'},
-  'tiktok':         {w:1080, h:1920, label:'1080 × 1920'},
-  'wpa':            {w:1024, h:1536, label:'1024 × 1536'},
+  'standard':        {w:2048,h:2048, label:'2048 × 2048'},
+  'instagram':       {w:1080,h:1080, label:'1080 × 1080'},
+  'instagram-story': {w:1080,h:1920, label:'1080 × 1920'},
+  'facebook':        {w:1640,h:924,  label:'1640 × 924'},
+  'tiktok':          {w:1080,h:1920, label:'1080 × 1920'},
+  'wpa':             {w:1024,h:1536, label:'1024 × 1536'},
 };
 
-// ═══════════════════════════════════════
+// Texture canvas size — matches the GLB base texture
+const TEX_SIZE = 1024;
+
+// ════════════════════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
 const S = {
   garmentColor: '#ffffff',
   bgColor: '#1a1410',
   bgImg: null, bgOpacity:1, bgBrightness:1,
   designImg: null,
-  designScale: 0.20,   // fraction of model bounding box width
-  designOffX: 0,       // -1..1 horizontal offset
-  designOffY: 0,       // -1..1 vertical offset
+  // UV-space design position & scale
+  // U/V are 0..1 coordinates in the texture space
+  designU: 0.50,   // horizontal center (0=left, 1=right)
+  designV: 0.60,   // vertical center (0=bottom, 1=top in UV)
+  designScale: 0.25, // fraction of texture width
   designOpacity: 1,
   rotSpeed: 8,
   autoRotate: true,
@@ -481,19 +470,28 @@ const S = {
   exportMode: 'standard',
   exportFormat: 'png',
   currentGarment: null,
+  hasUV: false,
 };
 
-// ═══════════════════════════════════════
-// THREE.JS SETUP
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
+// THREE.JS GLOBALS
+// ════════════════════════════════════════════════════
 let scene, camera, renderer;
 let currentModel = null;
-let designMesh = null;   // PlaneGeometry child of currentModel
+let targetMesh = null;       // the main garment mesh
+let garmentMaterial = null;  // reference to the mesh material
+// The texture canvas — we paint garment color + design onto it
+let texCanvas = null, texCtx = null;
+let canvasTex = null;        // THREE.CanvasTexture applied to material
 let lights = {};
 let orbit = { active:false, lastX:0, lastY:0, rotX:0, zoom:3.2 };
 let frameCount=0, lastFpsT=performance.now();
-let bgTexture = null;    // THREE.Texture for background image
+// Background
+let bgOffCanvas=null, bgOffCtx=null, bgCanvasTex=null;
 
+// ════════════════════════════════════════════════════
+// INIT SCENE
+// ════════════════════════════════════════════════════
 function initScene() {
   const tc = document.getElementById('threeCanvas');
   const area = document.getElementById('canvasArea');
@@ -516,14 +514,11 @@ function initScene() {
   lights.front.position.set(0,1,3); lights.front.castShadow=true;
   scene.add(lights.front);
   lights.top = new THREE.DirectionalLight(0xfff0e0, 0.8);
-  lights.top.position.set(0,4,0);
-  scene.add(lights.top);
+  lights.top.position.set(0,4,0); scene.add(lights.top);
   lights.left = new THREE.DirectionalLight(0xe8f0ff, 0.3);
-  lights.left.position.set(-3,1,1);
-  scene.add(lights.left);
+  lights.left.position.set(-3,1,1); scene.add(lights.left);
   lights.right = new THREE.DirectionalLight(0xffe8e0, 0.3);
-  lights.right.position.set(3,1,1);
-  scene.add(lights.right);
+  lights.right.position.set(3,1,1); scene.add(lights.right);
 
   const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(10,10),
@@ -531,6 +526,11 @@ function initScene() {
   );
   ground.rotation.x=-Math.PI/2; ground.position.y=-1.1; ground.receiveShadow=true;
   scene.add(ground);
+
+  // Texture canvas (will be applied as UV texture)
+  texCanvas = document.createElement('canvas');
+  texCanvas.width = TEX_SIZE; texCanvas.height = TEX_SIZE;
+  texCtx = texCanvas.getContext('2d');
 
   setBgColor(S.bgColor);
   setupOrbit();
@@ -544,12 +544,14 @@ function initScene() {
 function resizeAll() {
   const area = document.getElementById('canvasArea');
   const w = area.clientWidth, h = area.clientHeight;
-  renderer.setSize(w, h, false);
+  renderer.setSize(w,h,false);
   camera.aspect = w/h;
   camera.updateProjectionMatrix();
 }
 
-// ── Orbit ──
+// ════════════════════════════════════════════════════
+// ORBIT CONTROLS
+// ════════════════════════════════════════════════════
 function setupOrbit() {
   const el = renderer.domElement;
   el.addEventListener('mousedown',  e=>{ orbit.active=true; orbit.lastX=e.clientX; orbit.lastY=e.clientY; });
@@ -568,7 +570,9 @@ function orbitMove(dx,dy) {
   currentModel.rotation.x = orbit.rotX;
 }
 
-// ── Animate loop ──
+// ════════════════════════════════════════════════════
+// ANIMATE LOOP
+// ════════════════════════════════════════════════════
 function animate() {
   requestAnimationFrame(animate);
   if(S.autoRotate && currentModel) currentModel.rotation.y += S.rotSpeed/1000*0.3;
@@ -576,14 +580,75 @@ function animate() {
   frameCount++;
   const now=performance.now();
   if(now-lastFpsT>1000){ document.getElementById('fpsHud').textContent=frameCount+' fps'; frameCount=0; lastFpsT=now; }
-  // Background image: render onto scene background each frame
   updateBgTexture();
-  renderer.render(scene, camera);
+  renderer.render(scene,camera);
 }
 
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
+// UV TEXTURE SYSTEM
+// ════════════════════════════════════════════════════
+// paintTexture() redraws the entire texCanvas:
+//   1. Fill with garment color
+//   2. If design exists, draw it at UV position (U,V) with given scale
+// The canvas is already set as material.map → Three.js picks it up automatically.
+
+function paintTexture() {
+  if(!texCtx) return;
+  const W = TEX_SIZE, H = TEX_SIZE;
+  texCtx.clearRect(0,0,W,H);
+
+  // 1. Fill garment color
+  texCtx.fillStyle = S.garmentColor;
+  texCtx.fillRect(0,0,W,H);
+
+  // 2. Draw design if available
+  if(S.designImg) {
+    const dW = W * S.designScale;
+    const aspect = S.designImg.width / S.designImg.height;
+    const dH = dW / aspect;
+
+    // UV coords: U goes left→right (0→1), V goes bottom→top in UV space
+    // But in canvas coords Y goes top→bottom, so V=1 is top of canvas (Y=0)
+    const cx = S.designU * W;
+    const cy = (1 - S.designV) * H;  // flip V for canvas
+
+    texCtx.save();
+    texCtx.globalAlpha = S.designOpacity;
+    texCtx.drawImage(S.designImg, cx - dW/2, cy - dH/2, dW, dH);
+    texCtx.restore();
+  }
+
+  // Signal Three.js to re-upload the texture
+  if(canvasTex) canvasTex.needsUpdate = true;
+
+  // Redraw UV preview panel
+  drawUVPreview();
+}
+
+function drawUVPreview() {
+  const pv = document.getElementById('uvPreviewCanvas');
+  if(!pv) return;
+  const pw = pv.parentElement.clientWidth || 200;
+  pv.width = pw; pv.height = pw;
+  const pc = pv.getContext('2d');
+  // Draw miniature of the texture canvas
+  pc.drawImage(texCanvas, 0,0, pw, pw);
+  // Draw crosshair at design position
+  if(S.designImg) {
+    const cx = S.designU * pw;
+    const cy = (1-S.designV) * pw;
+    pc.strokeStyle='rgba(155,123,107,0.9)';
+    pc.lineWidth=1.5;
+    pc.beginPath(); pc.moveTo(cx-8,cy); pc.lineTo(cx+8,cy); pc.stroke();
+    pc.beginPath(); pc.moveTo(cx,cy-8); pc.lineTo(cx,cy+8); pc.stroke();
+    pc.beginPath(); pc.arc(cx,cy,5,0,Math.PI*2);
+    pc.strokeStyle='rgba(155,123,107,1)'; pc.stroke();
+  }
+}
+
+// ════════════════════════════════════════════════════
 // GLB LOADER
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
 let gltfLoader = null;
 
 function loadGLTFScript() {
@@ -592,7 +657,7 @@ function loadGLTFScript() {
     const s=document.createElement('script');
     s.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
     s.onload=()=>{ gltfLoader=new THREE.GLTFLoader(); resolve(); };
-    s.onerror=()=>reject(new Error('No se pudo cargar GLTFLoader'));
+    s.onerror=()=>reject(new Error('GLTFLoader no disponible'));
     document.head.appendChild(s);
   });
 }
@@ -601,15 +666,16 @@ async function loadGarment(garment) {
   showLoader('Cargando ' + garment.name + '…');
   hideErr();
   try { await loadGLTFScript(); }
-  catch(e) { showErr('No se pudo cargar el módulo 3D. Verificá la conexión.',''); return; }
+  catch(e) { showErr('No se pudo cargar el módulo 3D.',''); return; }
 
-  // Remove old model (and its design child)
-  if(currentModel) { scene.remove(currentModel); currentModel=null; designMesh=null; }
+  if(currentModel) { scene.remove(currentModel); currentModel=null; targetMesh=null; garmentMaterial=null; canvasTex=null; }
 
   const url = BASE_URL + garment.file;
   gltfLoader.load(url,
     (gltf) => {
       const model = gltf.scene;
+
+      // Auto-fit
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
@@ -617,16 +683,32 @@ async function loadGarment(garment) {
       model.scale.setScalar(sc);
       model.position.sub(center.multiplyScalar(sc));
       model.position.y -= 0.05;
-      model.traverse(c=>{ if(c.isMesh){ c.castShadow=true; c.receiveShadow=true; applyColor(c,S.garmentColor); } });
+
       scene.add(model);
       currentModel = model;
       S.currentGarment = garment;
-      // Re-attach design if one was loaded
-      if(S.designImg) attachDesignMesh();
+
+      // Find the main mesh (largest by vertex count) with UV coords
+      targetMesh = findMainMesh(model);
+      S.hasUV = checkHasUV(targetMesh);
+
+      if(S.hasUV && targetMesh) {
+        setupUVTexture(targetMesh);
+        document.getElementById('uvModeBadge').style.display='inline-flex';
+      } else {
+        // No UV: apply flat color only
+        applyFlatColor(model, S.garmentColor);
+        document.getElementById('uvModeBadge').style.display='none';
+      }
+
+      // Shadows on all meshes
+      model.traverse(c=>{ if(c.isMesh){ c.castShadow=true; c.receiveShadow=true; } });
+
       document.getElementById('modelBadge').textContent = garment.name;
       document.getElementById('modelStatus').className = 'chip ok';
       document.getElementById('modelStatus').textContent = '● Cargado';
       hideLoader();
+      paintTexture(); // initial paint
     },
     (prog)=>{ if(prog.total>0) updateLoadTxt('Cargando… '+Math.round(prog.loaded/prog.total*100)+'%'); },
     ()=>{
@@ -637,105 +719,242 @@ async function loadGarment(garment) {
   );
 }
 
-function applyColor(mesh, hex) {
-  if(!mesh.material) return;
-  const color = new THREE.Color(hex);
-  const mats = Array.isArray(mesh.material)?mesh.material:[mesh.material];
-  mats.forEach(m=>{ if(m.color){ m.color.set(color); m.needsUpdate=true; } });
-}
-
-// ═══════════════════════════════════════
-// DESIGN — PlaneGeometry child of model
-// This is the KEY fix: the plane is a child of currentModel,
-// so it rotates/moves exactly with the model in 3D space.
-// ═══════════════════════════════════════
-function attachDesignMesh() {
-  // Remove previous design plane if any
-  if(designMesh) { currentModel.remove(designMesh); designMesh=null; }
-  if(!S.designImg || !currentModel) return;
-
-  // Build texture from the HTMLImageElement
-  const tex = new THREE.Texture(S.designImg);
-  tex.needsUpdate = true;
-
-  const mat = new THREE.MeshBasicMaterial({
-    map: tex,
-    transparent: true,
-    depthWrite: false,
-    side: THREE.FrontSide,
-    opacity: S.designOpacity,
+// Find the mesh with the most vertices (usually the garment body)
+function findMainMesh(model) {
+  let best = null, bestVerts = 0;
+  model.traverse(c => {
+    if(c.isMesh) {
+      const count = c.geometry?.attributes?.position?.count || 0;
+      if(count > bestVerts) { bestVerts=count; best=c; }
+    }
   });
-
-  // Get model local bounding box (in model-local coords before world transform)
-  const box = new THREE.Box3().setFromObject(currentModel);
-  const size = box.getSize(new THREE.Vector3());
-  // Scale is baked into model world, so we compute local size
-  const localW = size.x / currentModel.scale.x * 0.92; // chest width
-  const localH = size.y / currentModel.scale.y * 0.92; // height
-
-  // Plane size based on scale slider
-  const planeW = localW * S.designScale * 1.4;
-  const aspect = S.designImg.width / S.designImg.height;
-  const planeH = planeW / aspect;
-
-  const geo = new THREE.PlaneGeometry(planeW, planeH);
-  designMesh = new THREE.Mesh(geo, mat);
-
-  // Position in local model space:
-  // Z: slightly in front of model front face (0.55 of half-depth)
-  const localZ = (size.z / currentModel.scale.z) * 0.28;
-  designMesh.position.set(
-    S.designOffX * localW * 0.35,
-    S.designOffY * localH * 0.35,
-    localZ
-  );
-  designMesh.renderOrder = 1;
-
-  currentModel.add(designMesh); // ← child of model, rotates with it!
+  return best;
 }
 
-function updateDecalMesh() {
-  if(!designMesh || !currentModel) return;
-  const box = new THREE.Box3().setFromObject(currentModel);
-  const size = box.getSize(new THREE.Vector3());
-  const localW = size.x / currentModel.scale.x * 0.92;
-  const localH = size.y / currentModel.scale.y * 0.92;
-  const localZ = (size.z / currentModel.scale.z) * 0.28;
-
-  const planeW = localW * S.designScale * 1.4;
-  const aspect = S.designImg.width / S.designImg.height;
-  const planeH = planeW / aspect;
-
-  // Update geometry
-  designMesh.geometry.dispose();
-  designMesh.geometry = new THREE.PlaneGeometry(planeW, planeH);
-
-  designMesh.position.set(
-    S.designOffX * localW * 0.35,
-    S.designOffY * localH * 0.35,
-    localZ
-  );
-  if(designMesh.material) designMesh.material.opacity = S.designOpacity;
+function checkHasUV(mesh) {
+  if(!mesh) return false;
+  return !!(mesh.geometry?.attributes?.uv);
 }
 
-// ═══════════════════════════════════════
-// RECORDING — captures the Three.js canvas directly
-// (design is already in the 3D scene as a child mesh)
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
+// SETUP UV TEXTURE ON MESH
+// ════════════════════════════════════════════════════
+function setupUVTexture(mesh) {
+  // Paint initial state
+  paintTexture();
+
+  // Create CanvasTexture from our texCanvas
+  canvasTex = new THREE.CanvasTexture(texCanvas);
+  canvasTex.flipY = true; // Standard UV convention
+
+  // Clone material so we don't affect other meshes sharing it
+  const mat = mesh.material;
+  let newMat;
+
+  if(Array.isArray(mat)) {
+    // Multi-material: apply to all
+    newMat = mat.map(m => cloneMaterialWithTex(m, canvasTex));
+  } else {
+    newMat = cloneMaterialWithTex(mat, canvasTex);
+  }
+
+  mesh.material = newMat;
+  garmentMaterial = newMat;
+}
+
+function cloneMaterialWithTex(mat, tex) {
+  // Use MeshStandardMaterial for proper lighting
+  const m = new THREE.MeshStandardMaterial({
+    map: tex,
+    roughness: mat.roughness ?? 0.8,
+    metalness: mat.metalness ?? 0.0,
+    normalMap: mat.normalMap || null,
+    aoMap: mat.aoMap || null,
+    side: THREE.FrontSide,
+  });
+  return m;
+}
+
+// Flat color fallback (no UV)
+function applyFlatColor(model, hex) {
+  const color = new THREE.Color(hex);
+  model.traverse(c=>{
+    if(c.isMesh){
+      const mats = Array.isArray(c.material)?c.material:[c.material];
+      mats.forEach(m=>{ if(m.color){ m.color.set(color); m.needsUpdate=true; } });
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════
+// DESIGN LOAD & CONTROLS
+// ════════════════════════════════════════════════════
+function loadDesign(event) {
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      S.designImg=img;
+      document.getElementById('designPreview').innerHTML=`<img src="${e.target.result}" alt="diseño">`;
+      document.getElementById('designControls').style.display='block';
+      paintTexture();
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearDesign() {
+  S.designImg=null;
+  document.getElementById('designPreview').innerHTML='<span class="nd">Sin diseño</span>';
+  document.getElementById('designControls').style.display='none';
+  document.getElementById('designUpload').value='';
+  // Reset sliders to defaults
+  document.getElementById('dScale').value=25; document.getElementById('vScale').textContent='25%';
+  document.getElementById('dU').value=50;     document.getElementById('vDU').textContent='0.50';
+  document.getElementById('dV').value=60;     document.getElementById('vDV').textContent='0.60';
+  document.getElementById('dOp').value=100;   document.getElementById('vDOp').textContent='100%';
+  S.designScale=0.25; S.designU=0.50; S.designV=0.60; S.designOpacity=1;
+  paintTexture();
+}
+
+function updateDecal() {
+  S.designScale   = parseInt(document.getElementById('dScale').value) / 100;
+  S.designU       = parseInt(document.getElementById('dU').value) / 100;
+  S.designV       = parseInt(document.getElementById('dV').value) / 100;
+  S.designOpacity = parseInt(document.getElementById('dOp').value) / 100;
+  document.getElementById('vScale').textContent = document.getElementById('dScale').value+'%';
+  document.getElementById('vDU').textContent    = S.designU.toFixed(2);
+  document.getElementById('vDV').textContent    = S.designV.toFixed(2);
+  document.getElementById('vDOp').textContent   = document.getElementById('dOp').value+'%';
+  paintTexture();
+}
+
+// Center design on front chest area (from UV map analysis)
+// Based on the Blender screenshot: front chest center ≈ U:0.50, V:0.62
+function centerDecal() {
+  S.designU=0.50; S.designV=0.62;
+  document.getElementById('dU').value=50;
+  document.getElementById('dV').value=62;
+  document.getElementById('vDU').textContent='0.50';
+  document.getElementById('vDV').textContent='0.62';
+  paintTexture();
+}
+
+// ════════════════════════════════════════════════════
+// GARMENT COLOR
+// ════════════════════════════════════════════════════
+function setGarmentColor(hex) {
+  S.garmentColor=hex;
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active',s.dataset.color===hex));
+  if(S.hasUV) {
+    paintTexture(); // repaints texture with new base color
+  } else {
+    applyFlatColor(currentModel, hex);
+  }
+}
+
+// ════════════════════════════════════════════════════
+// BACKGROUND
+// ════════════════════════════════════════════════════
+function updateBgTexture() {
+  if(!S.bgImg) return;
+  const rSize=renderer.getSize(new THREE.Vector2());
+  const W=rSize.x, H=rSize.y;
+  if(!bgOffCanvas||bgOffCanvas.width!==W||bgOffCanvas.height!==H){
+    bgOffCanvas=document.createElement('canvas');
+    bgOffCanvas.width=W; bgOffCanvas.height=H;
+    bgOffCtx=bgOffCanvas.getContext('2d');
+    if(bgCanvasTex){bgCanvasTex.dispose();bgCanvasTex=null;}
+  }
+  bgOffCtx.clearRect(0,0,W,H);
+  bgOffCtx.save();
+  bgOffCtx.globalAlpha=S.bgOpacity;
+  bgOffCtx.filter=`brightness(${S.bgBrightness})`;
+  const ia=S.bgImg.width/S.bgImg.height, ca=W/H;
+  let sw,sh,sx,sy;
+  if(ia>ca){sh=S.bgImg.height;sw=sh*ca;sx=(S.bgImg.width-sw)/2;sy=0;}
+  else{sw=S.bgImg.width;sh=sw/ca;sx=0;sy=(S.bgImg.height-sh)/2;}
+  bgOffCtx.drawImage(S.bgImg,sx,sy,sw,sh,0,0,W,H);
+  bgOffCtx.restore();
+  if(!bgCanvasTex){
+    bgCanvasTex=new THREE.CanvasTexture(bgOffCanvas);
+    scene.background=bgCanvasTex;
+  } else {
+    bgCanvasTex.needsUpdate=true;
+  }
+}
+
+function setBgColor(val) {
+  S.bgColor=val;
+  if(bgCanvasTex){bgCanvasTex.dispose();bgCanvasTex=null;bgOffCanvas=null;}
+  if(val==='transparent'){renderer.setClearColor(0x000000,0);scene.background=null;}
+  else{const c=new THREE.Color(val);scene.background=c;renderer.setClearColor(c,1);}
+  document.querySelectorAll('.bg-opt').forEach(b=>b.classList.toggle('active',b.dataset.color===val));
+}
+
+function loadBgImage(event) {
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      S.bgImg=img;
+      bgOffCanvas=null; bgCanvasTex=null;
+      document.getElementById('bgImgRow').style.display='block';
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearBgImage() {
+  S.bgImg=null;
+  if(bgCanvasTex){bgCanvasTex.dispose();bgCanvasTex=null;bgOffCanvas=null;}
+  setBgColor(S.bgColor);
+  document.getElementById('bgImgRow').style.display='none';
+  document.getElementById('bgUpload').value='';
+}
+
+function updateBgSettings() {
+  S.bgOpacity=parseInt(document.getElementById('bgOp').value)/100;
+  S.bgBrightness=parseInt(document.getElementById('bgBr').value)/100;
+  document.getElementById('vBgOp').textContent=document.getElementById('bgOp').value+'%';
+  document.getElementById('vBgBr').textContent=document.getElementById('bgBr').value+'%';
+  bgOffCanvas=null; // force rebuild
+}
+
+// ════════════════════════════════════════════════════
+// CAMERA & LIGHTS
+// ════════════════════════════════════════════════════
+function setCameraZoom(v){document.getElementById('vZoom').textContent=v+'%';orbit.zoom=0.5+(200-v)*0.022;}
+function setCameraHeight(v){document.getElementById('vCH').textContent=v;camera.position.y=v*0.025;}
+function setLight(type,v){
+  const map={front:'vLF',top:'vLT',amb:'vLA'};
+  document.getElementById(map[type]).textContent=v+'%';
+  const i=v/100;
+  if(type==='front') lights.front.intensity=i;
+  if(type==='top')   lights.top.intensity=i*.8;
+  if(type==='amb')   lights.ambient.intensity=i*.6;
+}
+function resetCamera(){orbit.zoom=3.2;orbit.rotX=0;camera.position.set(0,0.05,3.2);if(currentModel)currentModel.rotation.set(0,0,0);}
+function snapFront(){if(currentModel){currentModel.rotation.set(0,0,0);orbit.rotX=0;}}
+
+// ════════════════════════════════════════════════════
+// RECORDING
+// ════════════════════════════════════════════════════
 let mediaRecorder=null, recChunks=[], recActive=false;
 
 async function startRecording() {
   if(recActive) return;
-  if(!currentModel){ alert('Primero cargá una prenda'); return; }
-
+  if(!currentModel){alert('Primero cargá una prenda');return;}
   const q=S.recordQuality;
   const area=document.getElementById('canvasArea');
   const aspect=area.clientWidth/area.clientHeight;
   const rW=q===1080?1080:720, rH=Math.round(rW/aspect);
-
   renderer.setSize(rW,rH,false);
   camera.aspect=rW/rH; camera.updateProjectionMatrix();
-
   recChunks=[]; recActive=true;
   const btn=document.getElementById('recBtn');
   btn.disabled=true;
@@ -743,24 +962,21 @@ async function startRecording() {
   document.getElementById('progW').classList.add('show');
   document.getElementById('progF').style.width='0%';
   document.getElementById('progL').textContent='Iniciando…';
-
   const wasAuto=S.autoRotate; S.autoRotate=true;
-
   const stream=renderer.domElement.captureStream(60);
   const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
   mediaRecorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:q===1080?8e6:4e6});
-  mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) recChunks.push(e.data); };
+  mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recChunks.push(e.data);};
   mediaRecorder.onstop=()=>finishRec(wasAuto,area);
   mediaRecorder.start(100);
-
   const dur=S.recordDuration*1000, t0=performance.now();
   const iv=setInterval(()=>{
     const el=performance.now()-t0;
     document.getElementById('progF').style.width=Math.min(100,(el/dur)*100)+'%';
     document.getElementById('progL').textContent=`Grabando… ${(el/1000).toFixed(1)}s / ${S.recordDuration}s`;
-    if(el>=dur) clearInterval(iv);
+    if(el>=dur)clearInterval(iv);
   },100);
-  setTimeout(()=>{ clearInterval(iv); mediaRecorder.stop(); }, dur);
+  setTimeout(()=>{clearInterval(iv);mediaRecorder.stop();},dur);
 }
 
 function finishRec(wasAuto,area) {
@@ -783,43 +999,29 @@ function finishRec(wasAuto,area) {
   },300);
 }
 
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
 // IMAGE EXPORT
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
 function exportImage() {
-  if(!currentModel){ alert('Primero cargá una prenda'); return; }
+  if(!currentModel){alert('Primero cargá una prenda');return;}
   const sz=EXPORT_SIZES[S.exportMode], W=sz.w, H=sz.h;
   const area=document.getElementById('canvasArea');
   const origW=area.clientWidth, origH=area.clientHeight;
 
-  // Render at export resolution — design is already in scene
   renderer.setSize(W,H,false);
   camera.aspect=W/H; camera.updateProjectionMatrix();
   updateBgTexture();
   renderer.render(scene,camera);
 
-  // Grab rendered frame
   const ec=document.createElement('canvas'); ec.width=W; ec.height=H;
   const ctx=ec.getContext('2d');
-
-  // If we have a separate bgImg not handled by Three.js texture, composite it
-  if(S.bgImg && !scene.background) {
-    ctx.save(); ctx.globalAlpha=S.bgOpacity; ctx.filter=`brightness(${S.bgBrightness})`;
-    const ia=S.bgImg.width/S.bgImg.height, ca=W/H;
-    let sw,sh,sx,sy;
-    if(ia>ca){sh=S.bgImg.height;sw=sh*ca;sx=(S.bgImg.width-sw)/2;sy=0;}
-    else{sw=S.bgImg.width;sh=sw/ca;sx=0;sy=(S.bgImg.height-sh)/2;}
-    ctx.drawImage(S.bgImg,sx,sy,sw,sh,0,0,W,H);
-    ctx.restore();
-  }
   ctx.drawImage(renderer.domElement,0,0,W,H);
 
-  // Restore
   renderer.setSize(origW,origH,false);
   camera.aspect=origW/origH; camera.updateProjectionMatrix();
 
   let finalCanvas=ec;
-  if(S.exportFormat==='jpg') {
+  if(S.exportFormat==='jpg'){
     const jc=document.createElement('canvas'); jc.width=W; jc.height=H;
     const jctx=jc.getContext('2d');
     jctx.fillStyle='#ffffff'; jctx.fillRect(0,0,W,H);
@@ -833,221 +1035,47 @@ function exportImage() {
   a.click();
 }
 
-// ═══════════════════════════════════════
-// DESIGN LOAD & CLEAR
-// ═══════════════════════════════════════
-function loadDesign(event) {
-  const file=event.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const img=new Image();
-    img.onload=()=>{
-      S.designImg=img;
-      document.getElementById('designPreview').innerHTML=`<img src="${e.target.result}" alt="diseño">`;
-      document.getElementById('designControls').style.display='block';
-      attachDesignMesh(); // create the 3D plane child
-    };
-    img.src=e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function clearDesign() {
-  S.designImg=null;
-  if(designMesh && currentModel){ currentModel.remove(designMesh); designMesh=null; }
-  document.getElementById('designPreview').innerHTML='<span class="nd">Sin diseño</span>';
-  document.getElementById('designControls').style.display='none';
-  document.getElementById('designUpload').value='';
-  document.getElementById('dScale').value=20; document.getElementById('vScale').textContent='20%';
-  document.getElementById('dX').value=0;   document.getElementById('vDX').textContent='0';
-  document.getElementById('dY').value=0;   document.getElementById('vDY').textContent='0';
-  document.getElementById('dOp').value=100; document.getElementById('vDOp').textContent='100%';
-  S.designScale=0.20; S.designOffX=0; S.designOffY=0; S.designOpacity=1;
-}
-
-function updateDecal() {
-  S.designScale   = parseInt(document.getElementById('dScale').value) / 100;
-  S.designOffX    = parseInt(document.getElementById('dX').value) / 100;
-  S.designOffY    = parseInt(document.getElementById('dY').value) / 100;
-  S.designOpacity = parseInt(document.getElementById('dOp').value) / 100;
-  document.getElementById('vScale').textContent = document.getElementById('dScale').value+'%';
-  document.getElementById('vDX').textContent    = document.getElementById('dX').value;
-  document.getElementById('vDY').textContent    = document.getElementById('dY').value;
-  document.getElementById('vDOp').textContent   = document.getElementById('dOp').value+'%';
-  updateDecalMesh(); // update the 3D plane geometry/position
-}
-
-function centerDecal() {
-  document.getElementById('dX').value=0; document.getElementById('dY').value=0;
-  S.designOffX=0; S.designOffY=0;
-  document.getElementById('vDX').textContent='0';
-  document.getElementById('vDY').textContent='0';
-  updateDecalMesh();
-}
-
-// ═══════════════════════════════════════
-// BACKGROUND
-// ═══════════════════════════════════════
-// ═══════════════════════════════════════
-// BACKGROUND
-// ═══════════════════════════════════════
-// updateBgTexture is called every frame in animate().
-// It applies S.bgImg (with opacity/brightness) as scene.background via
-// an offscreen canvas → THREE.CanvasTexture, so it renders in real-time.
-let bgOffCanvas = null, bgOffCtx = null;
-let bgCanvasTex = null;
-
-function updateBgTexture() {
-  if(!S.bgImg) return; // nothing to do, color bg is handled by setBgColor
-  // Build or reuse offscreen canvas matching renderer size
-  const rSize = renderer.getSize(new THREE.Vector2());
-  const W=rSize.x, H=rSize.y;
-  if(!bgOffCanvas || bgOffCanvas.width!==W || bgOffCanvas.height!==H) {
-    bgOffCanvas=document.createElement('canvas');
-    bgOffCanvas.width=W; bgOffCanvas.height=H;
-    bgOffCtx=bgOffCanvas.getContext('2d');
-    if(bgCanvasTex){ bgCanvasTex.dispose(); bgCanvasTex=null; }
-  }
-  bgOffCtx.clearRect(0,0,W,H);
-  bgOffCtx.save();
-  bgOffCtx.globalAlpha=S.bgOpacity;
-  bgOffCtx.filter=`brightness(${S.bgBrightness})`;
-  // Cover-fit the image
-  const ia=S.bgImg.width/S.bgImg.height, ca=W/H;
-  let sw,sh,sx,sy;
-  if(ia>ca){sh=S.bgImg.height;sw=sh*ca;sx=(S.bgImg.width-sw)/2;sy=0;}
-  else{sw=S.bgImg.width;sh=sw/ca;sx=0;sy=(S.bgImg.height-sh)/2;}
-  bgOffCtx.drawImage(S.bgImg,sx,sy,sw,sh,0,0,W,H);
-  bgOffCtx.restore();
-  if(!bgCanvasTex){
-    bgCanvasTex=new THREE.CanvasTexture(bgOffCanvas);
-    scene.background=bgCanvasTex;
-  } else {
-    bgCanvasTex.needsUpdate=true;
-  }
-}
-
-function setBgColor(val) {
-  S.bgColor=val;
-  // When switching to color, clear any image texture
-  if(bgCanvasTex){ bgCanvasTex.dispose(); bgCanvasTex=null; bgOffCanvas=null; }
-  if(val==='transparent') {
-    renderer.setClearColor(0x000000,0); scene.background=null;
-  } else {
-    const c=new THREE.Color(val);
-    scene.background=c; renderer.setClearColor(c,1);
-  }
-  document.querySelectorAll('.bg-opt').forEach(b=>b.classList.toggle('active',b.dataset.color===val));
-}
-
-function loadBgImage(event) {
-  const file=event.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const img=new Image();
-    img.onload=()=>{
-      S.bgImg=img;
-      // Reset offscreen canvas so it rebuilds at correct size
-      bgOffCanvas=null; bgCanvasTex=null;
-      document.getElementById('bgImgRow').style.display='block';
-      // updateBgTexture() will fire on next frame automatically
-    };
-    img.src=e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function clearBgImage() {
-  S.bgImg=null;
-  if(bgCanvasTex){ bgCanvasTex.dispose(); bgCanvasTex=null; bgOffCanvas=null; }
-  // Restore color background
-  setBgColor(S.bgColor);
-  document.getElementById('bgImgRow').style.display='none';
-  document.getElementById('bgUpload').value='';
-}
-
-function updateBgSettings() {
-  S.bgOpacity=parseInt(document.getElementById('bgOp').value)/100;
-  S.bgBrightness=parseInt(document.getElementById('bgBr').value)/100;
-  document.getElementById('vBgOp').textContent=document.getElementById('bgOp').value+'%';
-  document.getElementById('vBgBr').textContent=document.getElementById('bgBr').value+'%';
-  // Force canvas rebuild
-  bgOffCanvas=null;
-}
-
-// ═══════════════════════════════════════
-// CAMERA & LIGHTS
-// ═══════════════════════════════════════
-function setCameraZoom(v) {
-  document.getElementById('vZoom').textContent=v+'%';
-  orbit.zoom = 0.5+(200-v)*0.022;
-}
-function setCameraHeight(v) {
-  document.getElementById('vCH').textContent=v;
-  camera.position.y=v*0.025;
-}
-function setLight(type,v) {
-  const map={front:'vLF',top:'vLT',amb:'vLA'};
-  document.getElementById(map[type]).textContent=v+'%';
-  const i=v/100;
-  if(type==='front') lights.front.intensity=i;
-  if(type==='top')   lights.top.intensity=i*.8;
-  if(type==='amb')   lights.ambient.intensity=i*.6;
-}
-function resetCamera() { orbit.zoom=3.2; orbit.rotX=0; camera.position.set(0,0.05,3.2); if(currentModel) currentModel.rotation.set(0,0,0); }
-function snapFront()    { if(currentModel){ currentModel.rotation.set(0,0,0); orbit.rotX=0; } }
-
-// ═══════════════════════════════════════
-// GARMENT COLOR
-// ═══════════════════════════════════════
-function setGarmentColor(hex) {
-  S.garmentColor=hex;
-  document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active',s.dataset.color===hex));
-  if(!currentModel) return;
-  currentModel.traverse(c=>{ if(c.isMesh) applyColor(c,hex); });
-}
-
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
 // EXPORT SETTINGS
-// ═══════════════════════════════════════
-function selectExport(mode) {
+// ════════════════════════════════════════════════════
+function selectExport(mode){
   S.exportMode=mode;
   document.querySelectorAll('.exp-card').forEach(c=>c.classList.remove('active'));
   document.getElementById('card-'+mode).classList.add('active');
   document.getElementById('currentDim').textContent=EXPORT_SIZES[mode].label;
 }
-function selectFormat(fmt) {
+function selectFormat(fmt){
   S.exportFormat=fmt;
   document.querySelectorAll('.fmt-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('fmt-'+fmt).classList.add('active');
 }
-function setDur(d) {
+function setDur(d){
   S.recordDuration=d;
   document.querySelectorAll('.dur-btn').forEach(b=>b.classList.toggle('active',parseInt(b.textContent)===d));
 }
-function setVidQ(q) {
+function setVidQ(q){
   S.recordQuality=q;
   document.querySelectorAll('.q-card').forEach(c=>c.classList.toggle('active',c.id==='q-'+q));
 }
 
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
 // LOADER HELPERS
-// ═══════════════════════════════════════
-function showLoader(t) { document.getElementById('loadOv').classList.remove('hidden'); updateLoadTxt(t); }
-function hideLoader()   { document.getElementById('loadOv').classList.add('hidden'); }
-function updateLoadTxt(t){ document.getElementById('loadTxt').textContent=t; }
-function showErr(msg,path) {
+// ════════════════════════════════════════════════════
+function showLoader(t){document.getElementById('loadOv').classList.remove('hidden');updateLoadTxt(t);}
+function hideLoader(){document.getElementById('loadOv').classList.add('hidden');}
+function updateLoadTxt(t){document.getElementById('loadTxt').textContent=t;}
+function showErr(msg,path){
   document.getElementById('errBox').classList.add('show');
   document.getElementById('errMsg').textContent=msg;
   document.getElementById('errPath').textContent=path;
   hideLoader();
 }
-function hideErr() { document.getElementById('errBox').classList.remove('show'); }
+function hideErr(){document.getElementById('errBox').classList.remove('show');}
 
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
 // BUILD UI
-// ═══════════════════════════════════════
-function buildGarmentList() {
+// ════════════════════════════════════════════════════
+function buildGarmentList(){
   const list=document.getElementById('garmentList');
   GARMENTS.forEach((g,i)=>{
     const el=document.createElement('div');
@@ -1062,7 +1090,7 @@ function buildGarmentList() {
   });
 }
 
-function buildSwatches() {
+function buildSwatches(){
   const wrap=document.getElementById('colorSwatches');
   COLORS.forEach(c=>{
     const el=document.createElement('div');
@@ -1074,12 +1102,12 @@ function buildSwatches() {
   });
 }
 
-function buildBgGrid() {
+function buildBgGrid(){
   const grid=document.getElementById('bgGrid');
   BG_PRESETS.forEach(bg=>{
     const el=document.createElement('div');
     el.className='bg-opt'+(bg.color===S.bgColor?' active':'');
-    el.dataset.color=bg.color; el.title=bg.color;
+    el.dataset.color=bg.color;
     const inner=document.createElement('div');
     if(bg.color==='transparent') inner.style.background='repeating-conic-gradient(#bbb 0% 25%,#fff 0% 50%) 0 0/8px 8px';
     else inner.style.background=bg.color;
@@ -1090,36 +1118,33 @@ function buildBgGrid() {
   });
 }
 
-// ── Setup drag-over for upload zones ──
-function setupDropZones() {
+function setupDropZones(){
   ['dzDesign','dzBg'].forEach(id=>{
     const z=document.getElementById(id);
-    z.addEventListener('dragover', e=>{ e.preventDefault(); z.classList.add('drag'); });
-    z.addEventListener('dragleave', ()=>z.classList.remove('drag'));
-    z.addEventListener('drop', e=>{
-      e.preventDefault(); z.classList.remove('drag');
-      const f=e.dataTransfer.files[0];
-      if(!f) return;
-      if(id==='dzDesign') { document.getElementById('designUpload').files=e.dataTransfer.files; loadDesign({target:{files:[f]}}); }
-      if(id==='dzBg')     { loadBgImage({target:{files:[f]}}); }
+    z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('drag');});
+    z.addEventListener('dragleave',()=>z.classList.remove('drag'));
+    z.addEventListener('drop',e=>{
+      e.preventDefault();z.classList.remove('drag');
+      const f=e.dataTransfer.files[0]; if(!f) return;
+      if(id==='dzDesign') loadDesign({target:{files:[f]}});
+      if(id==='dzBg')     loadBgImage({target:{files:[f]}});
     });
   });
 }
 
-// ═══════════════════════════════════════
+// ════════════════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════
-function init() {
+// ════════════════════════════════════════════════════
+function init(){
   buildGarmentList();
   buildSwatches();
   buildBgGrid();
   setupDropZones();
   initScene();
-  setTimeout(()=>loadGarment(GARMENTS[0]), 800);
+  setTimeout(()=>loadGarment(GARMENTS[0]),800);
 }
-
-window.addEventListener('load', init);
-window.addEventListener('resize', resizeAll);
+window.addEventListener('load',init);
+window.addEventListener('resize',resizeAll);
 </script>
 </body>
 </html>
