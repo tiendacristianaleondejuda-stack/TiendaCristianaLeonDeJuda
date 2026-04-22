@@ -236,8 +236,8 @@ input[type=color]{width:26px;height:26px;border-radius:50%;border:2px solid var(
 
     <div style="margin-top:10px;">
       <div class="ctrl"><label>Escala</label><input type="range" id="dScale" min="2" max="80" value="25" oninput="updateDecal()"><span class="val" id="vScale">25%</span></div>
-      <div class="ctrl"><label>Pos. U →</label><input type="range" id="dU" min="0" max="100" value="50" oninput="updateDecal()"><span class="val" id="vDU">0.50</span></div>
-      <div class="ctrl"><label>Pos. V ↑</label><input type="range" id="dV" min="0" max="100" value="60" oninput="updateDecal()"><span class="val" id="vDV">0.60</span></div>
+      <div class="ctrl"><label>Pos. U →</label><input type="range" id="dU" min="0" max="100" value="27" oninput="updateDecal()"><span class="val" id="vDU">0.27</span></div>
+      <div class="ctrl"><label>Pos. V ↑</label><input type="range" id="dV" min="0" max="100" value="55" oninput="updateDecal()"><span class="val" id="vDV">0.55</span></div>
       <div class="ctrl"><label>Opacidad</label><input type="range" id="dOp" min="10" max="100" value="100" oninput="updateDecal()"><span class="val" id="vDOp">100%</span></div>
     </div>
     <div class="btn-row">
@@ -459,8 +459,8 @@ const S = {
   designImg: null,
   // UV-space design position & scale
   // U/V are 0..1 coordinates in the texture space
-  designU: 0.50,   // horizontal center (0=left, 1=right)
-  designV: 0.60,   // vertical center (0=bottom, 1=top in UV)
+  designU: 0.27,   // front chest center U (left panel of this UV layout)
+  designV: 0.55,   // front chest center V
   designScale: 0.25, // fraction of texture width
   designOpacity: 1,
   rotSpeed: 8,
@@ -587,41 +587,58 @@ function animate() {
 // ════════════════════════════════════════════════════
 // UV TEXTURE SYSTEM
 // ════════════════════════════════════════════════════
-// paintTexture() redraws the entire texCanvas:
-//   1. Fill with garment color
-//   2. If design exists, draw it at UV position (U,V) with given scale
-// The canvas is already set as material.map → Three.js picks it up automatically.
+// We store the original texture image from the GLB.
+// paintTexture() composites: originalTexture → color tint → design stamp.
+// This preserves the garment shape/shading from the original UV map.
+
+let originalTexImg = null; // HTMLImageElement of the GLB's original texture
 
 function paintTexture() {
   if(!texCtx) return;
   const W = TEX_SIZE, H = TEX_SIZE;
   texCtx.clearRect(0,0,W,H);
 
-  // 1. Fill garment color
-  texCtx.fillStyle = S.garmentColor;
-  texCtx.fillRect(0,0,W,H);
+  // Step 1: Draw the original GLB texture as the base (preserves garment shape)
+  if(originalTexImg) {
+    texCtx.drawImage(originalTexImg, 0, 0, W, H);
+    // Apply color tint on top using 'multiply' blend if color != white,
+    // otherwise leave original as-is
+    if(S.garmentColor !== '#ffffff' && S.garmentColor !== '#FFFFFF') {
+      texCtx.save();
+      texCtx.globalCompositeOperation = 'multiply';
+      texCtx.fillStyle = S.garmentColor;
+      texCtx.fillRect(0, 0, W, H);
+      texCtx.restore();
+    }
+  } else {
+    // No original texture: just fill with garment color
+    texCtx.fillStyle = S.garmentColor;
+    texCtx.fillRect(0, 0, W, H);
+  }
 
-  // 2. Draw design if available
+  // Step 2: Draw design stamp if available
   if(S.designImg) {
     const dW = W * S.designScale;
     const aspect = S.designImg.width / S.designImg.height;
     const dH = dW / aspect;
 
-    // UV coords: U goes left→right (0→1), V goes bottom→top in UV space
-    // But in canvas coords Y goes top→bottom, so V=1 is top of canvas (Y=0)
+    // CanvasTexture with flipY=false means UV(0,0) = canvas top-left
+    // U goes left→right: cx = U * W
+    // V goes bottom→top in UV, but canvas Y goes top→bottom
+    // With flipY=false: V=1 → canvas Y=0 (top), V=0 → canvas Y=H (bottom)
     const cx = S.designU * W;
-    const cy = (1 - S.designV) * H;  // flip V for canvas
+    const cy = (1.0 - S.designV) * H;
 
     texCtx.save();
     texCtx.globalAlpha = S.designOpacity;
+    texCtx.globalCompositeOperation = 'source-over';
     texCtx.drawImage(S.designImg, cx - dW/2, cy - dH/2, dW, dH);
     texCtx.restore();
   }
 
-  // Signal Three.js to re-upload the texture
+  // Tell Three.js to re-upload the texture to GPU
   if(canvasTex) canvasTex.needsUpdate = true;
 
-  // Redraw UV preview panel
   drawUVPreview();
 }
 
@@ -740,39 +757,56 @@ function checkHasUV(mesh) {
 // SETUP UV TEXTURE ON MESH
 // ════════════════════════════════════════════════════
 function setupUVTexture(mesh) {
-  // Paint initial state
+  // Extract original texture image from the GLB material BEFORE we replace it
+  originalTexImg = extractOriginalTexture(mesh);
+
+  // Create our CanvasTexture — flipY=false so UV(0,0) maps to canvas top-left
+  // (matches how Three.js CanvasTexture works internally)
+  canvasTex = new THREE.CanvasTexture(texCanvas);
+  canvasTex.flipY = false;
+  canvasTex.encoding = THREE.sRGBEncoding;
+
+  // Paint initial state onto canvas (uses originalTexImg as base)
   paintTexture();
 
-  // Create CanvasTexture from our texCanvas
-  canvasTex = new THREE.CanvasTexture(texCanvas);
-  canvasTex.flipY = true; // Standard UV convention
-
-  // Clone material so we don't affect other meshes sharing it
+  // Build new materials that reference our canvas texture
   const mat = mesh.material;
   let newMat;
-
   if(Array.isArray(mat)) {
-    // Multi-material: apply to all
     newMat = mat.map(m => cloneMaterialWithTex(m, canvasTex));
   } else {
     newMat = cloneMaterialWithTex(mat, canvasTex);
   }
-
   mesh.material = newMat;
   garmentMaterial = newMat;
 }
 
+function extractOriginalTexture(mesh) {
+  // Try to get the existing map from the material
+  const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+  if(!mat) return null;
+  const tex = mat.map;
+  if(!tex || !tex.image) return null;
+  // tex.image may be HTMLImageElement, HTMLCanvasElement, or ImageBitmap
+  // We convert to HTMLImageElement/canvas for drawImage compatibility
+  const img = tex.image;
+  if(img instanceof HTMLImageElement || img instanceof HTMLCanvasElement || img instanceof ImageBitmap) {
+    return img;
+  }
+  return null;
+}
+
 function cloneMaterialWithTex(mat, tex) {
-  // Use MeshStandardMaterial for proper lighting
-  const m = new THREE.MeshStandardMaterial({
+  return new THREE.MeshStandardMaterial({
     map: tex,
-    roughness: mat.roughness ?? 0.8,
+    roughness: mat.roughness ?? 0.85,
     metalness: mat.metalness ?? 0.0,
-    normalMap: mat.normalMap || null,
-    aoMap: mat.aoMap || null,
-    side: THREE.FrontSide,
+    // Keep normal/ao maps from original for proper shading
+    normalMap:   mat.normalMap   || null,
+    aoMap:       mat.aoMap       || null,
+    // DoubleSide handles Sketchfab models that may have flipped normals
+    side: THREE.DoubleSide,
   });
-  return m;
 }
 
 // Flat color fallback (no UV)
@@ -812,10 +846,10 @@ function clearDesign() {
   document.getElementById('designUpload').value='';
   // Reset sliders to defaults
   document.getElementById('dScale').value=25; document.getElementById('vScale').textContent='25%';
-  document.getElementById('dU').value=50;     document.getElementById('vDU').textContent='0.50';
-  document.getElementById('dV').value=60;     document.getElementById('vDV').textContent='0.60';
+  document.getElementById('dU').value=27;     document.getElementById('vDU').textContent='0.27';
+  document.getElementById('dV').value=55;     document.getElementById('vDV').textContent='0.55';
   document.getElementById('dOp').value=100;   document.getElementById('vDOp').textContent='100%';
-  S.designScale=0.25; S.designU=0.50; S.designV=0.60; S.designOpacity=1;
+  S.designScale=0.25; S.designU=0.27; S.designV=0.55; S.designOpacity=1;
   paintTexture();
 }
 
@@ -831,14 +865,15 @@ function updateDecal() {
   paintTexture();
 }
 
-// Center design on front chest area (from UV map analysis)
-// Based on the Blender screenshot: front chest center ≈ U:0.50, V:0.62
+// Center design on front chest area
+// From texture analysis (Image_0.png): front panel = left half of texture
+// Front chest center ≈ U:0.27, V:0.55 (canvas coords with flipY=false)
 function centerDecal() {
-  S.designU=0.50; S.designV=0.62;
-  document.getElementById('dU').value=50;
-  document.getElementById('dV').value=62;
-  document.getElementById('vDU').textContent='0.50';
-  document.getElementById('vDV').textContent='0.62';
+  S.designU=0.27; S.designV=0.55;
+  document.getElementById('dU').value=27;
+  document.getElementById('dV').value=55;
+  document.getElementById('vDU').textContent='0.27';
+  document.getElementById('vDV').textContent='0.55';
   paintTexture();
 }
 
@@ -846,13 +881,23 @@ function centerDecal() {
 // GARMENT COLOR
 // ════════════════════════════════════════════════════
 function setGarmentColor(hex) {
-  S.garmentColor=hex;
-  document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active',s.dataset.color===hex));
+  S.garmentColor = hex;
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active', s.dataset.color===hex));
   if(S.hasUV) {
-    paintTexture(); // repaints texture with new base color
+    paintTexture(); // repaints: original tex + color tint + design stamp
   } else {
     applyFlatColor(currentModel, hex);
   }
+}
+
+function applyFlatColor(model, hex) {
+  if(!model) return;
+  const color = new THREE.Color(hex);
+  model.traverse(c=>{
+    if(!c.isMesh) return;
+    const mats = Array.isArray(c.material)?c.material:[c.material];
+    mats.forEach(m=>{ if(m.color){ m.color.set(color); } m.side=THREE.DoubleSide; m.needsUpdate=true; });
+  });
 }
 
 // ════════════════════════════════════════════════════
