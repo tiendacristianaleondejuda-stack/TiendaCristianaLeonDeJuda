@@ -1018,7 +1018,51 @@ document.addEventListener('DOMContentLoaded', async () => {
           <p class="sec-label">Talla</p>
           <div class="tallas-wrap">${tallasHTML}</div>
           <p id="stock-talla-info" style="font-size:.75rem;color:var(--text-muted);margin-top:-.5rem;margin-bottom:1rem;min-height:1.2em"></p>
-          <p class="guia-tallas"><i class="bi bi-rulers"></i> Ver guía de tallas</p>
+          <div class="accordion-item guia-tallas-item">
+  <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+    <span><i class="bi bi-rulers"></i> Ver guía de tallas</span>
+    <i class="bi bi-chevron-down accordion-icon"></i>
+  </div>
+  <div class="accordion-body">
+    <table class="tabla-tallas">
+      <thead>
+        <tr>
+          <th>Talle</th>
+          <th>Ancho (cm)</th>
+          <th>Largo (cm)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>S</td>
+          <td>47</td>
+          <td>70</td>
+        </tr>
+        <tr>
+          <td>M</td>
+          <td>51</td>
+          <td>72</td>
+        </tr>
+        <tr>
+          <td>L</td>
+          <td>53</td>
+          <td>74</td>
+        </tr>
+        <tr>
+          <td>XL</td>
+          <td>55</td>
+          <td>76</td>
+        </tr>
+        <tr>
+          <td>XXL</td>
+          <td>60</td>
+          <td>78</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="nota-tallas">* Las medidas pueden variar ±2cm. Medidas de la prenda ya terminada.</p>
+  </div>
+</div>
 
           <p class="sec-label">Cantidad</p>
           <div class="cantidad-wrap">
@@ -1068,7 +1112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <i class="bi bi-chevron-down accordion-icon"></i>
             </div>
             <div class="accordion-body">
-              Lavar a máquina en frío. No usar secadora. Planchar a temperatura media.
+              Lavar a máquina en frío para mayor duración - No usar secadora -Lavar del lado del revés -No usar blanqueador -No planchar directamente sobre estampas.
             </div>
           </div>
         </div>
