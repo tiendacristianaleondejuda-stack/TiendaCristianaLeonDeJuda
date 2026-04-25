@@ -246,6 +246,18 @@
         </div>
         <button class="btn-p" onclick="exportImage()">↓ Exportar imagen</button>
       </div>
+
+      <!-- SECCIÓN GUARDAR/CARGAR PROYECTO -->
+<div style="margin-top: 16px;">
+  <div class="st">💾 Guardar / Cargar Proyecto</div>
+  <div class="btn-row" style="margin-top: 8px; gap: 8px;">
+    <button class="btn-sm" style="flex:1;" onclick="guardarProyecto()">💾 Guardar Proyecto</button>
+    <button class="btn-sm" style="flex:1;" onclick="document.getElementById('cargarArchivo').click()">📂 Cargar Proyecto</button>
+    <input type="file" id="cargarArchivo" accept=".json" style="display:none" onchange="cargarProyecto(event)">
+  </div>
+  <small style="font-size: 0.6rem; color: var(--brown); display: block; margin-top: 6px;">Guarda todos los ajustes (diseño, color, posición, etc.)</small>
+</div>
+
     </div>
   </div>
 
@@ -2046,6 +2058,278 @@ function updateBgSettings() {
     // Cargar el primer modelo después de que la escena esté lista
     loadGarment(GARMENTS[0]);
   }
+
+
+  // ============================================
+// GUARDAR PROYECTO
+// ============================================
+function guardarProyecto() {
+    if (!currentModel) {
+        alert('Primero cargá una prenda antes de guardar');
+        return;
+    }
+    
+    // Crear objeto con todos los datos del proyecto
+    const proyecto = {
+        version: "1.0",
+        fecha: new Date().toISOString(),
+        prenda: {
+            id: S.currentGarment?.id,
+            nombre: S.currentGarment?.name,
+            color: S.garmentColor,
+            colorPorMalla: meshColorMap
+        },
+        diseñoFrontal: S.designImg ? {
+            imagenData: null,  // se procesa aparte
+            nombre: document.getElementById('designPreview')?.querySelector('img')?.src?.split('/').pop() || 'diseño',
+            u: S.designU,
+            v: S.designV,
+            escala: S.designScale,
+            rotacion: S.designRotation,
+            opacidad: S.designOpacity
+        } : null,
+        diseñoTrasero: S.designImg2 ? {
+            u: S.design2U,
+            v: S.design2V,
+            escala: S.design2Scale,
+            rotacion: S.design2Rotation,
+            opacidad: S.design2Opacity
+        } : null,
+        escena: {
+            zoom: orbit.zoom,
+            alturaCamara: camera.position.y,
+            luzFrontal: lights.front?.intensity / 0.8,
+            luzAmbiente: lights.ambient?.intensity / 0.7,
+            exposicion: renderer.toneMappingExposure * 100,
+            colorFondo: S.bgColor,
+            autoRotacion: S.autoRotate,
+            velocidadRotacion: S.rotSpeed
+        }
+    };
+    
+    // Si hay imagen frontal, convertirla a base64 (para guardarla dentro del archivo)
+    if (S.designImg) {
+        const canvas = document.createElement('canvas');
+        canvas.width = S.designImg.width;
+        canvas.height = S.designImg.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(S.designImg, 0, 0);
+        proyecto.diseñoFrontal.imagenData = canvas.toDataURL('image/png');
+    }
+    
+    // Si hay imagen trasera
+    if (S.designImg2) {
+        const canvas2 = document.createElement('canvas');
+        canvas2.width = S.designImg2.width;
+        canvas2.height = S.designImg2.height;
+        const ctx2 = canvas2.getContext('2d');
+        ctx2.drawImage(S.designImg2, 0, 0);
+        proyecto.diseñoTrasero.imagenData = canvas2.toDataURL('image/png');
+        proyecto.diseñoTrasero.nombre = document.getElementById('designPreview2')?.querySelector('img')?.src?.split('/').pop() || 'estampa';
+    }
+    
+    // Convertir a JSON y descargar
+    const jsonStr = JSON.stringify(proyecto, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mockup_${S.currentGarment?.id || 'proyecto'}_${new Date().toISOString().slice(0,19)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    alert('✅ Proyecto guardado correctamente');
+}
+
+
+// ============================================
+// CARGAR PROYECTO
+// ============================================
+async function cargarProyecto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const proyecto = JSON.parse(e.target.result);
+            
+            // 1. Cargar la prenda correcta
+            const prendaId = proyecto.prenda?.id;
+            const garmentEncontrado = GARMENTS.find(g => g.id === prendaId);
+            if (garmentEncontrado) {
+                // Esperar a que cargue el modelo
+                await new Promise((resolve) => {
+                    loadGarment(garmentEncontrado);
+                    const checkInterval = setInterval(() => {
+                        if (currentModel) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 100);
+                });
+            }
+            
+            // Pequeña pausa para que termine de cargar
+            await new Promise(r => setTimeout(r, 500));
+            
+            // 2. Restaurar color de prenda
+            if (proyecto.prenda?.color) {
+                setGarmentColor(proyecto.prenda.color);
+            }
+            
+            // 3. Restaurar colores por malla
+            if (proyecto.prenda?.colorPorMalla) {
+                meshColorMap = proyecto.prenda.colorPorMalla;
+                for (const [uuid, hex] of Object.entries(meshColorMap)) {
+                    setMeshColor(uuid, hex);
+                }
+            }
+            
+            // 4. Restaurar imágenes (frontal)
+            if (proyecto.diseñoFrontal?.imagenData) {
+                const img = await cargarImagenDesdeDataURL(proyecto.diseñoFrontal.imagenData);
+                if (img) {
+                    S.designImg = img;
+                    // Actualizar UI
+                    const designPreview = document.getElementById('designPreview');
+                    if (designPreview) designPreview.innerHTML = `<img src="${proyecto.diseñoFrontal.imagenData}" alt="diseño">`;
+                    const designControls = document.getElementById('designControls');
+                    if (designControls) designControls.style.display = 'block';
+                    const mobDesThumb = document.getElementById('mobDesThumb');
+                    if (mobDesThumb) mobDesThumb.innerHTML = `<img src="${proyecto.diseñoFrontal.imagenData}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+                    const mobDesignControls = document.getElementById('mobDesignControls');
+                    if (mobDesignControls) mobDesignControls.style.display = 'block';
+                    
+                    // Parámetros del diseño
+                    S.designU = proyecto.diseñoFrontal.u ?? 0.27;
+                    S.designV = proyecto.diseñoFrontal.v ?? 0.55;
+                    S.designScale = proyecto.diseñoFrontal.escala ?? 0.25;
+                    S.designRotation = proyecto.diseñoFrontal.rotacion ?? 0;
+                    S.designOpacity = proyecto.diseñoFrontal.opacidad ?? 1;
+                    
+                    // Sincronizar sliders
+                    sincronizarSlidersFrontal();
+                }
+            }
+            
+            // 5. Restaurar estampa trasera
+            if (proyecto.diseñoTrasero?.imagenData) {
+                const img2 = await cargarImagenDesdeDataURL(proyecto.diseñoTrasero.imagenData);
+                if (img2) {
+                    S.designImg2 = img2;
+                    const dp2 = document.getElementById('designPreview2');
+                    if (dp2) dp2.innerHTML = `<img src="${proyecto.diseñoTrasero.imagenData}" alt="estampa">`;
+                    const dc2 = document.getElementById('designControls2');
+                    if (dc2) dc2.style.display = 'block';
+                    const mob2thumb = document.getElementById('mobDes2Thumb');
+                    if (mob2thumb) mob2thumb.innerHTML = `<img src="${proyecto.diseñoTrasero.imagenData}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+                    const mob2c = document.getElementById('mobDesign2Controls');
+                    if (mob2c) mob2c.style.display = 'block';
+                    
+                    S.design2U = proyecto.diseñoTrasero.u ?? 0.73;
+                    S.design2V = proyecto.diseñoTrasero.v ?? 0.55;
+                    S.design2Scale = proyecto.diseñoTrasero.escala ?? 0.25;
+                    S.design2Rotation = proyecto.diseñoTrasero.rotacion ?? 0;
+                    S.design2Opacity = proyecto.diseñoTrasero.opacidad ?? 1;
+                    
+                    sincronizarSlidersTrasera();
+                }
+            }
+            
+            // 6. Restaurar escena
+            if (proyecto.escena) {
+                if (proyecto.escena.zoom) orbit.zoom = proyecto.escena.zoom;
+                if (proyecto.escena.alturaCamara) camera.position.y = proyecto.escena.alturaCamara;
+                if (proyecto.escena.luzFrontal) setLight('front', proyecto.escena.luzFrontal * 100);
+                if (proyecto.escena.luzAmbiente) setLight('amb', proyecto.escena.luzAmbiente * 100);
+                if (proyecto.escena.exposicion) setExposure(proyecto.escena.exposicion);
+                if (proyecto.escena.colorFondo) setBgColor(proyecto.escena.colorFondo);
+                if (proyecto.escena.autoRotacion !== undefined) S.autoRotate = proyecto.escena.autoRotacion;
+                if (proyecto.escena.velocidadRotacion) S.rotSpeed = proyecto.escena.velocidadRotacion;
+                
+                // Sincronizar checkboxes de auto-rotación
+                const autoRotateCheck = document.getElementById('autoRotate');
+                if (autoRotateCheck) autoRotateCheck.checked = S.autoRotate;
+                const mobAutoRotate = document.getElementById('mobAutoRotate');
+                if (mobAutoRotate) mobAutoRotate.checked = S.autoRotate;
+                
+                // Sincronizar velocidad
+                const rotSpeed = document.getElementById('rotSpeed');
+                if (rotSpeed) rotSpeed.value = S.rotSpeed;
+                const mobRotSpeed = document.getElementById('mobRotSpeed');
+                if (mobRotSpeed) mobRotSpeed.value = S.rotSpeed;
+            }
+            
+            // 7. Refrescar textura final
+            paintTexture();
+            
+            alert('✅ Proyecto cargado correctamente');
+            
+        } catch (error) {
+            console.error(error);
+            alert('❌ Error al cargar el proyecto: ' + error.message);
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Limpiar input
+}
+
+// Funciones auxiliares para sincronizar sliders
+function sincronizarSlidersFrontal() {
+    // Sliders escritorio
+    const dScale = document.getElementById('dScale'); if (dScale) dScale.value = Math.round(S.designScale * 100);
+    const dU = document.getElementById('dU'); if (dU) dU.value = Math.round(S.designU * 100);
+    const dV = document.getElementById('dV'); if (dV) dV.value = Math.round(S.designV * 100);
+    const dOp = document.getElementById('dOp'); if (dOp) dOp.value = Math.round(S.designOpacity * 100);
+    const dRot = document.getElementById('dRot'); if (dRot) dRot.value = S.designRotation;
+    
+    // Valores escritorio
+    const vScale = document.getElementById('vScale'); if (vScale) vScale.textContent = Math.round(S.designScale * 100) + '%';
+    const vDU = document.getElementById('vDU'); if (vDU) vDU.textContent = S.designU.toFixed(2);
+    const vDV = document.getElementById('vDV'); if (vDV) vDV.textContent = S.designV.toFixed(2);
+    const vDOp = document.getElementById('vDOp'); if (vDOp) vDOp.textContent = Math.round(S.designOpacity * 100) + '%';
+    const vDRot = document.getElementById('vDRot'); if (vDRot) vDRot.textContent = S.designRotation + '°';
+    
+    // Sliders móvil
+    const mdScale = document.getElementById('mdScale'); if (mdScale) mdScale.value = Math.round(S.designScale * 100);
+    const mdU = document.getElementById('mdU'); if (mdU) mdU.value = Math.round(S.designU * 100);
+    const mdV = document.getElementById('mdV'); if (mdV) mdV.value = Math.round(S.designV * 100);
+    const mdOp = document.getElementById('mdOp'); if (mdOp) mdOp.value = Math.round(S.designOpacity * 100);
+    const mdRot = document.getElementById('mdRot'); if (mdRot) mdRot.value = S.designRotation;
+    
+    // Valores móvil
+    const mvScale = document.getElementById('mvScale'); if (mvScale) mvScale.textContent = Math.round(S.designScale * 100) + '%';
+    const mvDU = document.getElementById('mvDU'); if (mvDU) mvDU.textContent = S.designU.toFixed(2);
+    const mvDV = document.getElementById('mvDV'); if (mvDV) mvDV.textContent = S.designV.toFixed(2);
+    const mvDOp = document.getElementById('mvDOp'); if (mvDOp) mvDOp.textContent = Math.round(S.designOpacity * 100) + '%';
+    const mvDRot = document.getElementById('mvDRot'); if (mvDRot) mvDRot.textContent = S.designRotation + '°';
+}
+
+function sincronizarSlidersTrasera() {
+    const d2Scale = document.getElementById('d2Scale'); if (d2Scale) d2Scale.value = Math.round(S.design2Scale * 100);
+    const d2U = document.getElementById('d2U'); if (d2U) d2U.value = Math.round(S.design2U * 100);
+    const d2V = document.getElementById('d2V'); if (d2V) d2V.value = Math.round(S.design2V * 100);
+    const d2Op = document.getElementById('d2Op'); if (d2Op) d2Op.value = Math.round(S.design2Opacity * 100);
+    const d2Rot = document.getElementById('d2Rot'); if (d2Rot) d2Rot.value = S.design2Rotation;
+    
+    const md2Scale = document.getElementById('md2Scale'); if (md2Scale) md2Scale.value = Math.round(S.design2Scale * 100);
+    const md2U = document.getElementById('md2U'); if (md2U) md2U.value = Math.round(S.design2U * 100);
+    const md2V = document.getElementById('md2V'); if (md2V) md2V.value = Math.round(S.design2V * 100);
+    const md2Op = document.getElementById('md2Op'); if (md2Op) md2Op.value = Math.round(S.design2Opacity * 100);
+    const md2Rot = document.getElementById('md2Rot'); if (md2Rot) md2Rot.value = S.design2Rotation;
+}
+
+function cargarImagenDesdeDataURL(dataURL) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = dataURL;
+    });
+}
+
+
 
   window.addEventListener('load', init);
   window.addEventListener('resize', resizeAll);
