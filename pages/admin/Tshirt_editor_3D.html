@@ -5,1277 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Mockup 3D — León de Judá</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --cream: #f5f0ea;
-    --taupe: #c4b5a5;
-    --brown: #7a6355;
-    --dark: #2c2420;
-    --accent: #9b7b6b;
-    --panel: rgba(250, 248, 245, 0.97);
-    --border: rgba(196, 181, 165, 0.4);
-    --shadow: 0 8px 40px rgba(44, 36, 32, 0.12);
-    --pw: 282px;
-  }
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
+  <link rel="preload" href="styles.css" as="style">
+  <link rel="stylesheet" href="styles.css">
 
-  html, body {
-    height: 100%;
-    overflow: hidden;
-  }
 
-  body {
-    font-family: 'Jost', sans-serif;
-    background: var(--dark);
-    color: var(--dark);
-    display: flex;
-    flex-direction: column;
-    height: 100dvh;
-  }
-
-  /* HEADER */
-  header {
-    background: var(--dark);
-    padding: 0 20px;
-    height: 52px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    border-bottom: 1px solid rgba(196, 181, 165, 0.15);
-  }
-
-  header h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem;
-    font-weight: 300;
-    color: var(--cream);
-    letter-spacing: 0.12em;
-  }
-
-  .hdr-r {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .badge {
-    font-size: 0.58rem;
-    background: var(--accent);
-    color: #fff;
-    padding: 3px 9px;
-    border-radius: 20px;
-    letter-spacing: 0.1em;
-    font-weight: 500;
-    text-transform: uppercase;
-  }
-
-  /* APP LAYOUT */
-  .app {
-    display: grid;
-    grid-template-columns: var(--pw) 1fr var(--pw);
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  /* PANELES LATERALES (ESCRITORIO) */
-  .panel-left, .panel-right {
-    background: var(--panel);
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-
-  .panel-left {
-    border-right: 1px solid var(--border);
-  }
-
-  .panel-right {
-    border-left: 1px solid var(--border);
-  }
-
-  .pi {
-    padding: 15px 13px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .st {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 8px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  ::-webkit-scrollbar {
-    width: 3px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 3px;
-  }
-
-  /* LISTA DE PRENDAS */
-  .garment-list {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .gi {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 7px 9px;
-    border-radius: 9px;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: all 0.17s;
-    background: #fff;
-  }
-
-  .gi:hover {
-    border-color: var(--taupe);
-  }
-
-  .gi.active {
-    border-color: var(--accent);
-    background: rgba(155, 123, 107, 0.07);
-  }
-
-  .gi .ico {
-    width: 34px;
-    height: 34px;
-    border-radius: 6px;
-    background: var(--cream);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    flex-shrink: 0;
-  }
-
-  .gi .inf {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .gi .gn {
-    font-size: 0.76rem;
-    font-weight: 500;
-    color: var(--dark);
-  }
-
-  .gi .gs {
-    font-size: 0.6rem;
-    color: var(--taupe);
-  }
-
-  .gi .dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--border);
-    flex-shrink: 0;
-    transition: background 0.2s;
-  }
-
-  .gi.active .dot {
-    background: var(--accent);
-  }
-
-  /* SELECTORES DE COLOR */
-  .swatches {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .swatch {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: all 0.17s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
-  }
-
-  .swatch:hover {
-    transform: scale(1.15);
-  }
-
-  .swatch.active {
-    border-color: var(--dark);
-    box-shadow: 0 0 0 3px rgba(44, 36, 32, 0.2);
-  }
-
-  /* ZONA DE SUBIDA */
-  .upzone {
-    border: 2px dashed var(--border);
-    border-radius: 10px;
-    padding: 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.22s;
-    background: rgba(245, 240, 234, 0.5);
-  }
-
-  .upzone:hover, .upzone.drag {
-    border-color: var(--accent);
-    background: rgba(155, 123, 107, 0.07);
-  }
-
-  .upzone svg {
-    opacity: 0.4;
-    margin-bottom: 4px;
-  }
-
-  .upzone p {
-    font-size: 0.73rem;
-    color: var(--brown);
-  }
-
-  .upzone small {
-    font-size: 0.61rem;
-    color: var(--taupe);
-  }
-
-  /* CONTROLES */
-  .ctrl {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin-bottom: 7px;
-  }
-
-  .ctrl label {
-    font-size: 0.68rem;
-    color: var(--brown);
-    min-width: 65px;
-    font-weight: 500;
-  }
-
-  .ctrl input[type=range] {
-    flex: 1;
-    -webkit-appearance: none;
-    height: 3px;
-    border-radius: 2px;
-    background: var(--border);
-    outline: none;
-    cursor: pointer;
-  }
-
-  .ctrl input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
-  }
-
-  .ctrl .val {
-    font-size: 0.65rem;
-    min-width: 36px;
-    text-align: right;
-    color: var(--accent);
-    font-weight: 500;
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* PREVISUALIZACIÓN UV */
-  .uv-preview-wrap {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: repeating-conic-gradient(#e8e2da 0% 25%, transparent 0% 50%) 0 0/12px 12px;
-    margin-top: 7px;
-  }
-
-  #uvPreviewCanvas {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  .uv-label {
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.55rem;
-    font-family: 'DM Mono', monospace;
-    color: var(--taupe);
-    background: rgba(250, 248, 245, 0.85);
-    padding: 2px 7px;
-    border-radius: 10px;
-    white-space: nowrap;
-  }
-
-  /* ÁREA DEL CANVAS 3D */
-  .canvas-area {
-    position: relative;
-    background: #1a1410;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-
-  .canvas-area::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 30%, rgba(155, 123, 107, 0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  #threeCanvas {
-    position: absolute;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-    cursor: grab;
-    display: block;
-  }
-
-  #threeCanvas:active {
-    cursor: grabbing;
-  }
-
-  /* LOADER */
-  .load-ov {
-    position: absolute;
-    inset: 0;
-    background: rgba(26, 20, 16, 0.9);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 13px;
-    z-index: 20;
-    transition: opacity 0.4s;
-  }
-
-  .load-ov.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .spinner {
-    width: 34px;
-    height: 34px;
-    border: 2px solid rgba(196, 181, 165, 0.2);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  .load-txt {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.88rem;
-    color: var(--taupe);
-    letter-spacing: 0.1em;
-  }
-
-  /* ERRORES */
-  .err-box {
-    position: absolute;
-    inset: 0;
-    background: rgba(26, 20, 16, 0.95);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 11px;
-    z-index: 25;
-  }
-
-  .err-box.show {
-    display: flex;
-  }
-
-  .err-msg {
-    font-size: 0.78rem;
-    color: var(--taupe);
-    text-align: center;
-    max-width: 280px;
-    line-height: 1.6;
-  }
-
-  .err-path {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--accent);
-    background: rgba(155, 123, 107, 0.1);
-    padding: 5px 10px;
-    border-radius: 6px;
-    word-break: break-all;
-    text-align: center;
-  }
-
-  /* HUD */
-  .hud {
-    position: absolute;
-    bottom: 13px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    display: flex;
-    background: rgba(44, 36, 32, 0.85);
-    border: 1px solid rgba(196, 181, 165, 0.2);
-    backdrop-filter: blur(10px);
-    padding: 6px 13px;
-    border-radius: 30px;
-    white-space: nowrap;
-    align-items: center;
-    gap: 9px;
-  }
-
-  .hud-i {
-    font-size: 0.6rem;
-    color: var(--taupe);
-    letter-spacing: 0.05em;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .hud-sep {
-    width: 1px;
-    height: 11px;
-    background: rgba(196, 181, 165, 0.2);
-  }
-
-  .hud-top {
-    position: absolute;
-    top: 13px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-  }
-
-  .mbadge {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.82rem;
-    color: var(--cream);
-    background: rgba(44, 36, 32, 0.75);
-    border: 1px solid rgba(196, 181, 165, 0.2);
-    backdrop-filter: blur(8px);
-    padding: 4px 15px;
-    border-radius: 20px;
-  }
-
-  /* CHIPS */
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.6rem;
-    font-family: 'DM Mono', monospace;
-    padding: 3px 9px;
-    border-radius: 20px;
-    letter-spacing: 0.04em;
-  }
-
-  .chip.ok {
-    background: rgba(39, 174, 96, 0.12);
-    color: #27ae60;
-  }
-
-  .chip.warn {
-    background: rgba(155, 123, 107, 0.12);
-    color: var(--accent);
-  }
-
-  .chip.err {
-    background: rgba(192, 57, 43, 0.12);
-    color: #c0392b;
-  }
-
-  /* BOTONES */
-  .btn-p {
-    width: 100%;
-    padding: 10px;
-    background: var(--dark);
-    color: var(--cream);
-    border: none;
-    border-radius: 10px;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    transition: all 0.22s;
-    text-transform: uppercase;
-  }
-
-  .btn-p:hover {
-    background: var(--accent);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(155, 123, 107, 0.3);
-  }
-
-  .btn-rec {
-    width: 100%;
-    padding: 10px;
-    background: linear-gradient(135deg, #8b1a1a, #c0392b);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    transition: all 0.22s;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .btn-rec:hover {
-    background: linear-gradient(135deg, #a01f1f, #e74c3c);
-    transform: translateY(-1px);
-  }
-
-  .rdot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #ff4444;
-    animation: blink 1s infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  .btn-row {
-    display: flex;
-    gap: 5px;
-  }
-
-  .btn-sm {
-    flex: 1;
-    padding: 7px 5px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: #fff;
-    color: var(--brown);
-    font-family: 'Jost', sans-serif;
-    font-size: 0.68rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.17s;
-    letter-spacing: 0.04em;
-  }
-
-  .btn-sm:hover {
-    border-color: var(--accent);
-    background: rgba(155, 123, 107, 0.06);
-    color: var(--dark);
-  }
-
-  /* PROGRESO */
-  .prog-w {
-    margin-top: 8px;
-    display: none;
-  }
-
-  .prog-w.show {
-    display: block;
-  }
-
-  .prog-b {
-    height: 3px;
-    background: var(--border);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-
-  .prog-f {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 3px;
-    transition: width 0.1s;
-    width: 0%;
-  }
-
-  .prog-l {
-    font-size: 0.6rem;
-    color: var(--taupe);
-    margin-top: 4px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* INFO BOX */
-  .info-box {
-    background: rgba(155, 123, 107, 0.08);
-    border: 1px solid rgba(155, 123, 107, 0.2);
-    border-radius: 8px;
-    padding: 8px 10px;
-  }
-
-  .info-box p {
-    font-size: 0.66rem;
-    color: var(--brown);
-    line-height: 1.55;
-  }
-
-  /* PREVISUALIZACIÓN DISEÑO */
-  .des-prev {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: repeating-conic-gradient(#e8e2da 0% 25%, transparent 0% 50%) 0 0/12px 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 7px;
-  }
-
-  .des-prev img {
-    max-width: 88%;
-    max-height: 88%;
-    object-fit: contain;
-  }
-
-  .des-prev .nd {
-    font-size: 0.63rem;
-    color: var(--taupe);
-  }
-
-  /* TOGGLE */
-  .tog-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 6px;
-  }
-
-  .tog-row>label {
-    font-size: 0.72rem;
-    font-weight: 500;
-    color: var(--brown);
-  }
-
-  .tog {
-    position: relative;
-    width: 36px;
-    height: 20px;
-    flex-shrink: 0;
-  }
-
-  .tog input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .tog-sl {
-    position: absolute;
-    inset: 0;
-    background: var(--border);
-    border-radius: 20px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-
-  .tog-sl::before {
-    content: '';
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    left: 3px;
-    top: 3px;
-    background: #fff;
-    border-radius: 50%;
-    transition: 0.3s;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .tog input:checked+.tog-sl {
-    background: var(--accent);
-  }
-
-  .tog input:checked+.tog-sl::before {
-    transform: translateX(16px);
-  }
-
-  .col-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-  }
-
-  .col-row span {
-    font-size: 0.68rem;
-    color: var(--brown);
-  }
-
-  input[type=color] {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    cursor: pointer;
-    padding: 0;
-    background: none;
-    outline: none;
-  }
-
-  /* EXPORTAR */
-  .exp-opts {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .exp-card {
-    border: 2px solid var(--border);
-    border-radius: 9px;
-    padding: 8px 11px;
-    cursor: pointer;
-    transition: all 0.17s;
-    background: #fff;
-  }
-
-  .exp-card:hover, .exp-card.active {
-    border-color: var(--accent);
-    background: rgba(155, 123, 107, 0.05);
-  }
-
-  .exp-card h4 {
-    font-size: 0.75rem;
-    font-weight: 500;
-    margin-bottom: 2px;
-  }
-
-  .exp-card small {
-    font-size: 0.62rem;
-    color: var(--taupe);
-  }
-
-  .exp-card .bdg {
-    display: inline-block;
-    font-size: 0.58rem;
-    font-family: 'DM Mono', monospace;
-    background: var(--cream);
-    border: 1px solid var(--border);
-    padding: 1px 5px;
-    border-radius: 6px;
-    margin-top: 3px;
-  }
-
-  .fmt-btns {
-    display: flex;
-    gap: 5px;
-  }
-
-  .fmt-btn {
-    flex: 1;
-    padding: 7px 4px;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    background: #fff;
-    color: var(--brown);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all 0.17s;
-  }
-
-  .fmt-btn:hover {
-    border-color: var(--taupe);
-  }
-
-  .fmt-btn.active {
-    border-color: var(--accent);
-    background: rgba(155, 123, 107, 0.08);
-    color: var(--dark);
-  }
-
-  .q-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
-  }
-
-  .q-card {
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 9px;
-    cursor: pointer;
-    transition: all 0.17s;
-    background: #fff;
-    text-align: center;
-  }
-
-  .q-card:hover, .q-card.active {
-    border-color: var(--accent);
-    background: rgba(155, 123, 107, 0.06);
-  }
-
-  .q-card h4 {
-    font-size: 0.7rem;
-    font-weight: 500;
-    margin-bottom: 2px;
-  }
-
-  .q-card small {
-    font-size: 0.58rem;
-    color: var(--taupe);
-  }
-
-  .dur-btns {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-  }
-
-  .dur-btn {
-    padding: 5px 9px;
-    border-radius: 7px;
-    border: 1px solid var(--border);
-    background: #fff;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.66rem;
-    color: var(--brown);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .dur-btn.active {
-    border-color: var(--accent);
-    background: rgba(155, 123, 107, 0.08);
-    color: var(--dark);
-  }
-
-  .bg-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
-  }
-
-  .bg-opt {
-    aspect-ratio: 1;
-    border-radius: 7px;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: all 0.15s;
-    overflow: hidden;
-  }
-
-  .bg-opt:hover, .bg-opt.active {
-    border-color: var(--accent);
-  }
-
-  .bg-opt div {
-    width: 100%;
-    height: 100%;
-    border-radius: 5px;
-  }
-
-  .dim-badge {
-    background: var(--dark);
-    color: var(--cream);
-    font-size: 0.63rem;
-    font-family: 'DM Mono', monospace;
-    padding: 3px 8px;
-    border-radius: 6px;
-    letter-spacing: 0.04em;
-    display: inline-block;
-  }
-
-  .uv-mode-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.6rem;
-    font-family: 'DM Mono', monospace;
-    padding: 3px 8px;
-    border-radius: 20px;
-    background: rgba(39, 174, 96, 0.12);
-    color: #27ae60;
-    margin-top: 6px;
-  }
-
-  /* ========== VISTA MÓVIL ========== */
-  .mob-sheet {
-    display: none;
-  }
-
-  @media (max-width: 680px) {
-    html, body {
-      overflow: hidden;
-      height: 100dvh;
-    }
-
-    header {
-      height: 46px;
-      padding: 0 14px;
-    }
-
-    header h1 {
-      font-size: 1rem;
-    }
-
-    .app {
-      display: flex !important;
-      flex-direction: column !important;
-      height: calc(100dvh - 46px) !important;
-      overflow: hidden !important;
-    }
-
-    .canvas-area {
-      flex: 1 1 0 !important;
-      min-height: 0 !important;
-    }
-
-    .panel-left, .panel-right {
-      display: none !important;
-    }
-
-    .mob-sheet {
-      display: flex !important;
-      flex-direction: column;
-      background: var(--panel);
-      border-top: 2px solid var(--border);
-      flex: 0 0 48vh !important;
-      height: 48vh !important;
-      overflow: hidden;
-      width: 100% !important;
-      z-index: 10;
-    }
-
-    .mob-tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      background: #fff;
-      flex-shrink: 0;
-    }
-
-    .mob-tab {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      padding: 10px 4px;
-      cursor: pointer;
-      border: none;
-      background: none;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.62rem;
-      font-weight: 500;
-      color: var(--taupe);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      transition: all 0.18s;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-    }
-
-    .mob-tab svg {
-      opacity: 0.6;
-      width: 18px;
-      height: 18px;
-    }
-
-    .mob-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    .mob-tab.active svg {
-      opacity: 1;
-    }
-
-    .mob-panels {
-      overflow-y: auto;
-      overflow-x: hidden;
-      flex: 1;
-      min-height: 0;
-    }
-
-    .mob-panel {
-      display: none;
-      padding: 14px;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .mob-panel.active {
-      display: flex;
-    }
-
-    .mob-garment-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .mob-gi {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      padding: 12px 6px;
-      border-radius: 12px;
-      border: 2px solid var(--border);
-      cursor: pointer;
-      background: #fff;
-      transition: all 0.17s;
-    }
-
-    .mob-gi.active {
-      border-color: var(--accent);
-      background: rgba(155, 123, 107, 0.07);
-    }
-
-    .mob-gi .mico {
-      font-size: 26px;
-    }
-
-    .mob-gi .mgn {
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: var(--dark);
-      text-align: center;
-    }
-
-    .mob-swatches {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .mob-swatch {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: all 0.17s;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
-    .mob-swatch.active {
-      border-color: var(--dark);
-      box-shadow: 0 0 0 3px rgba(44, 36, 32, 0.25);
-    }
-
-    .mob-upzone {
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-      cursor: pointer;
-      background: rgba(245, 240, 234, 0.5);
-    }
-
-    .mob-upzone p {
-      font-size: 0.8rem;
-      color: var(--brown);
-      margin-top: 6px;
-    }
-
-    .mob-upzone small {
-      font-size: 0.68rem;
-      color: var(--taupe);
-    }
-
-    .mob-des-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .mob-des-thumb {
-      width: 65px;
-      height: 65px;
-      border-radius: 10px;
-      flex-shrink: 0;
-      border: 1px solid var(--border);
-      background: repeating-conic-gradient(#e8e2da 0% 25%, transparent 0% 50%) 0 0/10px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .mob-ctrl {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .mob-ctrl label {
-      font-size: 0.72rem;
-      color: var(--brown);
-      min-width: 70px;
-      font-weight: 500;
-    }
-
-    .mob-ctrl input[type=range] {
-      flex: 1;
-      height: 5px;
-      border-radius: 3px;
-      background: var(--border);
-    }
-
-    .mob-ctrl input[type=range]::-webkit-slider-thumb {
-      width: 20px;
-      height: 20px;
-    }
-
-    .mob-ctrl .val {
-      font-size: 0.68rem;
-      min-width: 40px;
-    }
-
-    .mob-bg-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .mob-bg-opt {
-      aspect-ratio: 1;
-      border-radius: 10px;
-      border: 2px solid transparent;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .mob-bg-opt:hover {
-      border-color: var(--taupe);
-    }
-
-    .mob-bg-opt.active {
-      border-color: var(--accent);
-    }
-
-    .mob-bg-opt div {
-      width: 100%;
-      height: 100%;
-      border-radius: 8px;
-    }
-
-    .mob-btn-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .mob-btn {
-      flex: 1;
-      padding: 12px 6px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #fff;
-      color: var(--brown);
-      font-size: 0.76rem;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .mob-btn-full {
-      width: 100%;
-      padding: 12px;
-      background: var(--dark);
-      color: var(--cream);
-      border-radius: 10px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      text-transform: uppercase;
-    }
-
-    .mob-btn-rec {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #8b1a1a, #c0392b);
-      color: #fff;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 0.85rem;
-    }
-
-    .mob-st {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      padding-bottom: 5px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .mob-tog-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .mob-tog-row>span {
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--brown);
-    }
-
-    .hud {
-      padding: 5px 10px;
-      gap: 7px;
-    }
-
-    .hud-i {
-      font-size: 0.55rem;
-    }
-  }
-</style>
 </head>
 <body>
 
@@ -1304,6 +38,11 @@
           <input type="color" id="customColor" value="#ffffff" onchange="setGarmentColor(this.value)">
         </div>
       </div>
+      <div id="meshColorPanel" style="display:none;">
+        <div class="st">🎨 Color por Malla</div>
+        <div style="margin-top:6px;font-size:.65rem;color:var(--brown);margin-bottom:6px;">El modelo tiene varias mallas — asigná un color a cada una:</div>
+        <!-- Se rellena dinámicamente -->
+      </div>
       <div>
         <div class="st">🖼️ Diseño / Estampa</div>
         <div class="upzone" id="dzDesign" onclick="document.getElementById('designUpload').click()">
@@ -1325,11 +64,49 @@
           <div class="ctrl"><label>Escala</label><input type="range" id="dScale" min="2" max="80" value="25" oninput="updateDecal()"><span class="val" id="vScale">25%</span></div>
           <div class="ctrl"><label>Pos. U →</label><input type="range" id="dU" min="0" max="100" value="27" oninput="updateDecal()"><span class="val" id="vDU">0.27</span></div>
           <div class="ctrl"><label>Pos. V ↑</label><input type="range" id="dV" min="0" max="100" value="55" oninput="updateDecal()"><span class="val" id="vDV">0.55</span></div>
+          <div class="ctrl"><label>Rotación</label><input type="range" id="dRot" min="-180" max="180" value="0" oninput="updateDecal()"><span class="val" id="vDRot">0°</span></div>
+          <div class="btn-row" style="margin-top:2px;gap:4px;">
+            <button class="btn-sm" style="flex:1;padding:3px 0;font-size:.65rem;" onclick="setDecalRot(1,0)">0°</button>
+            <button class="btn-sm" style="flex:1;padding:3px 0;font-size:.65rem;" onclick="setDecalRot(1,90)">90°</button>
+            <button class="btn-sm" style="flex:1;padding:3px 0;font-size:.65rem;" onclick="setDecalRot(1,180)">180°</button>
+            <button class="btn-sm" style="flex:1;padding:3px 0;font-size:.65rem;" onclick="setDecalRot(1,-90)">-90°</button>
+          </div>
           <div class="ctrl"><label>Opacidad</label><input type="range" id="dOp" min="10" max="100" value="100" oninput="updateDecal()"><span class="val" id="vDOp">100%</span></div>
         </div>
         <div class="btn-row">
           <button class="btn-sm" onclick="clearDesign()">✕ Quitar</button>
           <button class="btn-sm" onclick="centerDecal()">⊕ Centrar pecho</button>
+        </div>
+      </div>
+      <!-- SEGUNDA ESTAMPA -->
+      <div>
+        <div class="st">🖼️ Estampa Trasera</div>
+        <div class="upzone" id="dzDesign2" onclick="document.getElementById('designUpload2').click()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          <p>Subir estampa trasera</p>
+          <small>PNG con transparencia</small>
+        </div>
+        <input type="file" id="designUpload2" accept="image/*" style="display:none" onchange="loadDesign2(event)">
+        <div class="des-prev" id="designPreview2"><span class="nd">Sin estampa trasera</span></div>
+      </div>
+      <div id="designControls2" style="display:none;">
+        <div class="st">📍 Posición estampa trasera</div>
+        <div>
+          <div class="ctrl"><label>Escala</label><input type="range" id="d2Scale" min="2" max="80" value="25" oninput="updateDecal2()"><span class="val" id="v2Scale">25%</span></div>
+          <div class="ctrl"><label>Pos. U →</label><input type="range" id="d2U" min="0" max="100" value="73" oninput="updateDecal2()"><span class="val" id="v2DU">0.73</span></div>
+          <div class="ctrl"><label>Pos. V ↑</label><input type="range" id="d2V" min="0" max="100" value="55" oninput="updateDecal2()"><span class="val" id="v2DV">0.55</span></div>
+          <div class="ctrl"><label>Rotación</label><input type="range" id="d2Rot" min="-180" max="180" value="0" oninput="updateDecal2()"><span class="val" id="v2DRot">0°</span></div>
+          <div class="btn-row" style="margin-top:2px;gap:4px;">
+            <button class="btn-sm" style="flex:1;padding:3px 0;font-size:.65rem;" onclick="setDecalRot(2,0)">0°</button>
+            <button class="btn-sm" style="flex:1;padding:3px 0;font-size:.65rem;" onclick="setDecalRot(2,90)">90°</button>
+            <button class="btn-sm" style="flex:1;padding:3px 0;font-size:.65rem;" onclick="setDecalRot(2,180)">180°</button>
+            <button class="btn-sm" style="flex:1;padding:3px 0;font-size:.65rem;" onclick="setDecalRot(2,-90)">-90°</button>
+          </div>
+          <div class="ctrl"><label>Opacidad</label><input type="range" id="d2Op" min="10" max="100" value="100" oninput="updateDecal2()"><span class="val" id="v2DOp">100%</span></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-sm" onclick="clearDesign2()">✕ Quitar</button>
+          <button class="btn-sm" onclick="centerDecal2()">⊕ Centrar espalda</button>
         </div>
       </div>
     </div>
@@ -1367,6 +144,7 @@
         <div class="ctrl"><label>Alt. cámara</label><input type="range" id="cHeight" min="-30" max="30" value="0" oninput="setCameraHeight(this.value)"><span class="val" id="vCH">0</span></div>
         <div class="ctrl"><label>Luz frontal</label><input type="range" id="lFront" min="0" max="200" value="100" oninput="setLight('front',this.value)"><span class="val" id="vLF">100%</span></div>
         <div class="ctrl"><label>Ambiente</label><input type="range" id="lAmb" min="0" max="200" value="60" oninput="setLight('amb',this.value)"><span class="val" id="vLA">60%</span></div>
+        <div class="ctrl"><label>Exposición</label><input type="range" id="exposure" min="20" max="300" value="100" oninput="setExposure(this.value)"><span class="val" id="vExp">100%</span></div>
       </div>
       <div>
         <div class="st">🌄 Fondo de Escena</div>
@@ -1395,10 +173,33 @@
           <label>Auto-rotación 360°</label>
           <label class="tog"><input type="checkbox" id="autoRotate" checked onchange="S.autoRotate=this.checked"><span class="tog-sl"></span></label>
         </div>
-        <div class="ctrl"><label>Velocidad</label><input type="range" id="rotSpeed" min="1" max="25" value="8" oninput="S.rotSpeed=parseInt(this.value);document.getElementById('vRS').textContent=this.value;"><span class="val" id="vRS">8</span></div>
+        <div class="ctrl"><label>Velocidad</label><input type="range" id="rotSpeed" min="1" max="100" value="8" oninput="S.rotSpeed=parseInt(this.value);document.getElementById('vRS').textContent=this.value;"><span class="val" id="vRS">8</span></div>
         <div class="btn-row">
           <button class="btn-sm" onclick="resetCamera()">⟳ Reset</button>
           <button class="btn-sm" onclick="snapFront()">⊡ Frontal</button>
+        </div>
+      </div>
+      <div>
+        <div class="st">🎵 Audio</div>
+        <div class="upzone" id="dzAudio" onclick="document.getElementById('audioUpload').click()" style="min-height:56px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <p>Subir audio</p>
+          <small>MP3 · WAV · OGG · AAC</small>
+        </div>
+        <input type="file" id="audioUpload" accept="audio/*" style="display:none" onchange="loadAudio(event)">
+        <div id="audioControls" style="display:none;margin-top:7px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <span id="audioName" style="font-size:.68rem;color:var(--brown);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+            <button class="btn-sm" style="flex:none;" onclick="clearAudio()">✕</button>
+          </div>
+          <div class="ctrl"><label>Volumen</label><input type="range" id="audioVol" min="0" max="100" value="80" oninput="setAudioVolume(this.value)"><span class="val" id="vAudioVol">80%</span></div>
+          <div class="tog-row" style="margin-top:4px;">
+            <label>Loop</label>
+            <label class="tog"><input type="checkbox" id="audioLoop" checked onchange="setAudioLoop(this.checked)"><span class="tog-sl"></span></label>
+          </div>
+          <div class="btn-row" style="margin-top:6px;">
+            <button class="btn-sm" id="audioPlayBtn" onclick="toggleAudio()">▶ Reproducir</button>
+          </div>
         </div>
       </div>
       <div>
@@ -1483,6 +284,11 @@
             <input type="color" id="mobCustomColor" value="#ffffff" onchange="setGarmentColor(this.value)" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--border);cursor:pointer;">
           </div>
         </div>
+        <div id="mobMeshColorPanel" style="display:none;margin-top:4px;">
+          <div class="mob-st">🎨 Color por Malla</div>
+          <div style="margin-top:4px;font-size:.65rem;color:var(--brown);margin-bottom:6px;">El modelo tiene varias mallas — asigná un color a cada una:</div>
+          <!-- Se rellena dinámicamente -->
+        </div>
       </div>
       <!-- Panel Diseño -->
       <div class="mob-panel" id="mpanel-diseno">
@@ -1506,11 +312,52 @@
             <div class="mob-ctrl"><label>Tamaño</label><input type="range" id="mdScale" min="2" max="80" value="25" oninput="mobUpdateDecal()"><span class="val" id="mvScale">25%</span></div>
             <div class="mob-ctrl"><label>Pos. U</label><input type="range" id="mdU" min="0" max="100" value="27" oninput="mobUpdateDecal()"><span class="val" id="mvDU">0.27</span></div>
             <div class="mob-ctrl"><label>Pos. V</label><input type="range" id="mdV" min="0" max="100" value="55" oninput="mobUpdateDecal()"><span class="val" id="mvDV">0.55</span></div>
+            <div class="mob-ctrl"><label>Rotación</label><input type="range" id="mdRot" min="-180" max="180" value="0" oninput="mobUpdateDecal()"><span class="val" id="mvDRot">0°</span></div>
+            <div style="display:flex;gap:4px;margin-top:2px;margin-bottom:4px;">
+              <button class="mob-btn" style="flex:1;padding:4px 0;font-size:.65rem;" onclick="setDecalRot(1,0)">0°</button>
+              <button class="mob-btn" style="flex:1;padding:4px 0;font-size:.65rem;" onclick="setDecalRot(1,90)">90°</button>
+              <button class="mob-btn" style="flex:1;padding:4px 0;font-size:.65rem;" onclick="setDecalRot(1,180)">180°</button>
+              <button class="mob-btn" style="flex:1;padding:4px 0;font-size:.65rem;" onclick="setDecalRot(1,-90)">-90°</button>
+            </div>
             <div class="mob-ctrl"><label>Opacidad</label><input type="range" id="mdOp" min="10" max="100" value="100" oninput="mobUpdateDecal()"><span class="val" id="mvDOp">100%</span></div>
           </div>
           <div class="mob-btn-row">
             <button class="mob-btn" onclick="clearDesign();document.getElementById('mobDesignControls').style.display='none';">✕ Quitar</button>
             <button class="mob-btn" onclick="centerDecal();mobSyncSliders()">⊕ Centrar pecho</button>
+          </div>
+        </div>
+        <!-- SEGUNDA ESTAMPA MÓVIL -->
+        <div style="margin-top:12px;">
+          <div class="mob-st">🖼️ Estampa Trasera</div>
+          <div class="mob-upzone" style="margin-top:10px;" onclick="document.getElementById('designUpload2').click()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <p>Subir estampa trasera</p>
+            <small>PNG transparente recomendado</small>
+          </div>
+        </div>
+        <div id="mobDesign2Controls" style="display:none;">
+          <div class="mob-des-row">
+            <div class="mob-des-thumb" id="mobDes2Thumb"></div>
+            <div style="flex:1;">
+              <div style="font-size:.72rem;font-weight:500;color:var(--dark);" id="mobDes2Name">Estampa trasera</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            <div class="mob-ctrl"><label>Tamaño</label><input type="range" id="md2Scale" min="2" max="80" value="25" oninput="mobUpdateDecal2()"><span class="val" id="mv2Scale">25%</span></div>
+            <div class="mob-ctrl"><label>Pos. U</label><input type="range" id="md2U" min="0" max="100" value="73" oninput="mobUpdateDecal2()"><span class="val" id="mv2DU">0.73</span></div>
+            <div class="mob-ctrl"><label>Pos. V</label><input type="range" id="md2V" min="0" max="100" value="55" oninput="mobUpdateDecal2()"><span class="val" id="mv2DV">0.55</span></div>
+            <div class="mob-ctrl"><label>Rotación</label><input type="range" id="md2Rot" min="-180" max="180" value="0" oninput="mobUpdateDecal2()"><span class="val" id="mv2DRot">0°</span></div>
+            <div style="display:flex;gap:4px;margin-top:2px;margin-bottom:4px;">
+              <button class="mob-btn" style="flex:1;padding:4px 0;font-size:.65rem;" onclick="setDecalRot(2,0)">0°</button>
+              <button class="mob-btn" style="flex:1;padding:4px 0;font-size:.65rem;" onclick="setDecalRot(2,90)">90°</button>
+              <button class="mob-btn" style="flex:1;padding:4px 0;font-size:.65rem;" onclick="setDecalRot(2,180)">180°</button>
+              <button class="mob-btn" style="flex:1;padding:4px 0;font-size:.65rem;" onclick="setDecalRot(2,-90)">-90°</button>
+            </div>
+            <div class="mob-ctrl"><label>Opacidad</label><input type="range" id="md2Op" min="10" max="100" value="100" oninput="mobUpdateDecal2()"><span class="val" id="mv2DOp">100%</span></div>
+          </div>
+          <div class="mob-btn-row">
+            <button class="mob-btn" onclick="clearDesign2();document.getElementById('mobDesign2Controls').style.display='none';">✕ Quitar</button>
+            <button class="mob-btn" onclick="centerDecal2();mobSyncSliders2()">⊕ Centrar espalda</button>
           </div>
         </div>
       </div>
@@ -1523,6 +370,7 @@
             <div class="mob-ctrl"><label>Altura</label><input type="range" id="mcHeight" min="-30" max="30" value="0" oninput="setCameraHeight(this.value);document.getElementById('mvCH').textContent=this.value"><span class="val" id="mvCH">0</span></div>
             <div class="mob-ctrl"><label>Luz frontal</label><input type="range" id="mlFront" min="0" max="200" value="100" oninput="setLight('front',this.value);document.getElementById('mvLF').textContent=this.value+'%'"><span class="val" id="mvLF">100%</span></div>
             <div class="mob-ctrl"><label>Ambiente</label><input type="range" id="mlAmb" min="0" max="200" value="60" oninput="setLight('amb',this.value);document.getElementById('mvLA').textContent=this.value+'%'"><span class="val" id="mvLA">60%</span></div>
+            <div class="mob-ctrl"><label>Exposición</label><input type="range" id="mExposure" min="20" max="300" value="100" oninput="setExposure(this.value);document.getElementById('mvExp').textContent=this.value+'%'"><span class="val" id="mvExp">100%</span></div>
           </div>
         </div>
         <div>
@@ -1575,6 +423,26 @@
             <button class="fmt-btn" id="mobfmt-webp" onclick="selectFormat('webp');mobSelectFmt('webp')">WEBP</button>
           </div>
           <button class="mob-btn-full" style="margin-top:10px;" onclick="exportImage()">Exportar imagen</button>
+        </div>
+        <div>
+          <div class="mob-st">🎵 Audio</div>
+          <div class="mob-upzone" style="margin-top:10px;min-height:56px;" onclick="document.getElementById('audioUpload').click()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <p>Subir audio</p>
+            <small>MP3 · WAV · OGG · AAC</small>
+          </div>
+          <div id="mobAudioControls" style="display:none;margin-top:8px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+              <span id="mobAudioName" style="font-size:.68rem;color:var(--brown);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+              <button class="mob-btn" style="flex:none;padding:4px 10px;" onclick="clearAudio()">✕</button>
+            </div>
+            <div class="mob-ctrl"><label>Volumen</label><input type="range" id="mobAudioVol" min="0" max="100" value="80" oninput="setAudioVolume(this.value)"><span class="val" id="mvAudioVol">80%</span></div>
+            <div class="mob-tog-row" style="margin-top:6px;">
+              <span>Loop</span>
+              <label class="tog"><input type="checkbox" id="mobAudioLoop" checked onchange="setAudioLoop(this.checked)"><span class="tog-sl"></span></label>
+            </div>
+            <button class="mob-btn" id="mobAudioPlayBtn" style="width:100%;margin-top:6px;" onclick="toggleAudio()">▶ Reproducir</button>
+          </div>
         </div>
         <div>
           <div class="mob-st">📹 Exportar Video</div>
@@ -1654,12 +522,21 @@
     designV: 0.55,
     designScale: 0.25,
     designOpacity: 1,
+    designRotation: 0,
+    designImg2: null,
+    design2U: 0.73,
+    design2V: 0.55,
+    design2Scale: 0.25,
+    design2Opacity: 1,
+    design2Rotation: 0,
     rotSpeed: 8,
     autoRotate: true,
     recordDuration: 5,
     recordQuality: 720,
     exportMode: 'standard',
     exportFormat: 'png',
+    audioEl: null,
+    audioPlaying: false,
     currentGarment: null,
     hasUV: false
   };
@@ -1727,19 +604,41 @@
     renderer = new THREE.WebGLRenderer({ canvas: tc, antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputEncoding = THREE.sRGBEncoding;
+    // Sin tone mapping agresivo — LinearToneMapping mantiene los colores de Blender
+    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    // physicallyCorrectLights OFF — con este flag las intensidades deben estar en lúmenes
+    // y los valores originales del GLB se ven demasiado oscuros o brillantes.
+    renderer.physicallyCorrectLights = false;
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(35, 1, 0.01, 100);
     camera.position.set(0, 0.05, 3.2);
 
-    lights.ambient = new THREE.AmbientLight(0xfff8f0, 0.6);
+    // Luz ambiente suave — simula la iluminación hemisférica de Blender
+    lights.ambient = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(lights.ambient);
-    lights.front = new THREE.DirectionalLight(0xffffff, 1.0);
-    lights.front.position.set(0, 1, 3);
+
+    // Luz hemisférica — cielo/suelo, da la sensación de entorno real
+    lights.hemi = new THREE.HemisphereLight(0xfff4e0, 0x222233, 0.5);
+    scene.add(lights.hemi);
+
+    // Luz frontal principal (key light)
+    lights.front = new THREE.DirectionalLight(0xffffff, 0.8);
+    lights.front.position.set(1, 2, 3);
     lights.front.castShadow = true;
+    lights.front.shadow.mapSize.set(1024, 1024);
     scene.add(lights.front);
-    lights.top = new THREE.DirectionalLight(0xfff0e0, 0.8);
-    lights.top.position.set(0, 4, 0);
+
+    // Luz de relleno (fill light) — izquierda, más suave
+    lights.fill = new THREE.DirectionalLight(0xddeeff, 0.3);
+    lights.fill.position.set(-3, 1, 1);
+    scene.add(lights.fill);
+
+    // Luz superior (rim/back light) — borde superior
+    lights.top = new THREE.DirectionalLight(0xffffff, 0.4);
+    lights.top.position.set(0, 4, -2);
     scene.add(lights.top);
 
     texCanvas = document.createElement('canvas');
@@ -1747,12 +646,31 @@
     texCanvas.height = TEX_SIZE;
     texCtx = texCanvas.getContext('2d');
 
+    // ── Environment map procedural para reflejos realistas ──────────────────
+    try {
+      if (typeof THREE.PMREMGenerator === 'function') {
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        pmrem.compileEquirectangularShader();
+        // Env neutro de estudio con escena simple
+        const envGeo = new THREE.SphereGeometry(50, 8, 8);
+        const envMat = new THREE.MeshBasicMaterial({ color: 0x888888, side: THREE.BackSide });
+        const envMesh = new THREE.Mesh(envGeo, envMat);
+        const envScene = new THREE.Scene();
+        envScene.add(envMesh);
+        const envTex = pmrem.fromScene(envScene).texture;
+        scene.environment = envTex;
+        pmrem.dispose();
+        envGeo.dispose();
+        envMat.dispose();
+      }
+    } catch(e) { /* env map no disponible, continúa sin él */ }
+
     setBgColor(S.bgColor);
     setupOrbit();
     resizeAll();
     new ResizeObserver(resizeAll).observe(area);
     animate();
-    setTimeout(hideLoader, 600);
+    // El loader se oculta cuando el modelo termine de cargar, no aquí
   }
 
   function resizeAll() {
@@ -1796,7 +714,7 @@
 
   function animate() {
     requestAnimationFrame(animate);
-    if (S.autoRotate && currentModel) currentModel.rotation.y += S.rotSpeed / 1000 * 0.3;
+    if (S.autoRotate && currentModel) currentModel.rotation.y += (S.rotSpeed / 100) * 0.035;
     camera.position.z = orbit.zoom;
     frameCount++;
     const now = performance.now();
@@ -1813,38 +731,68 @@
   // ============================================
   // SISTEMA DE TEXTURAS UV
   // ============================================
-  function paintTexture() {
+function paintTexture() {
     if (!texCtx) return;
     const W = TEX_SIZE, H = TEX_SIZE;
     texCtx.clearRect(0, 0, W, H);
+
+    // === TODO se dibuja dentro de la misma transformación ===
+    texCtx.save();
+    
+    // Invertir Y para que coincida con UV de Three.js (V=0 abajo)
+    texCtx.translate(0, H);
+    texCtx.scale(1, -1);
+    
+    // 1. Dibujar textura base
     if (originalTexImg) {
-      texCtx.drawImage(originalTexImg, 0, 0, W, H);
-      if (S.garmentColor !== '#ffffff' && S.garmentColor !== '#FFFFFF') {
-        texCtx.save();
-        texCtx.globalCompositeOperation = 'multiply';
+        texCtx.drawImage(originalTexImg, 0, 0, W, H);
+        if (S.garmentColor !== '#ffffff' && S.garmentColor !== '#FFFFFF') {
+            texCtx.globalCompositeOperation = 'multiply';
+            texCtx.fillStyle = S.garmentColor;
+            texCtx.fillRect(0, 0, W, H);
+            texCtx.globalCompositeOperation = 'source-over';
+        }
+    } else {
         texCtx.fillStyle = S.garmentColor;
         texCtx.fillRect(0, 0, W, H);
-        texCtx.restore();
-      }
-    } else {
-      texCtx.fillStyle = S.garmentColor;
-      texCtx.fillRect(0, 0, W, H);
     }
+    
+    // 2. Dibujar estampa delantera (dentro de la misma transformación)
     if (S.designImg) {
-      const dW = W * S.designScale;
-      const aspect = S.designImg.width / S.designImg.height;
-      const dH = dW / aspect;
-      const cx = S.designU * W;
-      const cy = (1.0 - S.designV) * H;
-      texCtx.save();
-      texCtx.globalAlpha = S.designOpacity;
-      texCtx.globalCompositeOperation = 'source-over';
-      texCtx.drawImage(S.designImg, cx - dW / 2, cy - dH / 2, dW, dH);
-      texCtx.restore();
+        const dW = W * S.designScale;
+        const dH = dW / (S.designImg.width / S.designImg.height);
+        const cx = S.designU * W;
+        const cy = S.designV * H;  // ← AHORA sin el (1 - ...) porque estamos dentro del flip
+        
+        texCtx.save();
+        texCtx.translate(cx, cy);
+        if (S.designRotation) texCtx.rotate(S.designRotation * Math.PI / 180);
+        texCtx.globalAlpha = S.designOpacity;
+        texCtx.drawImage(S.designImg, -dW/2, -dH/2, dW, dH);
+        texCtx.restore();
     }
+    
+    // 3. Dibujar estampa trasera (dentro de la misma transformación)
+    if (S.designImg2) {
+        const dW2 = W * S.design2Scale;
+        const dH2 = dW2 / (S.designImg2.width / S.designImg2.height);
+        const cx2 = S.design2U * W;
+        const cy2 = S.design2V * H;  // ← AHORA sin el (1 - ...)
+        
+        texCtx.save();
+        texCtx.translate(cx2, cy2);
+        if (S.design2Rotation) texCtx.rotate(S.design2Rotation * Math.PI / 180);
+        texCtx.globalAlpha = S.design2Opacity;
+        texCtx.drawImage(S.designImg2, -dW2/2, -dH2/2, dW2, dH2);
+        texCtx.restore();
+    }
+    
+    texCtx.restore();  // Restaurar el contexto original
+    
+    // Actualizar textura de Three.js
     if (canvasTex) canvasTex.needsUpdate = true;
     drawUVPreview();
-  }
+}
 
   function drawUVPreview() {
     const pv = document.getElementById('uvPreviewCanvas');
@@ -1907,29 +855,38 @@
   }
 
   function setupUVTexture(mesh) {
-    const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-    if (mat && mat.map && mat.map.image) originalTexImg = mat.map.image;
-    canvasTex = new THREE.CanvasTexture(texCanvas);
-    canvasTex.flipY = true;
-    canvasTex.encoding = THREE.sRGBEncoding;
-    paintTexture();
-    let newMat;
-    if (Array.isArray(mesh.material)) {
-      newMat = mesh.material.map(m => new THREE.MeshStandardMaterial({
-        map: canvasTex,
-        roughness: m.roughness ?? 0.85,
-        metalness: m.metalness ?? 0,
-        side: THREE.DoubleSide
-      }));
-    } else {
-      newMat = new THREE.MeshStandardMaterial({
-        map: canvasTex,
-        roughness: mesh.material?.roughness ?? 0.85,
-        metalness: mesh.material?.metalness ?? 0,
-        side: THREE.DoubleSide
-      });
+    // ── 1. Obtener material original (primer material si es array) ──────────
+    const srcMat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+
+    // ── 2. Guardar textura base original para pintarla en el canvas ──────────
+    if (srcMat && srcMat.map && srcMat.map.image) {
+      originalTexImg = srcMat.map.image;
     }
-    mesh.material = newMat;
+
+    // ── 3. Crear CanvasTexture que reemplazará solo el .map ──────────────────
+    canvasTex = new THREE.CanvasTexture(texCanvas);
+    // GLB/GLTF usa flipY=false. Lo mantenemos para que las UVs coincidan exactamente.
+    canvasTex.flipY = false;
+    canvasTex.encoding = THREE.sRGBEncoding;
+    canvasTex.wrapS = THREE.RepeatWrapping;
+    canvasTex.wrapT = THREE.RepeatWrapping;
+
+    // ── 4. Clonar el material original conservando TODOS sus mapas ───────────
+    function cloneMat(m) {
+      const clone = m.clone();          // copia roughnessMap, normalMap, aoMap, etc.
+      clone.map = canvasTex;            // solo reemplazamos el mapa de color
+      clone.side = THREE.DoubleSide;
+      clone.needsUpdate = true;
+      return clone;
+    }
+
+    if (Array.isArray(mesh.material)) {
+      mesh.material = mesh.material.map(cloneMat);
+    } else {
+      mesh.material = cloneMat(srcMat || new THREE.MeshStandardMaterial());
+    }
+
+    paintTexture();
   }
 
   function applyFlatColor(model, hex) {
@@ -1940,6 +897,82 @@
         c.material.needsUpdate = true;
       }
     });
+  }
+
+  // ── Colores por malla ────────────────────────────────────────────────────
+  let meshColorMap = {}; // uuid → hex
+
+  function buildMeshColorPanel(model) {
+    meshColorMap = {};
+    const meshes = [];
+    model.traverse(c => { if (c.isMesh) meshes.push(c); });
+
+    // Panel escritorio
+    const panel = document.getElementById('meshColorPanel');
+    const mobPanel = document.getElementById('mobMeshColorPanel');
+    if (!panel && !mobPanel) return;
+
+    if (meshes.length <= 1) {
+      if (panel) panel.style.display = 'none';
+      if (mobPanel) mobPanel.style.display = 'none';
+      return;
+    }
+
+    // Mostrar el panel solo si hay 2+ mallas
+    if (panel) { panel.style.display = 'block'; panel.innerHTML = ''; }
+    if (mobPanel) { mobPanel.style.display = 'block'; mobPanel.innerHTML = ''; }
+
+    const PRESET_COLORS = ['#ffffff','#000000','#ff0000','#0055ff','#ffcc00','#00aa44','#ff6600','#cc00cc'];
+
+    meshes.forEach((mesh, i) => {
+      const name = mesh.name || ('Malla ' + (i + 1));
+      const uid  = mesh.uuid;
+      // Color inicial: tomar del material o blanco
+      const matColor = mesh.material?.color ? '#' + mesh.material.color.getHexString() : '#ffffff';
+      meshColorMap[uid] = matColor;
+
+      // Fila para escritorio
+      if (panel) {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px;';
+        row.innerHTML = `
+          <span style="flex:1;font-size:.68rem;color:var(--brown);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${name}">${name}</span>
+          <input type="color" value="${matColor}" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--border);cursor:pointer;padding:0;"
+            onchange="setMeshColor('${uid}', this.value)">`;
+        panel.appendChild(row);
+      }
+
+      // Fila para móvil
+      if (mobPanel) {
+        const mrow = document.createElement('div');
+        mrow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px;';
+        mrow.innerHTML = `
+          <span style="flex:1;font-size:.68rem;color:var(--brown);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${name}">${name}</span>
+          <input type="color" value="${matColor}" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--border);cursor:pointer;padding:0;"
+            onchange="setMeshColor('${uid}', this.value)">`;
+        mobPanel.appendChild(mrow);
+      }
+    });
+  }
+
+  function setMeshColor(uuid, hex) {
+    meshColorMap[uuid] = hex;
+    if (!currentModel) return;
+    currentModel.traverse(c => {
+      if (c.isMesh && c.uuid === uuid) {
+        if (Array.isArray(c.material)) {
+          c.material.forEach(m => { if (m.color) m.color.set(hex); m.needsUpdate = true; });
+        } else if (c.material) {
+          if (c.material.color) c.material.color.set(hex);
+          c.material.needsUpdate = true;
+        }
+      }
+    });
+    // Si esta malla es la malla principal con UV, repintar textura
+    if (targetMesh && targetMesh.uuid === uuid) {
+      S.garmentColor = hex;
+      paintTexture();
+    }
   }
 
   async function loadGarment(garment) {
@@ -1984,6 +1017,7 @@
           applyFlatColor(model, S.garmentColor);
         }
         model.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } });
+        buildMeshColorPanel(model);
         let modelBadge = document.getElementById('modelBadge');
         if (modelBadge) modelBadge.textContent = garment.name;
         let modelStatus = document.getElementById('modelStatus');
@@ -2069,21 +1103,30 @@
 
   function updateDecal() {
     let dScale = document.getElementById('dScale');
-    let dU = document.getElementById('dU');
-    let dV = document.getElementById('dV');
-    let dOp = document.getElementById('dOp');
-    if (dScale) S.designScale = parseInt(dScale.value) / 100;
-    if (dU) S.designU = parseInt(dU.value) / 100;
-    if (dV) S.designV = parseInt(dV.value) / 100;
-    if (dOp) S.designOpacity = parseInt(dOp.value) / 100;
-    let vScale = document.getElementById('vScale');
-    if (vScale && dScale) vScale.textContent = dScale.value + '%';
-    let vDU = document.getElementById('vDU');
-    if (vDU) vDU.textContent = S.designU.toFixed(2);
-    let vDV = document.getElementById('vDV');
-    if (vDV) vDV.textContent = S.designV.toFixed(2);
-    let vDOp = document.getElementById('vDOp');
-    if (vDOp && dOp) vDOp.textContent = dOp.value + '%';
+    let dU     = document.getElementById('dU');
+    let dV     = document.getElementById('dV');
+    let dOp    = document.getElementById('dOp');
+    let dRot   = document.getElementById('dRot');
+    if (dScale) S.designScale    = parseInt(dScale.value) / 100;
+    if (dU)     S.designU        = parseInt(dU.value) / 100;
+    if (dV)     S.designV        = parseInt(dV.value) / 100;
+    if (dOp)    S.designOpacity  = parseInt(dOp.value) / 100;
+    if (dRot)   S.designRotation = parseInt(dRot.value);
+    let vScale = document.getElementById('vScale');  if (vScale && dScale) vScale.textContent = dScale.value + '%';
+    let vDU    = document.getElementById('vDU');     if (vDU)  vDU.textContent  = S.designU.toFixed(2);
+    let vDV    = document.getElementById('vDV');     if (vDV)  vDV.textContent  = S.designV.toFixed(2);
+    let vDOp   = document.getElementById('vDOp');    if (vDOp && dOp)  vDOp.textContent  = dOp.value + '%';
+    let vDRot  = document.getElementById('vDRot');   if (vDRot && dRot) vDRot.textContent = dRot.value + '°';
+    let mdScale = document.getElementById('mdScale'); if (mdScale && dScale) mdScale.value = dScale.value;
+    let mdU     = document.getElementById('mdU');     if (mdU && dU)   mdU.value     = dU.value;
+    let mdV     = document.getElementById('mdV');     if (mdV && dV)   mdV.value     = dV.value;
+    let mdOp    = document.getElementById('mdOp');    if (mdOp && dOp) mdOp.value    = dOp.value;
+    let mdRot   = document.getElementById('mdRot');   if (mdRot && dRot) mdRot.value = dRot.value;
+    let mvScale = document.getElementById('mvScale'); if (mvScale && dScale) mvScale.textContent = dScale.value + '%';
+    let mvDU    = document.getElementById('mvDU');    if (mvDU)  mvDU.textContent  = S.designU.toFixed(2);
+    let mvDV    = document.getElementById('mvDV');    if (mvDV)  mvDV.textContent  = S.designV.toFixed(2);
+    let mvDOp   = document.getElementById('mvDOp');   if (mvDOp && dOp)  mvDOp.textContent  = dOp.value + '%';
+    let mvDRot  = document.getElementById('mvDRot');  if (mvDRot && dRot) mvDRot.textContent = dRot.value + '°';
     paintTexture();
   }
 
@@ -2099,6 +1142,144 @@
     let vDV = document.getElementById('vDV');
     if (vDV) vDV.textContent = '0.55';
     paintTexture();
+  }
+
+  // ============================================
+  // CONTROLES SEGUNDA ESTAMPA (TRASERA)
+  // ============================================
+  function loadDesign2(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        S.designImg2 = img;
+        let dp2 = document.getElementById('designPreview2');
+        if (dp2) dp2.innerHTML = `<img src="${e.target.result}" alt="estampa trasera">`;
+        let dc2 = document.getElementById('designControls2');
+        if (dc2) dc2.style.display = 'block';
+        let mob2thumb = document.getElementById('mobDes2Thumb');
+        if (mob2thumb) mob2thumb.innerHTML = `<img src="${e.target.result}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+        let mob2name = document.getElementById('mobDes2Name');
+        if (mob2name) mob2name.textContent = file.name;
+        let mob2c = document.getElementById('mobDesign2Controls');
+        if (mob2c) mob2c.style.display = 'block';
+        paintTexture();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearDesign2() {
+    S.designImg2 = null;
+    let dp2 = document.getElementById('designPreview2');
+    if (dp2) dp2.innerHTML = '<span class="nd">Sin estampa trasera</span>';
+    let dc2 = document.getElementById('designControls2');
+    if (dc2) dc2.style.display = 'none';
+    let mob2thumb = document.getElementById('mobDes2Thumb');
+    if (mob2thumb) mob2thumb.innerHTML = '';
+    let mob2c = document.getElementById('mobDesign2Controls');
+    if (mob2c) mob2c.style.display = 'none';
+    let du2 = document.getElementById('designUpload2');
+    if (du2) du2.value = '';
+    S.design2Scale = 0.25; S.design2U = 0.73; S.design2V = 0.55; S.design2Opacity = 1;
+    paintTexture();
+  }
+
+  function updateDecal2() {
+    let d2Scale = document.getElementById('d2Scale');
+    let d2U     = document.getElementById('d2U');
+    let d2V     = document.getElementById('d2V');
+    let d2Op    = document.getElementById('d2Op');
+    let d2Rot   = document.getElementById('d2Rot');
+    if (d2Scale) S.design2Scale    = parseInt(d2Scale.value) / 100;
+    if (d2U)     S.design2U        = parseInt(d2U.value) / 100;
+    if (d2V)     S.design2V        = parseInt(d2V.value) / 100;
+    if (d2Op)    S.design2Opacity  = parseInt(d2Op.value) / 100;
+    if (d2Rot)   S.design2Rotation = parseInt(d2Rot.value);
+    let v2Scale = document.getElementById('v2Scale');  if (v2Scale && d2Scale) v2Scale.textContent = d2Scale.value + '%';
+    let v2DU    = document.getElementById('v2DU');     if (v2DU)  v2DU.textContent  = S.design2U.toFixed(2);
+    let v2DV    = document.getElementById('v2DV');     if (v2DV)  v2DV.textContent  = S.design2V.toFixed(2);
+    let v2DOp   = document.getElementById('v2DOp');    if (v2DOp && d2Op)  v2DOp.textContent  = d2Op.value + '%';
+    let v2DRot  = document.getElementById('v2DRot');   if (v2DRot && d2Rot) v2DRot.textContent = d2Rot.value + '°';
+    let md2Scale = document.getElementById('md2Scale'); if (md2Scale && d2Scale) md2Scale.value = d2Scale.value;
+    let md2U     = document.getElementById('md2U');     if (md2U && d2U)   md2U.value     = d2U.value;
+    let md2V     = document.getElementById('md2V');     if (md2V && d2V)   md2V.value     = d2V.value;
+    let md2Op    = document.getElementById('md2Op');    if (md2Op && d2Op) md2Op.value    = d2Op.value;
+    let md2Rot   = document.getElementById('md2Rot');   if (md2Rot && d2Rot) md2Rot.value = d2Rot.value;
+    let mv2Scale = document.getElementById('mv2Scale'); if (mv2Scale && d2Scale) mv2Scale.textContent = d2Scale.value + '%';
+    let mv2DU    = document.getElementById('mv2DU');    if (mv2DU)  mv2DU.textContent  = S.design2U.toFixed(2);
+    let mv2DV    = document.getElementById('mv2DV');    if (mv2DV)  mv2DV.textContent  = S.design2V.toFixed(2);
+    let mv2DOp   = document.getElementById('mv2DOp');   if (mv2DOp && d2Op)  mv2DOp.textContent  = d2Op.value + '%';
+    let mv2DRot  = document.getElementById('mv2DRot');  if (mv2DRot && d2Rot) mv2DRot.textContent = d2Rot.value + '°';
+    paintTexture();
+  }
+
+  function mobUpdateDecal2() {
+    let md2Scale = document.getElementById('md2Scale');
+    let md2U     = document.getElementById('md2U');
+    let md2V     = document.getElementById('md2V');
+    let md2Op    = document.getElementById('md2Op');
+    let md2Rot   = document.getElementById('md2Rot');
+    if (md2Scale) S.design2Scale    = parseInt(md2Scale.value) / 100;
+    if (md2U)     S.design2U        = parseInt(md2U.value) / 100;
+    if (md2V)     S.design2V        = parseInt(md2V.value) / 100;
+    if (md2Op)    S.design2Opacity  = parseInt(md2Op.value) / 100;
+    if (md2Rot)   S.design2Rotation = parseInt(md2Rot.value);
+    let mv2Scale = document.getElementById('mv2Scale'); if (mv2Scale) mv2Scale.textContent = Math.round(S.design2Scale*100)+'%';
+    let mv2DU    = document.getElementById('mv2DU');    if (mv2DU)   mv2DU.textContent    = S.design2U.toFixed(2);
+    let mv2DV    = document.getElementById('mv2DV');    if (mv2DV)   mv2DV.textContent    = S.design2V.toFixed(2);
+    let mv2DOp   = document.getElementById('mv2DOp');   if (mv2DOp)  mv2DOp.textContent   = Math.round(S.design2Opacity*100)+'%';
+    let mv2DRot  = document.getElementById('mv2DRot');  if (mv2DRot && md2Rot) mv2DRot.textContent = md2Rot.value+'°';
+    let d2Scale  = document.getElementById('d2Scale');  if (d2Scale && md2Scale) d2Scale.value = md2Scale.value;
+    let d2U      = document.getElementById('d2U');      if (d2U && md2U)   d2U.value   = md2U.value;
+    let d2V      = document.getElementById('d2V');      if (d2V && md2V)   d2V.value   = md2V.value;
+    let d2Op     = document.getElementById('d2Op');     if (d2Op && md2Op) d2Op.value  = md2Op.value;
+    let d2Rot    = document.getElementById('d2Rot');    if (d2Rot && md2Rot) d2Rot.value = md2Rot.value;
+    paintTexture();
+  }
+
+  function centerDecal2() {
+    S.design2U = 0.73;
+    S.design2V = 0.55;
+    let d2U = document.getElementById('d2U'); if (d2U) d2U.value = 73;
+    let d2V = document.getElementById('d2V'); if (d2V) d2V.value = 55;
+    let v2DU = document.getElementById('v2DU'); if (v2DU) v2DU.textContent = '0.73';
+    let v2DV = document.getElementById('v2DV'); if (v2DV) v2DV.textContent = '0.55';
+    let md2U = document.getElementById('md2U'); if (md2U) md2U.value = 73;
+    let md2V = document.getElementById('md2V'); if (md2V) md2V.value = 55;
+    let mv2DU = document.getElementById('mv2DU'); if (mv2DU) mv2DU.textContent = '0.73';
+    let mv2DV = document.getElementById('mv2DV'); if (mv2DV) mv2DV.textContent = '0.55';
+    paintTexture();
+  }
+
+  // Seteo rápido de rotación: stamp=1|2, angle en grados
+  function setDecalRot(stamp, angle) {
+    if (stamp === 1) {
+      S.designRotation = angle;
+      let dRot  = document.getElementById('dRot');   if (dRot)  dRot.value  = angle;
+      let mdRot = document.getElementById('mdRot');  if (mdRot) mdRot.value = angle;
+      let vDRot  = document.getElementById('vDRot'); if (vDRot)  vDRot.textContent  = angle + '°';
+      let mvDRot = document.getElementById('mvDRot'); if (mvDRot) mvDRot.textContent = angle + '°';
+    } else {
+      S.design2Rotation = angle;
+      let d2Rot  = document.getElementById('d2Rot');   if (d2Rot)  d2Rot.value  = angle;
+      let md2Rot = document.getElementById('md2Rot');  if (md2Rot) md2Rot.value = angle;
+      let v2DRot  = document.getElementById('v2DRot'); if (v2DRot)  v2DRot.textContent  = angle + '°';
+      let mv2DRot = document.getElementById('mv2DRot'); if (mv2DRot) mv2DRot.textContent = angle + '°';
+    }
+    paintTexture();
+  }
+
+  function mobSyncSliders2() {
+    let md2Scale = document.getElementById('md2Scale'); if (md2Scale) md2Scale.value = Math.round(S.design2Scale * 100);
+    let md2U = document.getElementById('md2U'); if (md2U) md2U.value = Math.round(S.design2U * 100);
+    let md2V = document.getElementById('md2V'); if (md2V) md2V.value = Math.round(S.design2V * 100);
+    let mv2Scale = document.getElementById('mv2Scale'); if (mv2Scale) mv2Scale.textContent = Math.round(S.design2Scale * 100) + '%';
+    let mv2DU = document.getElementById('mv2DU'); if (mv2DU) mv2DU.textContent = S.design2U.toFixed(2);
+    let mv2DV = document.getElementById('mv2DV'); if (mv2DV) mv2DV.textContent = S.design2V.toFixed(2);
   }
 
   // ============================================
@@ -2303,18 +1484,25 @@ function updateBgSettings() {
 
   function setLight(type, v) {
     const i = v / 100;
-    if (type === 'front') lights.front.intensity = i;
-    if (type === 'amb') lights.ambient.intensity = i * 0.6;
+    if (type === 'front') { if (lights.front) lights.front.intensity = i * 0.8; }
+    if (type === 'amb')   { if (lights.ambient) lights.ambient.intensity = i * 0.7; if (lights.hemi) lights.hemi.intensity = i * 0.5; }
     if (isMobile()) {
-      if (type === 'front') {
-        let mvLF = document.getElementById('mvLF');
-        if (mvLF) mvLF.textContent = v + '%';
-      }
-      if (type === 'amb') {
-        let mvLA = document.getElementById('mvLA');
-        if (mvLA) mvLA.textContent = v + '%';
-      }
+      if (type === 'front') { let mvLF = document.getElementById('mvLF'); if (mvLF) mvLF.textContent = v + '%'; }
+      if (type === 'amb')   { let mvLA = document.getElementById('mvLA'); if (mvLA) mvLA.textContent = v + '%'; }
     }
+  }
+
+  function setExposure(v) {
+    if (renderer) renderer.toneMappingExposure = parseFloat(v) / 100;
+    let vExp = document.getElementById('vExp');
+    if (vExp) vExp.textContent = v + '%';
+    let mvExp = document.getElementById('mvExp');
+    if (mvExp) mvExp.textContent = v + '%';
+    // Sync sliders
+    let expSlider = document.getElementById('exposure');
+    let mExpSlider = document.getElementById('mExposure');
+    if (expSlider && expSlider.value != v) expSlider.value = v;
+    if (mExpSlider && mExpSlider.value != v) mExpSlider.value = v;
   }
 
   function resetCamera() {
@@ -2359,11 +1547,50 @@ function updateBgSettings() {
     if (progL) progL.textContent = 'Iniciando…';
     const wasAuto = S.autoRotate;
     S.autoRotate = true;
-    const stream = renderer.domElement.captureStream(60);
-    const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
-    mediaRecorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: q === 1080 ? 8e6 : 4e6 });
+    const videoStream = renderer.domElement.captureStream(60);
+
+    // ── Mezclar audio si hay uno cargado ────────────────────────────────────
+    let audioCtx = null;
+    let recStream = videoStream;
+    if (S.audioEl) {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const dest = audioCtx.createMediaStreamDestination();
+        const src  = audioCtx.createMediaElementSource(S.audioEl);
+        src.connect(dest);
+        src.connect(audioCtx.destination); // para escucharlo mientras graba
+        // Copiar las pistas de audio al stream de video
+        const combined = new MediaStream([
+          ...videoStream.getVideoTracks(),
+          ...dest.stream.getAudioTracks()
+        ]);
+        recStream = combined;
+        // Reiniciar audio desde el principio y reproducir
+        S.audioEl.currentTime = 0;
+        S.audioEl.play();
+        S.audioPlaying = true;
+        updateAudioBtn(true);
+      } catch(e) {
+        console.warn('Audio mixing failed, recording without audio:', e);
+      }
+    }
+
+    const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+      ? 'video/webm;codecs=vp9,opus'
+      : MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        ? 'video/webm;codecs=vp9'
+        : 'video/webm';
+    mediaRecorder = new MediaRecorder(recStream, { mimeType: mime, videoBitsPerSecond: q === 1080 ? 8e6 : 4e6 });
     mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recChunks.push(e.data); };
-    mediaRecorder.onstop = () => finishRec(wasAuto);
+    mediaRecorder.onstop = () => {
+      if (audioCtx) { audioCtx.close(); audioCtx = null; }
+      if (S.audioEl && S.audioPlaying && !S.audioEl.loop) {
+        S.audioEl.pause();
+        S.audioPlaying = false;
+        updateAudioBtn(false);
+      }
+      finishRec(wasAuto);
+    };
     mediaRecorder.start(100);
     const dur = S.recordDuration * 1000, t0 = performance.now();
     const iv = setInterval(() => {
@@ -2594,29 +1821,25 @@ function updateBgSettings() {
 
   function mobUpdateDecal() {
     let mdScale = document.getElementById('mdScale');
-    let mdU = document.getElementById('mdU');
-    let mdV = document.getElementById('mdV');
-    let mdOp = document.getElementById('mdOp');
-    if (mdScale) S.designScale = parseInt(mdScale.value) / 100;
-    if (mdU) S.designU = parseInt(mdU.value) / 100;
-    if (mdV) S.designV = parseInt(mdV.value) / 100;
-    if (mdOp) S.designOpacity = parseInt(mdOp.value) / 100;
-    let mvScale = document.getElementById('mvScale');
-    if (mvScale && mdScale) mvScale.textContent = mdScale.value + '%';
-    let mvDU = document.getElementById('mvDU');
-    if (mvDU) mvDU.textContent = S.designU.toFixed(2);
-    let mvDV = document.getElementById('mvDV');
-    if (mvDV) mvDV.textContent = S.designV.toFixed(2);
-    let mvDOp = document.getElementById('mvDOp');
-    if (mvDOp && mdOp) mvDOp.textContent = mdOp.value + '%';
-    let dScale = document.getElementById('dScale');
-    if (dScale && mdScale) dScale.value = mdScale.value;
-    let dU = document.getElementById('dU');
-    if (dU && mdU) dU.value = mdU.value;
-    let dV = document.getElementById('dV');
-    if (dV && mdV) dV.value = mdV.value;
-    let dOp = document.getElementById('dOp');
-    if (dOp && mdOp) dOp.value = mdOp.value;
+    let mdU     = document.getElementById('mdU');
+    let mdV     = document.getElementById('mdV');
+    let mdOp    = document.getElementById('mdOp');
+    let mdRot   = document.getElementById('mdRot');
+    if (mdScale) S.designScale    = parseInt(mdScale.value) / 100;
+    if (mdU)     S.designU        = parseInt(mdU.value) / 100;
+    if (mdV)     S.designV        = parseInt(mdV.value) / 100;
+    if (mdOp)    S.designOpacity  = parseInt(mdOp.value) / 100;
+    if (mdRot)   S.designRotation = parseInt(mdRot.value);
+    let mvScale = document.getElementById('mvScale'); if (mvScale && mdScale) mvScale.textContent = mdScale.value + '%';
+    let mvDU    = document.getElementById('mvDU');    if (mvDU)  mvDU.textContent  = S.designU.toFixed(2);
+    let mvDV    = document.getElementById('mvDV');    if (mvDV)  mvDV.textContent  = S.designV.toFixed(2);
+    let mvDOp   = document.getElementById('mvDOp');   if (mvDOp && mdOp)  mvDOp.textContent  = mdOp.value + '%';
+    let mvDRot  = document.getElementById('mvDRot');  if (mvDRot && mdRot) mvDRot.textContent = mdRot.value + '°';
+    let dScale  = document.getElementById('dScale');  if (dScale && mdScale) dScale.value = mdScale.value;
+    let dU      = document.getElementById('dU');      if (dU && mdU)   dU.value   = mdU.value;
+    let dV      = document.getElementById('dV');      if (dV && mdV)   dV.value   = mdV.value;
+    let dOp     = document.getElementById('dOp');     if (dOp && mdOp) dOp.value  = mdOp.value;
+    let dRot    = document.getElementById('dRot');    if (dRot && mdRot) dRot.value = mdRot.value;
     paintTexture();
   }
 
@@ -2705,8 +1928,84 @@ function updateBgSettings() {
     if (mobBgUpload) mobBgUpload.value = '';
   }
 
+  // ============================================
+  // AUDIO
+  // ============================================
+  function loadAudio(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    clearAudio(false);
+    const url = URL.createObjectURL(file);
+    const audio = new Audio(url);
+    audio.loop = true;
+    audio.volume = 0.8;
+    audio.onended = () => { if (!audio.loop) updateAudioBtn(false); };
+    S.audioEl = audio;
+    S.audioPlaying = false;
+    // Show controls
+    ['audioControls','mobAudioControls'].forEach(id => {
+      let el = document.getElementById(id); if (el) el.style.display = 'block';
+    });
+    ['audioName','mobAudioName'].forEach(id => {
+      let el = document.getElementById(id); if (el) el.textContent = file.name;
+    });
+    updateAudioBtn(false);
+    if (event.target) event.target.value = '';
+  }
+
+  function clearAudio(resetInput = true) {
+    if (S.audioEl) {
+      S.audioEl.pause();
+      S.audioEl.src = '';
+      S.audioEl = null;
+    }
+    S.audioPlaying = false;
+    ['audioControls','mobAudioControls'].forEach(id => {
+      let el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
+    if (resetInput) {
+      let up = document.getElementById('audioUpload'); if (up) up.value = '';
+    }
+  }
+
+  function toggleAudio() {
+    if (!S.audioEl) return;
+    if (S.audioPlaying) {
+      S.audioEl.pause();
+      S.audioPlaying = false;
+    } else {
+      S.audioEl.play();
+      S.audioPlaying = true;
+    }
+    updateAudioBtn(S.audioPlaying);
+  }
+
+  function updateAudioBtn(playing) {
+    ['audioPlayBtn','mobAudioPlayBtn'].forEach(id => {
+      let btn = document.getElementById(id);
+      if (btn) btn.textContent = playing ? '⏸ Pausar' : '▶ Reproducir';
+    });
+  }
+
+  function setAudioVolume(v) {
+    if (S.audioEl) S.audioEl.volume = v / 100;
+    let vAudioVol = document.getElementById('vAudioVol'); if (vAudioVol) vAudioVol.textContent = v + '%';
+    let mvAudioVol = document.getElementById('mvAudioVol'); if (mvAudioVol) mvAudioVol.textContent = v + '%';
+    // Sync sliders
+    let desktopVol = document.getElementById('audioVol');
+    let mobVol = document.getElementById('mobAudioVol');
+    if (desktopVol && desktopVol.value != v) desktopVol.value = v;
+    if (mobVol && mobVol.value != v) mobVol.value = v;
+  }
+
+  function setAudioLoop(checked) {
+    if (S.audioEl) S.audioEl.loop = checked;
+    let dLoop = document.getElementById('audioLoop'); if (dLoop) dLoop.checked = checked;
+    let mLoop = document.getElementById('mobAudioLoop'); if (mLoop) mLoop.checked = checked;
+  }
+
   function setupDropZones() {
-    ['dzDesign', 'dzBg', 'mobDzBg'].forEach(id => {
+    ['dzDesign', 'dzDesign2', 'dzBg', 'mobDzBg', 'dzAudio'].forEach(id => {
       const z = document.getElementById(id);
       if (z) {
         z.addEventListener('dragover', e => { e.preventDefault(); z.classList.add('drag'); });
@@ -2717,8 +2016,10 @@ function updateBgSettings() {
           const f = e.dataTransfer.files[0];
           if (!f) return;
           if (id === 'dzDesign') loadDesign({ target: { files: [f] } });
+          if (id === 'dzDesign2') loadDesign2({ target: { files: [f] } });
           if (id === 'dzBg') loadBgMedia({ target: { files: [f] } });
           if (id === 'mobDzBg') loadBgMediaMob({ target: { files: [f] } });
+          if (id === 'dzAudio') loadAudio({ target: { files: [f] } });
         });
       }
     });
@@ -2735,8 +2036,15 @@ function updateBgSettings() {
     buildMobSwatches();
     buildMobBgGrid();
     setupDropZones();
-    initScene();
-    setTimeout(() => loadGarment(GARMENTS[0]), 800);
+    showLoader('Iniciando escena 3D…');
+    try {
+      initScene();
+    } catch(e) {
+      showErr('Error al iniciar la escena 3D: ' + e.message, '');
+      return;
+    }
+    // Cargar el primer modelo después de que la escena esté lista
+    loadGarment(GARMENTS[0]);
   }
 
   window.addEventListener('load', init);
