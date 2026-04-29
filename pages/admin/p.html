@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>León de Judá</title>
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #111318;
+      color: #f0eee8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      gap: 1rem;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #c9a96e;
+      letter-spacing: .05em;
+    }
+    .msg {
+      font-size: .9rem;
+      color: #7c8090;
+    }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid rgba(201,169,110,.2);
+      border-top-color: #c9a96e;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="logo">✝ León de Judá</div>
+  <div class="spinner"></div>
+  <div class="msg">Cargando producto…</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL      = 'https://tprgnfikrfwqnndotgio.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwcmduZmlrcmZ3cW5uZG90Z2lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNTA0ODksImV4cCI6MjA4OTYyNjQ4OX0.bBcfyoWNLO3OT4NFMoPggPlLPMGPNe2uKvJg40SQd0Y';
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const n = parseInt(params.get('n'));
+
+      if (!n || isNaN(n)) {
+        window.location.href = '/';
+        return;
+      }
+
+      const { data, error } = await sb
+        .from('productos')
+        .select('id')
+        .eq('n', n)
+        .single();
+
+      if (data?.id) {
+        window.location.href = `/pages/tienda/producto.html?id=${data.id}`;
+      } else {
+        // Producto no encontrado → ir al inicio
+        window.location.href = '/';
+      }
+    })();
+  </script>
+</body>
+</html>
