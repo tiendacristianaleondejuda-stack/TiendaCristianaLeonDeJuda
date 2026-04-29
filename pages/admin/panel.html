@@ -1661,6 +1661,7 @@ function renderTablaProductos(lista) {
       </td>
       <td>
         <div class="actions-cell">
+          ${p.n ? `<button class="btn btn-ghost btn-sm" title="Copiar link corto" onclick="copiarLinkCorto(${p.n})"><i class="bi bi-whatsapp" style="color:#25d366"></i></button>` : ''}
           <button class="btn btn-ghost btn-sm" onclick="editarProducto('${p.id}')"><i class="bi bi-pencil"></i></button>
           <button class="btn btn-danger btn-sm" onclick="eliminarProducto('${p.id}','${p.nombre.replace(/'/g,'')}')"><i class="bi bi-trash3"></i></button>
         </div>
@@ -3498,6 +3499,12 @@ async function eliminarPedido(pedidoId) {
     xInicio = null;
   }, { passive: true });
 })();
+
+function copiarLinkCorto(n) {
+  const url = `https://tiendacristianaleondejuda.vercel.app/pages/admin/p.html?n=${n}`;
+  navigator.clipboard.writeText(url);
+  toast('Link copiado ✓', 'ok');
+}
 
 // Cerrar modales al hacer clic fuera
 document.getElementById('modal-producto').addEventListener('click', e => { if (e.target === e.currentTarget) cerrarModalProducto(); });
