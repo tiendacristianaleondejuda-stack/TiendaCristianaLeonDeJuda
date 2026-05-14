@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="León de Judá — Ropa Empresarial. Uniformes, remeras y buzos personalizados para tu empresa. Cotizá por WhatsApp. Villa María, Córdoba.">
+  <meta name="keywords" content="ropa empresarial, uniformes personalizados, remeras empresa, buzos corporativos, villa maria, córdoba, argentina">
+  <meta name="author" content="León de Judá">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="León de Judá — Ropa Empresarial">
+  <meta property="og:description" content="Uniformes y ropa personalizada para tu empresa. Cotizá sin cargo por WhatsApp.">
+  <meta property="og:image"       content="/assets/icons/icon-192x192.png">
+  <meta name="theme-color" content="#1c1917">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192x192.png">
+  <link rel="icon" href="/assets/icons/icon-192x192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <title>León de Judá — Ropa Empresarial</title>
+
+  <style>
+    :root {
+      --bg:           #f5f0e8;
+      --bg2:          #ede6d6;
+      --bg3:          #e4dac8;
+      --card-bg:      #faf7f2;
+      --text:         #1c1917;
+      --text-muted:   #78716c;
+      --gold:         #9a7b2e;
+      --gold-light:   #c9a84c;
+      --border:       #ddd5c0;
+      --white:        #ffffff;
+      --red:          #b91c1c;
+      --nav-h:        56px;
+      /* Empresarial accent */
+      --emp:          #1e3a5f;
+      --emp-light:    #3b82f6;
+      --emp-pale:     rgba(30,58,95,.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; width: 100%; }
+    button { font-family: inherit; cursor: pointer; }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(30,58,95,.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, rgba(154,123,46,.05) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    * { position: relative; z-index: 1; }
+
+    /* ══ NAVBAR ══ */
+    .navbar {
+      position: sticky; top: 0; z-index: 900;
+      background: var(--text); height: var(--nav-h);
+      display: flex; align-items: center; padding: 0 1rem; gap: .75rem;
+    }
+    .navbar-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; font-weight: 600; color: var(--white);
+      letter-spacing: .04em; white-space: nowrap; flex-shrink: 0; line-height: 1.1;
+    }
+    .navbar-logo small {
+      display: block; font-size: .55rem; letter-spacing: .18em; text-transform: uppercase;
+      color: #93c5fd; font-family: 'Jost', sans-serif; font-weight: 500;
+    }
+    .navbar-actions { display: flex; align-items: center; gap: .1rem; flex-shrink: 0; margin-left: auto; }
+    .nav-icon-btn {
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,.85); width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 1.15rem; position: relative;
+      transition: background .15s, color .15s;
+    }
+    .nav-icon-btn:hover { background: rgba(255,255,255,.1); color: white; }
+    .nav-label-text { font-size: .72rem; font-weight: 500; color: rgba(255,255,255,.7); display: none; }
+    @media (min-width: 480px) { .navbar { padding: 0 1.25rem; gap: 1rem; } .navbar-logo { font-size: 1.35rem; } }
+    @media (min-width: 768px) { .navbar { padding: 0 1.5rem; } .nav-label-text { display: inline; } .nav-icon-btn { gap: .35rem; width: auto; padding: 0 .75rem; } }
+
+    /* ══ LINEAS NAV ══ */
+    .lineas-nav {
+      background: #111;
+      display: flex; align-items: center; justify-content: center; gap: .25rem;
+      padding: .5rem 1rem; border-bottom: 1px solid rgba(255,255,255,.06);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .lineas-nav::-webkit-scrollbar { display: none; }
+    .linea-btn {
+      display: flex; align-items: center; gap: .4rem;
+      padding: .35rem .9rem; border-radius: 50px;
+      font-size: .75rem; font-weight: 500; letter-spacing: .04em;
+      color: rgba(255,255,255,.5); border: 1px solid transparent;
+      white-space: nowrap; transition: all .18s;
+    }
+    .linea-btn:hover { color: rgba(255,255,255,.85); }
+    .linea-btn.active {
+      background: rgba(59,130,246,.12);
+      border-color: rgba(59,130,246,.3);
+      color: #93c5fd;
+    }
+
+    /* ══ HERO ══ */
+    .hero {
+      background: linear-gradient(135deg, #0f1c2e 0%, #1e3a5f 100%);
+      color: white; padding: 3.5rem 1.25rem 3rem;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(59,130,246,.2) 0%, transparent 70%);
+    }
+    .hero::after {
+      content: '🏢';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14rem; opacity: .04; pointer-events: none; line-height: 1;
+    }
+    .hero-eyebrow {
+      font-size: .65rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+      color: #93c5fd; margin-bottom: .85rem; position: relative;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; width: 24px; height: 1px; background: #93c5fd; opacity: .6;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 7vw, 4rem);
+      font-weight: 500; line-height: 1.1; margin-bottom: .75rem; position: relative;
+    }
+    .hero h1 em { font-style: italic; color: #93c5fd; }
+    .hero-sub {
+      font-size: .85rem; color: rgba(255,255,255,.55);
+      margin-bottom: 2rem; position: relative; max-width: 480px; margin-left: auto; margin-right: auto;
+      line-height: 1.6;
+    }
+    .hero-btns {
+      display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; position: relative;
+    }
+    .btn-hero-primary {
+      display: inline-flex; align-items: center; gap: .6rem;
+      background: var(--emp-light); color: white;
+      padding: .85rem 1.75rem; border-radius: 3px;
+      font-size: .8rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      transition: background .2s, transform .2s; border: none;
+    }
+    .btn-hero-primary:hover { background: #2563eb; transform: translateY(-2px); }
+    .btn-hero-secondary {
+      display: inline-flex; align-items: center; gap: .6rem;
+      background: transparent; color: rgba(255,255,255,.8);
+      padding: .85rem 1.75rem; border-radius: 3px;
+      font-size: .8rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      border: 1.5px solid rgba(255,255,255,.2);
+      transition: border-color .2s, color .2s, transform .2s;
+    }
+    .btn-hero-secondary:hover { border-color: rgba(255,255,255,.5); color: white; transform: translateY(-2px); }
+
+    /* ══ VENTAJAS ══ */
+    .ventajas {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+    }
+    .ventajas-grid {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+    }
+    @media (min-width: 600px) { .ventajas-grid { grid-template-columns: repeat(4, 1fr); } }
+    .ventaja {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: .4rem; padding: .75rem;
+    }
+    .ventaja-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--emp-pale); border: 1px solid rgba(30,58,95,.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; color: var(--emp-light);
+    }
+    .ventaja-titulo { font-size: .82rem; font-weight: 600; color: var(--text); }
+    .ventaja-desc { font-size: .72rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* ══ PRODUCTOS DESTACADOS ══ */
+    .productos-section { padding: 2rem 1rem; }
+    .sec-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; }
+    .sec-titulo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 500; }
+    .sec-count { font-size: .75rem; color: var(--text-muted); }
+    .grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem .75rem;
+    }
+    @media (min-width: 600px)  { .grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 900px)  { .grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (min-width: 1200px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+
+    .prod-card { cursor: pointer; transition: transform .2s; }
+    .prod-card:hover { transform: translateY(-3px); }
+    .prod-img {
+      aspect-ratio: 3/4; border-radius: 8px; overflow: hidden;
+      background: var(--bg3); position: relative; margin-bottom: .6rem;
+    }
+    .prod-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s; }
+    .prod-card:hover .prod-img img { transform: scale(1.05); }
+    .prod-badge {
+      position: absolute; top: .5rem; left: .5rem;
+      background: var(--emp); color: white; font-size: .58rem; font-weight: 700;
+      letter-spacing: .07em; text-transform: uppercase; padding: .18rem .45rem; border-radius: 3px;
+    }
+    .btn-cot {
+      position: absolute; bottom: .5rem; right: .5rem;
+      background: white; border: none; border-radius: 50%;
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: var(--text);
+      opacity: 0; transform: scale(.8); transition: opacity .2s, transform .2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+    .prod-card:hover .btn-cot { opacity: 1; transform: scale(1); }
+    .prod-nombre { font-size: .82rem; font-weight: 600; margin-bottom: .15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .prod-cat { font-size: .7rem; color: var(--text-muted); margin-bottom: .25rem; text-transform: capitalize; }
+    .prod-desde { font-size: .78rem; color: var(--text-muted); }
+    .prod-desde strong { font-size: .9rem; color: var(--emp-light); font-weight: 700; }
+
+    /* ── Skeleton ── */
+    .skel {
+      background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+      background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .empty { grid-column: 1 / -1; text-align: center; padding: 3.5rem 1rem; color: var(--text-muted); }
+    .empty i { font-size: 2.5rem; margin-bottom: .75rem; opacity: .35; display: block; }
+
+    /* ══ SEPARADOR FORMULARIO ══ */
+    .sep {
+      padding: 3rem 1rem 0;
+      text-align: center;
+    }
+    .sep-eyebrow {
+      font-size: .65rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--emp-light); margin-bottom: .6rem;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+    }
+    .sep-eyebrow::before, .sep-eyebrow::after {
+      content: ''; flex: 1; max-width: 60px; height: 1px;
+      background: var(--emp-light); opacity: .4;
+    }
+    .sep h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 500; margin-bottom: .5rem;
+    }
+    .sep p { font-size: .85rem; color: var(--text-muted); max-width: 460px; margin: 0 auto; line-height: 1.6; }
+
+    /* ══ FORMULARIO COTIZACIÓN ══ */
+    .cotizacion-wrap {
+      max-width: 620px;
+      margin: 2rem auto 4rem;
+      padding: 0 1rem;
+    }
+    .cot-form {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+    }
+    @media (min-width: 600px) { .cot-form { padding: 2.5rem 2rem; } }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    @media (min-width: 500px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+      .form-full { grid-column: 1 / -1; }
+    }
+
+    .field { display: flex; flex-direction: column; gap: .35rem; }
+    .field-label {
+      font-size: .72rem; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text-muted);
+    }
+    .field-label span { color: var(--emp-light); }
+    .field-input {
+      padding: .65rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-size: .875rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      width: 100%;
+      appearance: none;
+    }
+    .field-input:focus {
+      border-color: var(--emp-light);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+    }
+    .field-input::placeholder { color: var(--text-muted); }
+    select.field-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .85rem center; padding-right: 2.2rem; cursor: pointer; }
+    textarea.field-input { resize: vertical; min-height: 90px; }
+
+    /* Contador de prendas */
+    .prendas-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem;
+    }
+    @media (min-width: 500px) { .prendas-grid { grid-template-columns: repeat(3, 1fr); } }
+    .prenda-item {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: .65rem .75rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: .5rem; background: var(--bg);
+      transition: border-color .2s;
+    }
+    .prenda-item:focus-within { border-color: var(--emp-light); }
+    .prenda-label { font-size: .78rem; font-weight: 500; color: var(--text-muted); white-space: nowrap; }
+    .prenda-counter {
+      display: flex; align-items: center; gap: .3rem;
+    }
+    .counter-btn {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--white); font-size: .85rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text); transition: all .15s; flex-shrink: 0;
+      line-height: 1;
+    }
+    .counter-btn:hover { border-color: var(--emp-light); color: var(--emp-light); }
+    .counter-val {
+      width: 32px; text-align: center;
+      font-weight: 700; font-size: .9rem; color: var(--text);
+      border: none; background: none; outline: none;
+      font-family: 'Jost', sans-serif;
+    }
+    /* Ocultar flechas del input number */
+    .counter-val::-webkit-inner-spin-button,
+    .counter-val::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .counter-val[type=number] { -moz-appearance: textfield; }
+
+    /* Colores del diseño */
+    .colores-wrap { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .35rem; }
+    .color-chip {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2.5px solid transparent; cursor: pointer;
+      transition: transform .15s, border-color .15s;
+      position: relative; flex-shrink: 0;
+    }
+    .color-chip:hover { transform: scale(1.12); }
+    .color-chip.sel { border-color: var(--emp-light); }
+    .color-chip.sel::after {
+      content: '✓'; position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 900; color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,.5);
+    }
+
+    /* Indicador total */
+    .total-prendas {
+      background: var(--emp-pale);
+      border: 1px solid rgba(30,58,95,.15);
+      border-radius: 10px;
+      padding: .75rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: .82rem;
+    }
+    .total-prendas .num { font-size: 1.3rem; font-weight: 700; color: var(--emp); }
+    .total-prendas .label { color: var(--text-muted); font-size: .78rem; }
+
+    /* Botón enviar */
+    .btn-enviar {
+      width: 100%; padding: 1rem;
+      background: #25d366;
+      color: white; border: none; border-radius: 10px;
+      font-family: 'Jost', sans-serif; font-size: .9rem; font-weight: 700;
+      letter-spacing: .04em;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+      transition: background .2s, transform .2s;
+    }
+    .btn-enviar:hover { background: #1ebe5d; transform: translateY(-2px); }
+    .btn-enviar i { font-size: 1.1rem; }
+    .enviar-nota {
+      text-align: center; font-size: .72rem; color: var(--text-muted);
+      margin-top: .6rem; line-height: 1.5;
+    }
+
+    /* ══ TOAST ══ */
+    .toast-wrap {
+      position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
+      z-index: 9999; pointer-events: none; display: flex; flex-direction: column; gap: .4rem;
+    }
+    .toast {
+      background: var(--text); color: white; padding: .65rem 1.1rem;
+      border-radius: 50px; font-size: .82rem; font-weight: 500; white-space: nowrap;
+      display: flex; align-items: center; gap: .5rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,.25);
+      animation: t-in .3s ease, t-out .3s ease 2.2s forwards;
+    }
+    .toast i { color: #86efac; }
+    @keyframes t-in  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+    @keyframes t-out { from { opacity:1; } to { opacity:0; } }
+
+    /* ══ FOOTER ══ */
+    .footer-banner {
+      background: var(--emp); color: white; text-align: center;
+      padding: .75rem 1.25rem; font-size: .82rem; font-weight: 600; letter-spacing: .04em;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+    }
+    footer { background: #141210; color: rgba(255,255,255,.55); font-size: .85rem; margin-top: 0; }
+    .footer-main {
+      max-width: 1280px; margin: 0 auto; padding: 3.5rem 2rem 2.5rem;
+      display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 3rem;
+    }
+    @media (max-width: 700px) { .footer-main { grid-template-columns: 1fr; gap: 1.75rem; padding: 2.5rem 1.25rem 2rem; } }
+    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; color: white; font-weight: 600; display: block; margin-bottom: .35rem; }
+    .footer-tagline { font-size: .78rem; color: rgba(255,255,255,.35); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 1rem; }
+    .footer-social { display: flex; gap: .6rem; }
+    .footer-social a {
+      width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.5); font-size: 1rem; transition: border-color .2s, color .2s;
+    }
+    .footer-social a:hover { border-color: #93c5fd; color: #93c5fd; }
+    .footer-col-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600;
+      color: white; letter-spacing: .06em; text-transform: uppercase;
+      margin-bottom: 1rem; padding-bottom: .5rem; border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .footer-links { display: flex; flex-direction: column; gap: .55rem; }
+    .footer-links a {
+      color: rgba(255,255,255,.5); font-size: .84rem; transition: color .15s;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .footer-links a:hover { color: #93c5fd; }
+    .footer-info-row { display: flex; align-items: flex-start; gap: .6rem; margin-bottom: .7rem; font-size: .83rem; line-height: 1.5; }
+    .footer-info-row i { color: #93c5fd; font-size: .95rem; margin-top: .1rem; flex-shrink: 0; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.06); padding: 1.25rem 2rem;
+      max-width: 1280px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: .5rem; font-size: .75rem; color: rgba(255,255,255,.25);
+    }
+    @media (max-width: 520px) { .footer-bottom { flex-direction: column; text-align: center; padding: 1rem 1.25rem; } }
+  </style>
+</head>
+
+<body>
+
+  <!-- ─── NAVBAR ─── -->
+  <nav class="navbar">
+    <a class="navbar-logo" href="/index.html">
+      León de Judá
+      <small>Empresarial</small>
+    </a>
+    <div class="navbar-actions">
+      <a href="/login.html" class="nav-icon-btn" id="nav-login" title="Ingresar">
+        <i class="bi bi-person"></i>
+        <span class="nav-label-text">Ingresar</span>
+      </a>
+      <a href="/pages/tienda/cuenta.html" class="nav-icon-btn" id="nav-cuenta" style="display:none" title="Mi cuenta">
+        <i class="bi bi-person-check"></i>
+        <span class="nav-label-text" id="nav-nombre-usuario">Mi cuenta</span>
+      </a>
+      <a href="/pages/admin/panel.html" class="nav-icon-btn" id="nav-admin" style="display:none" title="Panel admin">
+        <i class="bi bi-grid-1x2"></i>
+        <span class="nav-label-text">Panel</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ─── LINEAS NAV ─── -->
+  <div class="lineas-nav">
+    <a href="/index.html" class="linea-btn">✝ Cristiana</a>
+    <a href="/pages/tienda/casual.html" class="linea-btn">⚽ Casual</a>
+    <a href="/pages/tienda/empresarial.html" class="linea-btn active">🏢 Empresarial</a>
+  </div>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <p class="hero-eyebrow">Ropa corporativa · Personalización total</p>
+    <h1>Tu empresa, <em>tu marca</em></h1>
+    <p class="hero-sub">
+      Uniformes y ropa personalizada con el logo de tu empresa.
+      Talles variados, pedidos desde 10 unidades. Cotizá sin cargo en minutos.
+    </p>
+    <div class="hero-btns">
+      <button class="btn-hero-primary" onclick="document.getElementById('cotizacion').scrollIntoView({behavior:'smooth'})">
+        <i class="bi bi-whatsapp"></i> Cotizar ahora
+      </button>
+      <a href="#productos" class="btn-hero-secondary">
+        <i class="bi bi-grid"></i> Ver catálogo
+      </a>
+    </div>
+  </section>
+
+  <!-- ─── VENTAJAS ─── -->
+  <div class="ventajas">
+    <div class="ventajas-grid">
+      <div class="ventaja">
+        <div class="ventaja-icon"><i class="bi bi-palette2"></i></div>
+        <p class="ventaja-titulo">Diseño incluido</p>
+        <p class="ventaja-desc">Te ayudamos a adaptar tu logo al estampado</p>
+      </div>
+      <div class="ventaja">
+        <div class="ventaja-icon"><i class="bi bi-boxes"></i></div>
+        <p class="ventaja-titulo">Desde 10 unidades</p>
+        <p class="ventaja-desc">Sin mínimos altos, ideal para equipos pequeños</p>
+      </div>
+      <div class="ventaja">
+        <div class="ventaja-icon"><i class="bi bi-rulers"></i></div>
+        <p class="ventaja-titulo">Todos los talles</p>
+        <p class="ventaja-desc">XS a 4XL en la misma orden sin costo extra</p>
+      </div>
+      <div class="ventaja">
+        <div class="ventaja-icon"><i class="bi bi-truck"></i></div>
+        <p class="ventaja-titulo">Envío a todo el país</p>
+        <p class="ventaja-desc">Andreani, OCA y Correo Argentino</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CATÁLOGO EMPRESARIAL ─── -->
+  <section class="productos-section" id="productos">
+    <div class="sec-header">
+      <h2 class="sec-titulo">Productos para empresas</h2>
+      <span class="sec-count" id="count-label"></span>
+    </div>
+    <div class="grid" id="grid">
+      <div><div class="skel" style="aspect-ratio:3/4"></div><div class="skel" style="height:12px;margin-top:10px;width:80%"></div><div class="skel" style="height:10px;margin-top:6px;width:50%"></div></div>
+      <div><div class="skel" style="aspect-ratio:3/4"></div><div class="skel" style="height:12px;margin-top:10px;width:80%"></div><div class="skel" style="height:10px;margin-top:6px;width:50%"></div></div>
+    </div>
+  </section>
+
+  <!-- ─── SEPARADOR ─── -->
+  <div class="sep">
+    <p class="sep-eyebrow">Presupuesto sin cargo</p>
+    <h2>¿Cuánto cuesta para tu empresa?</h2>
+    <p>Completá el formulario y te respondemos por WhatsApp en menos de 24 hs con precio final por unidad según cantidad.</p>
+  </div>
+
+  <!-- ─── FORMULARIO COTIZACIÓN ─── -->
+  <div class="cotizacion-wrap" id="cotizacion">
+    <div class="cot-form">
+
+      <div class="form-grid">
+
+        <!-- Empresa -->
+        <div class="field">
+          <label class="field-label">Nombre de empresa / marca <span>*</span></label>
+          <input type="text" class="field-input" id="emp-nombre" placeholder="Ej: Ferretería García">
+        </div>
+
+        <!-- Contacto -->
+        <div class="field">
+          <label class="field-label">Tu nombre <span>*</span></label>
+          <input type="text" class="field-input" id="emp-contacto" placeholder="Ej: Martín García">
+        </div>
+
+        <!-- Tipo de prenda -->
+        <div class="field form-full">
+          <label class="field-label">¿Qué prenda necesitás? <span>*</span></label>
+          <select class="field-input" id="emp-prenda">
+            <option value="">Seleccioná una opción…</option>
+            <option value="remeras">Remeras</option>
+            <option value="buzos">Buzos con capucha</option>
+            <option value="buzos-crew">Buzos crew neck</option>
+            <option value="camisas">Camisas de trabajo</option>
+            <option value="gorras">Gorras</option>
+            <option value="pantalones">Pantalones / bermudas</option>
+            <option value="combinado">Combinado (varias prendas)</option>
+          </select>
+        </div>
+
+        <!-- Cantidad por talle -->
+        <div class="field form-full">
+          <label class="field-label">Cantidad por talle</label>
+          <div class="prendas-grid" id="prendas-grid">
+            <!-- Generado por JS -->
+          </div>
+        </div>
+
+        <!-- Total indicador -->
+        <div class="field form-full">
+          <div class="total-prendas">
+            <div>
+              <div class="label">Total de unidades</div>
+              <div class="num" id="total-num">0</div>
+            </div>
+            <div style="font-size:.78rem;color:var(--text-muted);text-align:right;line-height:1.5">
+              Mínimo 10 unidades<br>para precio corporativo
+            </div>
+          </div>
+        </div>
+
+        <!-- Colores -->
+        <div class="field form-full">
+          <label class="field-label">Color de prenda preferido</label>
+          <div class="colores-wrap" id="colores-chips"></div>
+        </div>
+
+        <!-- Diseño / logo -->
+        <div class="field form-full">
+          <label class="field-label">¿Dónde va el logo / diseño?</label>
+          <select class="field-input" id="emp-logo-pos">
+            <option value="">Seleccioná…</option>
+            <option value="pecho-izq">Pecho izquierdo (chico)</option>
+            <option value="pecho-centro">Pecho centro (grande)</option>
+            <option value="espalda">Espalda</option>
+            <option value="manga">Manga</option>
+            <option value="pecho-espalda">Pecho + Espalda</option>
+          </select>
+        </div>
+
+        <!-- Técnica -->
+        <div class="field form-full">
+          <label class="field-label">Técnica de personalización</label>
+          <select class="field-input" id="emp-tecnica">
+            <option value="">No sé / a definir</option>
+            <option value="serigrafía">Serigrafía</option>
+            <option value="sublimación">Sublimación</option>
+            <option value="bordado">Bordado</option>
+            <option value="dtf">Transfer DTF</option>
+          </select>
+        </div>
+
+        <!-- Notas adicionales -->
+        <div class="field form-full">
+          <label class="field-label">Notas adicionales <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:.72rem">(opcional)</span></label>
+          <textarea class="field-input" id="emp-notas" placeholder="Ej: tenemos logo en vectores, necesitamos para el 15/08, queremos etiqueta propia…"></textarea>
+        </div>
+
+      </div><!-- /form-grid -->
+
+      <div style="margin-top:1.5rem">
+        <button class="btn-enviar" id="btn-enviar-cot">
+          <i class="bi bi-whatsapp"></i>
+          Enviar consulta por WhatsApp
+        </button>
+        <p class="enviar-nota">
+          Te vamos a responder en menos de 24 hs con el presupuesto. Sin compromiso.
+        </p>
+      </div>
+
+    </div><!-- /cot-form -->
+  </div><!-- /cotizacion-wrap -->
+
+  <!-- ─── FOOTER ─── -->
+  <div class="footer-banner">
+    <i class="bi bi-building"></i>
+    Ropa corporativa a medida · Desde Villa María, Córdoba
+  </div>
+
+  <footer>
+    <div class="footer-main">
+      <div>
+        <span class="footer-logo">León de Judá</span>
+        <p class="footer-tagline">Ropa Empresarial</p>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/leondejudavmtiendacristiana/" title="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="https://www.facebook.com/LeonDeJudaTiendaDeRopaCristiana/" title="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="https://wa.me/5493534180007" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+        </div>
+      </div>
+      <div>
+        <p class="footer-col-title">Secciones</p>
+        <div class="footer-links">
+          <a href="/index.html"><i class="bi bi-chevron-right"></i> ✝ Cristiana</a>
+          <a href="/pages/tienda/casual.html"><i class="bi bi-chevron-right"></i> ⚽ Casual</a>
+          <a href="/pages/tienda/empresarial.html"><i class="bi bi-chevron-right"></i> 🏢 Empresarial</a>
+          <a href="/pages/tienda/carrito.html"><i class="bi bi-chevron-right"></i> Mi carrito</a>
+        </div>
+      </div>
+      <div>
+        <p class="footer-col-title">Contacto</p>
+        <div class="footer-info-row">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>Parajon Ortiz 774, Villa María, Córdoba</span>
+        </div>
+        <div class="footer-info-row">
+          <i class="bi bi-whatsapp"></i>
+          <a href="https://wa.me/5493534180007" style="color:rgba(255,255,255,.55)">+54 9 3534180007</a>
+        </div>
+        <div class="footer-info-row">
+          <i class="bi bi-envelope-fill"></i>
+          <span>tiendacristianaleondejuda@gmail.com</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 León de Judá · Todos los derechos reservados</span>
+      <span>Hecho con <i class="bi bi-heart-fill" style="color:#93c5fd;font-size:.7rem"></i> y dedicación</span>
+    </div>
+  </footer>
+
+  <div class="toast-wrap" id="toasts"></div>
+
+  <!-- ─── SCRIPTS ─── -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js"></script>
+
+  <script>
+    // ─── Talles y colores ───
+    const TALLES = ['XS','S','M','L','XL','XXL','3XL'];
+    const COLORES = [
+      { nombre:'Negro',   hex:'#1c1917' },
+      { nombre:'Blanco',  hex:'#f5f5f4' },
+      { nombre:'Gris',    hex:'#6b7280' },
+      { nombre:'Azul',    hex:'#1e40af' },
+      { nombre:'Rojo',    hex:'#b91c1c' },
+      { nombre:'Verde',   hex:'#166534' },
+      { nombre:'Bordó',   hex:'#7f1d1d' },
+      { nombre:'Celeste', hex:'#0284c7' },
+      { nombre:'Naranja', hex:'#c2410c' },
+    ];
+    let colorSel = null;
+
+    // Render contadores de talle
+    const grid = document.getElementById('prendas-grid');
+    grid.innerHTML = TALLES.map(t => `
+      <div class="prenda-item">
+        <span class="prenda-label">${t}</span>
+        <div class="prenda-counter">
+          <button class="counter-btn" onclick="cambiar('${t}',-1)" type="button">−</button>
+          <input type="number" class="counter-val" id="talle-${t}" value="0" min="0" max="999"
+            oninput="actualizarTotal()">
+          <button class="counter-btn" onclick="cambiar('${t}',1)" type="button">+</button>
+        </div>
+      </div>`).join('');
+
+    // Render chips de color
+    const chipsWrap = document.getElementById('colores-chips');
+    chipsWrap.innerHTML = COLORES.map(c => `
+      <div class="color-chip" style="background:${c.hex};${c.hex==='#f5f5f4'?'border:1.5px solid #ddd5c0;':''}"
+        title="${c.nombre}" onclick="selColor(this,'${c.nombre}')"></div>`).join('');
+
+    function cambiar(talle, delta) {
+      const el = document.getElementById('talle-' + talle);
+      const v  = Math.max(0, (parseInt(el.value) || 0) + delta);
+      el.value = v;
+      actualizarTotal();
+    }
+
+    function actualizarTotal() {
+      const total = TALLES.reduce((s, t) => s + (parseInt(document.getElementById('talle-'+t).value) || 0), 0);
+      document.getElementById('total-num').textContent = total;
+    }
+
+    function selColor(chip, nombre) {
+      colorSel = nombre;
+      document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('sel'));
+      chip.classList.add('sel');
+    }
+
+    // ─── Enviar cotización por WhatsApp ───
+    document.getElementById('btn-enviar-cot').addEventListener('click', () => {
+      const empresa  = document.getElementById('emp-nombre').value.trim();
+      const contacto = document.getElementById('emp-contacto').value.trim();
+      const prenda   = document.getElementById('emp-prenda').value;
+      const logoPos  = document.getElementById('emp-logo-pos').value;
+      const tecnica  = document.getElementById('emp-tecnica').value;
+      const notas    = document.getElementById('emp-notas').value.trim();
+
+      if (!empresa || !contacto || !prenda) {
+        toast('Completá los campos obligatorios *', 'err');
+        return;
+      }
+
+      // Armar detalle de talles
+      const tallesDetalle = TALLES
+        .map(t => ({ t, v: parseInt(document.getElementById('talle-'+t).value) || 0 }))
+        .filter(x => x.v > 0)
+        .map(x => `${x.t}: ${x.v}`)
+        .join(', ');
+      const total = TALLES.reduce((s, t) => s + (parseInt(document.getElementById('talle-'+t).value) || 0), 0);
+
+      const lineasPrenda   = prenda   ? `\n🧥 Prenda: ${prenda}`       : '';
+      const lineasTalles   = tallesDetalle ? `\n📏 Talles: ${tallesDetalle} (Total: ${total} uds)` : `\n📏 Cantidad total: ${total} uds`;
+      const lineasColor    = colorSel ? `\n🎨 Color: ${colorSel}`       : '';
+      const lineasLogo     = logoPos  ? `\n🖨️ Logo en: ${logoPos}`      : '';
+      const lineasTecnica  = tecnica  ? `\n⚙️ Técnica: ${tecnica}`      : '';
+      const lineasNotas    = notas    ? `\n📝 Notas: ${notas}`          : '';
+
+      const msg = `¡Hola! Soy *${contacto}* de *${empresa}* y quiero cotizar ropa para mi empresa:${lineasPrenda}${lineasTalles}${lineasColor}${lineasLogo}${lineasTecnica}${lineasNotas}\n\n¿Me podés dar un presupuesto?`;
+
+      const url = `https://wa.me/5493534180007?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    });
+
+    // ─── Cargar productos empresariales desde Supabase ───
+    (async () => {
+      try {
+        const { data, error } = await sb
+          .from('productos')
+          .select('*')
+          .eq('activo', true)
+          .eq('linea', 'empresarial')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        const lista = data || [];
+        document.getElementById('count-label').textContent =
+          lista.length + ' producto' + (lista.length !== 1 ? 's' : '');
+        if (!lista.length) {
+          document.getElementById('grid').innerHTML =
+            `<div class="empty">
+              <i class="bi bi-building"></i>
+              <p style="margin-bottom:.5rem">Catálogo en construcción</p>
+              <p style="font-size:.78rem">¡Ya podés cotizar usando el formulario de abajo!</p>
+            </div>`;
+          return;
+        }
+        document.getElementById('grid').innerHTML = lista.map(p => {
+          const img = p.imagen_url || 'https://placehold.co/400x530/1e3a5f/93c5fd?text=Empresa';
+          const precio = typeof formatearPrecio === 'function' ? formatearPrecio(p.precio) : '$' + p.precio;
+          return `
+            <div class="prod-card" onclick="document.getElementById('cotizacion').scrollIntoView({behavior:'smooth'})">
+              <div class="prod-img">
+                <img src="${img}" alt="${p.nombre}" loading="lazy"
+                  onerror="this.src='https://placehold.co/400x530/1e3a5f/93c5fd?text=Empresa'">
+                <span class="prod-badge">Corporativo</span>
+                <button class="btn-cot" title="Cotizar" onclick="event.stopPropagation();document.getElementById('cotizacion').scrollIntoView({behavior:'smooth'})">
+                  <i class="bi bi-whatsapp"></i>
+                </button>
+              </div>
+              <p class="prod-nombre">${p.nombre}</p>
+              <p class="prod-cat">${p.categoria || ''}</p>
+              <p class="prod-desde">Desde <strong>${precio}</strong> / unidad</p>
+            </div>`;
+        }).join('');
+      } catch {
+        document.getElementById('grid').innerHTML =
+          `<div class="empty"><i class="bi bi-exclamation-circle"></i><p>No se pudo cargar el catálogo.</p></div>`;
+      }
+    })();
+
+    // ─── Navbar usuario ───
+    (async () => {
+      if (typeof getUsuario !== 'function') return;
+      const user = await getUsuario();
+      const linkLogin  = document.getElementById('nav-login');
+      const linkCuenta = document.getElementById('nav-cuenta');
+      const linkAdmin  = document.getElementById('nav-admin');
+      const nombreSpan = document.getElementById('nav-nombre-usuario');
+      if (!user) { if (linkLogin) linkLogin.style.display = 'flex'; return; }
+      const { data: perfil } = await sb.from('perfiles').select('nombre').eq('user_id', user.id).maybeSingle();
+      if (linkLogin)  linkLogin.style.display  = 'none';
+      if (linkCuenta) { linkCuenta.style.display = 'flex'; }
+      if (nombreSpan) nombreSpan.textContent = perfil?.nombre || user.email.split('@')[0];
+      if (linkAdmin)  linkAdmin.style.display = user.email === ADMIN_EMAIL ? 'flex' : 'none';
+    })();
+
+    // ─── Toast ───
+    function toast(msg) {
+      const w = document.getElementById('toasts');
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.innerHTML = `<i class="bi bi-exclamation-circle-fill" style="color:#fca5a5"></i> ${msg}`;
+      w.appendChild(el);
+      setTimeout(() => el.remove(), 2600);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="León de Judá — Ropa Casual. Remeras, buzos y gorras de edición especial Mundial 2026 y ropa casual. Envíos a todo Argentina.">
+  <meta name="keywords" content="ropa casual, mundial 2026, remeras mundialistas, ropa deportiva, villa maria, córdoba, argentina">
+  <meta name="author" content="León de Judá">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="León de Judá — Ropa Casual">
+  <meta property="og:description" content="Colección casual y Mundial 2026. Envíos a todo Argentina.">
+  <meta property="og:image"       content="/assets/icons/icon-192x192.png">
+  <meta property="og:locale"      content="es_AR">
+  <meta name="theme-color" content="#0f1f15">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192x192.png">
+  <link rel="icon" href="/assets/icons/icon-192x192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <title>León de Judá — Ropa Casual</title>
+
+  <style>
+    :root {
+      --bg:           #f5f0e8;
+      --bg2:          #ede6d6;
+      --bg3:          #e4dac8;
+      --card-bg:      #faf7f2;
+      --text:         #1c1917;
+      --text-muted:   #78716c;
+      --gold:         #9a7b2e;
+      --gold-light:   #c9a84c;
+      --border:       #ddd5c0;
+      --white:        #ffffff;
+      --red:          #b91c1c;
+      --nav-h:        56px;
+      --casual:       #166534;
+      --casual-light: #22c55e;
+      --casual-pale:  rgba(22,101,52,.1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; width: 100%; }
+    button { font-family: inherit; cursor: pointer; }
+
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(22,101,52,.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, rgba(154,123,46,.05) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    * { position: relative; z-index: 1; }
+
+    /* ══ NAVBAR ══ */
+    .navbar {
+      position: sticky; top: 0; z-index: 900;
+      background: var(--text); height: var(--nav-h);
+      display: flex; align-items: center; padding: 0 1rem; gap: .5rem;
+    }
+
+    .btn-back {
+      background: none; border: none;
+      color: rgba(255,255,255,.7);
+      width: 36px; height: 36px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 1.1rem;
+      transition: background .15s, color .15s;
+    }
+    .btn-back:hover { background: rgba(255,255,255,.1); color: white; }
+    .btn-back.hidden { display: none; }
+
+    .navbar-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; font-weight: 600; color: var(--white);
+      letter-spacing: .04em; white-space: nowrap; flex-shrink: 0; line-height: 1.1;
+    }
+    .navbar-logo small {
+      display: block; font-size: .55rem; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--casual-light); font-family: 'Jost', sans-serif; font-weight: 500;
+    }
+
+    .navbar-search {
+      flex: 1; display: flex; align-items: center;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 50px; padding: .35rem .85rem; gap: .4rem; min-width: 0;
+    }
+    .navbar-search i { color: rgba(255,255,255,.45); font-size: .95rem; flex-shrink: 0; }
+    .navbar-search input {
+      background: none; border: none; outline: none; color: white;
+      font-family: 'Jost', sans-serif; font-size: .82rem; width: 100%; min-width: 0;
+    }
+    .navbar-search input::placeholder { color: rgba(255,255,255,.35); }
+
+    .navbar-actions { display: flex; align-items: center; gap: .1rem; flex-shrink: 0; }
+    .nav-icon-btn {
+      background: none; border: none; color: rgba(255,255,255,.85);
+      width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 1.15rem; position: relative;
+      transition: background .15s, color .15s;
+    }
+    .nav-icon-btn:hover { background: rgba(255,255,255,.1); color: white; }
+
+    .carrito-badge, .msg-badge {
+      position: absolute; top: 5px; right: 5px;
+      width: 17px; height: 17px;
+      font-size: .6rem; font-weight: 800;
+      border-radius: 50%; display: none;
+      align-items: center; justify-content: center;
+    }
+    .carrito-badge { background: var(--casual-light); color: var(--text); }
+    .msg-badge     { background: #4ade80; color: #111; }
+
+    .nav-label-text { font-size: .72rem; font-weight: 500; color: rgba(255,255,255,.7); display: none; }
+
+    @media (min-width: 480px) { .navbar { padding: 0 1.25rem; gap: .75rem; } .navbar-logo { font-size: 1.35rem; } }
+    @media (min-width: 768px) {
+      .navbar { padding: 0 1.5rem; }
+      .nav-label-text { display: inline; }
+      .nav-icon-btn { gap: .35rem; width: auto; padding: 0 .75rem; }
+    }
+
+    /* ══ LINEAS NAV ══ */
+    .lineas-nav {
+      background: #111; display: flex; align-items: center; justify-content: center;
+      gap: .25rem; padding: .5rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .lineas-nav::-webkit-scrollbar { display: none; }
+    .linea-btn {
+      display: flex; align-items: center; gap: .4rem;
+      padding: .35rem .9rem; border-radius: 50px;
+      font-size: .75rem; font-weight: 500; letter-spacing: .04em;
+      color: rgba(255,255,255,.5); border: 1px solid transparent;
+      white-space: nowrap; transition: all .18s;
+    }
+    .linea-btn:hover { color: rgba(255,255,255,.85); }
+    .linea-btn.active {
+      background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.3);
+      color: var(--casual-light);
+    }
+
+    /* ══ HERO ══ */
+    .hero {
+      background: #0f1f15; color: white;
+      padding: 3rem 1.25rem 2.5rem; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(22,101,52,.35) 0%, transparent 70%);
+    }
+    .hero::after {
+      content: '⚽'; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%); font-size: 16rem; opacity: .03; pointer-events: none; line-height: 1;
+    }
+    .hero-eyebrow {
+      font-size: .65rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--casual-light); margin-bottom: .85rem; position: relative;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+    }
+    .hero-eyebrow::before,.hero-eyebrow::after { content:''; width:24px; height:1px; background:var(--casual-light); opacity:.6; }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem,7vw,4rem); font-weight: 500; line-height: 1.1;
+      margin-bottom: .75rem; position: relative;
+    }
+    .hero h1 em { font-style: italic; color: var(--casual-light); }
+    .hero-sub { font-size: .85rem; color: rgba(255,255,255,.5); margin-bottom: 1.75rem; position: relative; }
+    .btn-hero {
+      display: inline-flex; align-items: center; gap: .6rem;
+      background: var(--casual); color: white; padding: .8rem 1.75rem; border-radius: 3px;
+      font-size: .8rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+      transition: background .2s, transform .2s; position: relative; border: none;
+    }
+    .btn-hero:hover { background: #15803d; transform: translateY(-2px); }
+
+    /* ══ CATEGORÍAS ══ */
+    .cats-wrap {
+      display: flex; gap: .5rem; padding: 1.25rem 1rem;
+      overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
+    .cats-wrap::-webkit-scrollbar { display: none; }
+    .cat-btn {
+      padding: .45rem 1rem; border: 1.5px solid var(--border);
+      border-radius: 50px; background: var(--card-bg);
+      font-family: 'Jost', sans-serif; font-size: .75rem; font-weight: 500;
+      letter-spacing: .05em; color: var(--text-muted); white-space: nowrap;
+      transition: all .18s; flex-shrink: 0;
+    }
+    .cat-btn:hover { border-color: var(--casual); color: var(--casual); }
+    .cat-btn.active { background: var(--text); border-color: var(--text); color: white; }
+
+    /* ══ PRODUCTOS ══ */
+    .productos-section { padding: .5rem 1rem 4rem; }
+    .sec-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.25rem; }
+    .sec-titulo { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 500; }
+    .sec-count { font-size: .75rem; color: var(--text-muted); }
+
+    /* ══ GRID ══ */
+    .grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem .75rem; }
+    @media (min-width:600px)  { .grid { grid-template-columns: repeat(3,1fr); } }
+    @media (min-width:900px)  { .grid { grid-template-columns: repeat(4,1fr); } }
+    @media (min-width:1200px) { .grid { grid-template-columns: repeat(5,1fr); } }
+
+    .prod-card { cursor: pointer; transition: transform .2s; }
+    .prod-card:hover { transform: translateY(-3px); }
+    .prod-img {
+      aspect-ratio: 3/4; border-radius: 8px; overflow: hidden;
+      background: var(--bg3); position: relative; margin-bottom: .6rem;
+    }
+    .prod-img img { width:100%; height:100%; object-fit:cover; transition: transform .45s; }
+    .prod-card:hover .prod-img img { transform: scale(1.05); }
+    .prod-badge {
+      position: absolute; top:.5rem; left:.5rem;
+      background: var(--casual); color: white;
+      font-size:.58rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+      padding:.18rem .45rem; border-radius:3px;
+    }
+    .prod-badge.oferta  { background: var(--red); }
+    .prod-badge.agotado { background: #78716c; }
+    .btn-add {
+      position: absolute; bottom:.5rem; right:.5rem;
+      width:34px; height:34px; background:white; border:none;
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-size:1rem; color:var(--text);
+      opacity:0; transform:scale(.8); transition:opacity .2s,transform .2s;
+      box-shadow:0 2px 8px rgba(0,0,0,.18);
+    }
+    .prod-card:hover .btn-add { opacity:1; transform:scale(1); }
+    .prod-nombre { font-size:.82rem; font-weight:600; margin-bottom:.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .prod-cat { font-size:.7rem; color:var(--text-muted); margin-bottom:.2rem; text-transform:capitalize; }
+    .prod-estrellas { display:flex; align-items:center; gap:.3rem; font-size:.75rem; color:var(--text-muted); margin-bottom:.25rem; }
+    .prod-estrellas .stars { color:#f59e0b; letter-spacing:.05em; font-size:.8rem; }
+    .prod-precio { font-size:.9rem; font-weight:700; color:var(--casual); }
+    .prod-precio-orig { font-size:.75rem; color:var(--text-muted); text-decoration:line-through; margin-left:.35rem; }
+
+    /* ── Skeleton ── */
+    .skel {
+      background: linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);
+      background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:8px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .empty { grid-column:1/-1; text-align:center; padding:3.5rem 1rem; color:var(--text-muted); }
+    .empty i { font-size:2.5rem; margin-bottom:.75rem; opacity:.35; }
+
+    /* ══ MODAL TALLA ══ */
+    .modal-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,.45);
+      z-index:999; display:flex; align-items:flex-end; justify-content:center;
+      opacity:0; pointer-events:none; transition:opacity .25s;
+    }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal-box {
+      background:var(--card-bg); border-radius:16px 16px 0 0;
+      padding:1.5rem 1.25rem; width:100%; max-width:480px;
+      transform:translateY(100%); transition:transform .3s ease;
+      max-height:92vh; overflow-y:auto;
+    }
+    .modal-overlay.open .modal-box { transform:translateY(0); }
+    .modal-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 1.1rem; }
+    .modal-titulo {
+      font-family:'Cormorant Garamond',serif; font-size:1.15rem; font-weight:500;
+      margin-bottom:1rem; padding-bottom:.75rem; border-bottom:1px solid var(--border);
+    }
+    .tallas-grid { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+    .talla-btn {
+      min-width:50px; height:50px; border:1.5px solid var(--border); border-radius:8px;
+      background:transparent; font-family:'Jost',sans-serif; font-size:.875rem; font-weight:600;
+      color:var(--text); transition:all .15s; padding:0 .75rem;
+    }
+    .talla-btn:hover { border-color:var(--casual); color:var(--casual); }
+    .talla-btn.sin-stock { opacity:.38; cursor:not-allowed; text-decoration:line-through; border-style:dashed; }
+    .talla-btn.sin-stock:hover { border-color:var(--border); color:var(--text); }
+    .talla-btn.sel { background:var(--text); border-color:var(--text); color:white; }
+    .btn-confirm {
+      width:100%; padding:.9rem; background:var(--text); color:white;
+      border:none; border-radius:8px; font-family:'Jost',sans-serif;
+      font-size:.875rem; font-weight:600; letter-spacing:.05em; transition:background .2s;
+    }
+    .btn-confirm:hover    { background:#2c2520; }
+    .btn-confirm:disabled { background:var(--border); color:var(--text-muted); cursor:not-allowed; }
+
+    /* ── Calculadora de envío (dentro del modal, colapsable) ── */
+    .envio-calc {
+      margin-top:1rem; border:1px solid var(--border); border-radius:12px; overflow:hidden;
+    }
+    .envio-calc-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.75rem 1rem; cursor:pointer; background:var(--bg2);
+      transition:background .15s; user-select:none;
+    }
+    .envio-calc-header:hover { background:var(--bg3); }
+    .envio-calc-titulo {
+      font-size:.75rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+      color:var(--text-muted); display:flex; align-items:center; gap:.4rem;
+    }
+    .envio-calc-titulo i { color:var(--casual); font-size:.95rem; }
+    .envio-toggle-icon { font-size:.8rem; color:var(--text-muted); transition:transform .2s; flex-shrink:0; }
+    .envio-calc.open .envio-toggle-icon { transform:rotate(180deg); }
+    .envio-calc-body { padding:0 1rem 1rem; display:none; background:var(--bg2); }
+    .envio-calc.open .envio-calc-body { display:block; }
+
+    .envio-calc-row { display:flex; gap:.5rem; align-items:stretch; margin-top:.6rem; }
+    .envio-input {
+      flex:1; padding:.6rem .85rem; border:1.5px solid var(--border); border-radius:8px;
+      font-family:'Jost',sans-serif; font-size:.9rem; background:var(--white); color:var(--text);
+      outline:none; transition:border-color .2s;
+    }
+    .envio-input:focus { border-color:var(--casual); }
+    .envio-btn {
+      padding:.6rem 1rem; background:var(--text); color:white;
+      border:none; border-radius:8px; font-family:'Jost',sans-serif;
+      font-size:.82rem; font-weight:600; white-space:nowrap; transition:background .2s;
+    }
+    .envio-btn:hover { background:#2c2520; }
+    .envio-resultado { margin-top:.75rem; display:none; }
+    .envio-opcion {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:.5rem .6rem; border-radius:8px; margin-bottom:.35rem;
+      background:var(--card-bg); font-size:.85rem;
+    }
+    .envio-opcion-nombre { display:flex; align-items:center; gap:.4rem; font-weight:600; }
+    .envio-opcion-precio { font-weight:700; color:var(--casual); }
+    .envio-zona { font-size:.72rem; color:var(--text-muted); margin-top:.35rem; }
+    .envio-error { font-size:.82rem; color:#b91c1c; margin-top:.5rem; display:none; }
+
+    /* ══ TOAST ══ */
+    .toast-wrap {
+      position:fixed; bottom:1.25rem; left:50%; transform:translateX(-50%);
+      z-index:9999; pointer-events:none; display:flex; flex-direction:column; gap:.4rem;
+    }
+    .toast {
+      background:var(--text); color:white; padding:.65rem 1.1rem;
+      border-radius:50px; font-size:.82rem; font-weight:500; white-space:nowrap;
+      display:flex; align-items:center; gap:.5rem;
+      box-shadow:0 4px 16px rgba(0,0,0,.25);
+      animation:t-in .3s ease, t-out .3s ease 2.2s forwards;
+    }
+    .toast i { color:#86efac; }
+    @keyframes t-in  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+    @keyframes t-out { from{opacity:1} to{opacity:0} }
+
+    /* ══ FOOTER ══ */
+    .footer-banner {
+      background:var(--casual); color:white; text-align:center;
+      padding:.75rem 1.25rem; font-size:.82rem; font-weight:600; letter-spacing:.04em;
+      display:flex; align-items:center; justify-content:center; gap:.5rem;
+    }
+    footer { background:#141210; color:rgba(255,255,255,.55); font-size:.85rem; margin-top:4rem; }
+    .footer-main {
+      max-width:1280px; margin:0 auto; padding:3.5rem 2rem 2.5rem;
+      display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; gap:3rem;
+    }
+    @media (max-width:900px) { .footer-main { grid-template-columns:1fr 1fr; gap:2rem; } }
+    @media (max-width:520px) { .footer-main { grid-template-columns:1fr; gap:1.75rem; padding:2.5rem 1.25rem 2rem; } }
+    .footer-logo {
+      font-family:'Cormorant Garamond',serif; font-size:1.7rem;
+      color:white; font-weight:600; display:block; margin-bottom:.35rem;
+    }
+    .footer-tagline { font-size:.78rem; color:rgba(255,255,255,.35); letter-spacing:.08em; text-transform:uppercase; margin-bottom:1rem; }
+    .footer-social { display:flex; gap:.6rem; }
+    .footer-social a {
+      width:34px; height:34px; border:1px solid rgba(255,255,255,.12);
+      border-radius:8px; display:flex; align-items:center; justify-content:center;
+      color:rgba(255,255,255,.5); font-size:1rem; transition:border-color .2s,color .2s,background .2s;
+    }
+    .footer-social a:hover { border-color:var(--casual-light); color:var(--casual-light); background:rgba(22,101,52,.1); }
+    .footer-col-title {
+      font-family:'Cormorant Garamond',serif; font-size:1rem; font-weight:600;
+      color:white; letter-spacing:.06em; text-transform:uppercase;
+      margin-bottom:1rem; padding-bottom:.5rem; border-bottom:1px solid rgba(255,255,255,.07);
+    }
+    .footer-links { display:flex; flex-direction:column; gap:.55rem; }
+    .footer-links a { color:rgba(255,255,255,.5); font-size:.84rem; transition:color .15s; display:flex; align-items:center; gap:.4rem; }
+    .footer-links a:hover { color:var(--casual-light); }
+    .footer-info-row { display:flex; align-items:flex-start; gap:.6rem; margin-bottom:.7rem; font-size:.83rem; line-height:1.5; }
+    .footer-info-row i { color:var(--casual-light); font-size:.95rem; margin-top:.1rem; flex-shrink:0; }
+    .metodo-badge {
+      display:flex; align-items:center; gap:.4rem;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+      border-radius:8px; padding:.4rem .7rem; font-size:.75rem; color:rgba(255,255,255,.65); font-weight:500;
+    }
+    .metodos-pago-grid { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .footer-bottom {
+      border-top:1px solid rgba(255,255,255,.06); padding:1.25rem 2rem;
+      max-width:1280px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:.5rem; font-size:.75rem; color:rgba(255,255,255,.25);
+    }
+    @media (max-width:520px) { .footer-bottom { flex-direction:column; text-align:center; padding:1rem 1.25rem; } }
+
+    /* ══ PWA INSTALL BANNER ══ */
+    #pwa-banner {
+      display:none; position:fixed; bottom:0; left:0; right:0; z-index:9990;
+      background:#0f1f15; color:white; padding:1rem 1.25rem;
+      box-shadow:0 -4px 24px rgba(0,0,0,.35); font-family:'Jost',sans-serif;
+    }
+    .pwa-inner {
+      max-width:600px; margin:0 auto; display:flex;
+      align-items:center; gap:1rem; flex-wrap:wrap;
+    }
+    .pwa-txt { flex:1; min-width:0; }
+    .pwa-txt strong { font-size:.85rem; display:flex; align-items:center; gap:.5rem; margin-bottom:.2rem; }
+    .pwa-txt p { font-size:.78rem; color:rgba(255,255,255,.6); line-height:1.3; }
+    .pwa-btns { display:flex; gap:.5rem; flex-shrink:0; }
+    .btn-pwa-install {
+      background:var(--casual-light); color:#0f1f15; border:none; border-radius:6px;
+      padding:.55rem 1.1rem; font-family:'Jost',sans-serif;
+      font-size:.8rem; font-weight:700; white-space:nowrap;
+    }
+    .btn-pwa-dismiss {
+      background:rgba(255,255,255,.08); color:rgba(255,255,255,.6);
+      border:1px solid rgba(255,255,255,.12); border-radius:6px;
+      padding:.55rem .9rem; font-family:'Jost',sans-serif; font-size:.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav class="navbar">
+
+    <!--
+      Botón "volver atrás":
+      - En mobile muestra si hay historia navegable
+      - Llama history.back() para no salir de la PWA
+    -->
+    <button class="btn-back hidden" id="btn-back" title="Volver" onclick="history.back()">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <!--
+      Logo: siempre apunta a casual.html para que al tocar
+      el nombre el usuario vuelva al inicio de esta sección
+    -->
+    <a class="navbar-logo" href="/pages/tienda/casual.html">
+      León de Judá
+      <small>Ropa Casual</small>
+    </a>
+
+    <div class="navbar-search">
+      <i class="bi bi-search"></i>
+      <input type="text" id="search-input" placeholder="Buscar…">
+    </div>
+
+    <div class="navbar-actions">
+      <a href="/pages/tienda/carrito.html" class="nav-icon-btn" title="Carrito">
+        <i class="bi bi-bag"></i>
+        <span class="carrito-badge" id="carrito-badge">0</span>
+      </a>
+      <a href="/pages/tienda/cuenta.html" class="nav-icon-btn" id="nav-chat" style="display:none" title="Mensajes">
+        <i class="bi bi-chat-dots"></i>
+        <span class="msg-badge" id="chat-badge">0</span>
+      </a>
+      <a href="/login.html" class="nav-icon-btn" id="nav-login" title="Ingresar">
+        <i class="bi bi-person"></i>
+        <span class="nav-label-text">Ingresar</span>
+      </a>
+      <a href="/pages/tienda/cuenta.html" class="nav-icon-btn" id="nav-cuenta" style="display:none" title="Mi cuenta">
+        <i class="bi bi-person-check"></i>
+        <span class="nav-label-text" id="nav-nombre-usuario">Mi cuenta</span>
+      </a>
+      <a href="/pages/admin/panel.html" class="nav-icon-btn" id="nav-admin" style="display:none" title="Panel admin">
+        <i class="bi bi-grid-1x2"></i>
+        <span class="nav-label-text">Panel</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ═══ BARRA DE LÍNEAS ═══ -->
+  <div class="lineas-nav">
+    <a href="/index.html"                       class="linea-btn">✝ Cristiana</a>
+    <a href="/pages/tienda/casual.html"         class="linea-btn active">⚽ Casual</a>
+    <a href="/pages/tienda/empresarial.html"    class="linea-btn">🏢 Empresarial</a>
+  </div>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <p class="hero-eyebrow">Colección Casual · Mundial 2026</p>
+    <h1>Vestite para <em>ganar</em></h1>
+    <p class="hero-sub">Remeras, buzos y gorras de edición especial — para la cancha y la calle</p>
+    <button class="btn-hero" onclick="document.getElementById('productos').scrollIntoView({behavior:'smooth'})">
+      Ver colección <i class="bi bi-arrow-down"></i>
+    </button>
+  </section>
+
+  <!-- ═══ CATEGORÍAS ═══ -->
+  <div class="cats-wrap">
+    <button class="cat-btn active" data-cat="">Todos</button>
+    <button class="cat-btn" data-cat="remeras">Remeras</button>
+    <button class="cat-btn" data-cat="pantalones">Pantalones</button>
+    <button class="cat-btn" data-cat="gorras">Gorras</button>
+    <button class="cat-btn" data-cat="buzos">Buzos</button>
+    <button class="cat-btn" data-cat="musculosas">Musculosas</button>
+    <button class="cat-btn" data-cat="accesorios">Accesorios</button>
+  </div>
+
+  <!-- ═══ PRODUCTOS ═══ -->
+  <section class="productos-section" id="productos">
+    <div class="sec-header">
+      <h2 class="sec-titulo">Productos Casuales</h2>
+      <span class="sec-count" id="count-label"></span>
+    </div>
+    <div class="grid" id="grid">
+      <!-- skeletons iniciales -->
+      <div><div class="skel" style="aspect-ratio:3/4"></div><div class="skel" style="height:12px;margin-top:10px;width:80%"></div><div class="skel" style="height:10px;margin-top:6px;width:50%"></div></div>
+      <div><div class="skel" style="aspect-ratio:3/4"></div><div class="skel" style="height:12px;margin-top:10px;width:80%"></div><div class="skel" style="height:10px;margin-top:6px;width:50%"></div></div>
+      <div style="display:none"><div class="skel" style="aspect-ratio:3/4"></div></div>
+      <div style="display:none"><div class="skel" style="aspect-ratio:3/4"></div></div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <div class="footer-banner">
+    <i class="bi bi-truck"></i> Envío a todo el país · Andreani, OCA y Correo Argentino
+  </div>
+
+  <footer>
+    <div class="footer-main">
+      <div>
+        <span class="footer-logo">León de Judá</span>
+        <p class="footer-tagline">Ropa Casual</p>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/leondejudavmtiendacristiana/" title="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="https://www.facebook.com/LeonDeJudaTiendaDeRopaCristiana/" title="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="https://wa.me/5493534180007" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+          <a href="#" title="TikTok"><i class="bi bi-tiktok"></i></a>
+        </div>
+      </div>
+      <div>
+        <p class="footer-col-title">Secciones</p>
+        <div class="footer-links">
+          <a href="/index.html"><i class="bi bi-chevron-right"></i> ✝ Cristiana</a>
+          <a href="/pages/tienda/casual.html"><i class="bi bi-chevron-right"></i> ⚽ Casual</a>
+          <a href="/pages/tienda/empresarial.html"><i class="bi bi-chevron-right"></i> 🏢 Empresarial</a>
+          <a href="/pages/tienda/carrito.html"><i class="bi bi-chevron-right"></i> Mi carrito</a>
+          <a href="/pages/tienda/cuenta.html"><i class="bi bi-chevron-right"></i> Mi cuenta</a>
+        </div>
+      </div>
+      <div>
+        <p class="footer-col-title">Local</p>
+        <div class="footer-info-row"><i class="bi bi-geo-alt-fill"></i><span>Parajon Ortiz 774<br><span style="color:rgba(255,255,255,.3);font-size:.78rem">Villa Maria, Cordoba</span></span></div>
+        <div class="footer-info-row"><i class="bi bi-clock-fill"></i><span>Lun–Vie: 9:00–18:00 · Sáb: 10:00–14:00</span></div>
+        <div class="footer-info-row"><i class="bi bi-whatsapp"></i><a href="https://wa.me/5493534180007" style="color:rgba(255,255,255,.55)">+54 9 3534 180007</a></div>
+      </div>
+      <div>
+        <p class="footer-col-title">Medios de pago</p>
+        <div class="metodos-pago-grid">
+          <div class="metodo-badge">💳 Tarjeta</div>
+          <div class="metodo-badge">📱 MercadoPago</div>
+          <div class="metodo-badge">🏦 Transferencia</div>
+          <div class="metodo-badge">💵 Efectivo</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 León de Judá · Todos los derechos reservados</span>
+      <span>Hecho con <i class="bi bi-heart-fill" style="color:var(--casual-light);font-size:.7rem"></i> y pasión</span>
+    </div>
+  </footer>
+
+  <!-- ═══ MODAL TALLA + CALCULADORA ENVÍO ═══ -->
+  <div class="modal-overlay" id="modal-talla">
+    <div class="modal-box">
+      <div class="modal-handle"></div>
+      <p class="modal-titulo" id="modal-titulo-prod">Seleccioná una talla</p>
+
+      <!-- Grilla de talles -->
+      <div class="tallas-grid" id="modal-tallas"></div>
+
+      <!-- Botón agregar -->
+      <button class="btn-confirm" id="modal-confirm" disabled>Agregar al carrito</button>
+
+      <!-- ── Calculadora de envío colapsable ── -->
+      <div class="envio-calc" id="envio-calc-wrap">
+        <div class="envio-calc-header" onclick="toggleCalcEnvio()" role="button" aria-expanded="false" id="envio-header">
+          <p class="envio-calc-titulo">
+            <i class="bi bi-truck"></i> Calculá el costo de envío
+          </p>
+          <i class="bi bi-chevron-down envio-toggle-icon" id="envio-toggle-icon"></i>
+        </div>
+        <div class="envio-calc-body">
+          <div class="envio-calc-row">
+            <input type="number" class="envio-input" id="envio-cp"
+              placeholder="Código postal (ej: 5900)"
+              maxlength="8"
+              onkeydown="if(event.key==='Enter') calcularEnvio()">
+            <button class="envio-btn" onclick="calcularEnvio()">Calcular</button>
+          </div>
+          <p class="envio-error" id="envio-error"></p>
+          <div class="envio-resultado" id="envio-resultado"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ TOASTS ═══ -->
+  <div class="toast-wrap" id="toasts"></div>
+
+  <!-- ═══ PWA INSTALL BANNER ═══ -->
+  <div id="pwa-banner">
+    <div class="pwa-inner">
+      <div class="pwa-txt">
+        <strong><span>⚽</span> León de Judá — Casual</strong>
+        <p>Instalá la app y accedé a la tienda sin necesidad del navegador.</p>
+      </div>
+      <div class="pwa-btns">
+        <button class="btn-pwa-install" id="pwa-install-btn">Instalar app</button>
+        <button class="btn-pwa-dismiss" id="pwa-dismiss-btn">Ahora no</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCRIPTS ═══ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js"></script>
+  <script>
+  /* ─────────────────────────────────────────
+     PWA — Manejo del botón "atrás" en mobile
+     Impide salir de la app si hay historial;
+     si se está en la raíz, la app se minimiza
+     (comportamiento nativo esperado).
+  ───────────────────────────────────────── */
+  (function pwaBackHandler() {
+    const btnBack      = document.getElementById('btn-back');
+    const enStandalone = window.matchMedia('(display-mode: standalone)').matches
+                         || navigator.standalone === true;
+
+    // Mostrar botón si el usuario llegó desde otra página
+    if (history.length > 1 && btnBack) btnBack.classList.remove('hidden');
+
+    if (!enStandalone) return;
+
+    // En modo PWA: inyectamos un estado "base" para poder
+    // detectar cuándo el usuario ya no tiene más historial.
+    // Usamos replaceState para no añadir un paso extra al historial
+    // al primer cargue, y luego pushState para tener un estado de "raíz".
+    history.replaceState({ pwa: 'root', page: 'casual' }, '');
+
+    window.addEventListener('popstate', function(e) {
+      if (e.state && e.state.pwa === 'root') {
+        // No hay más historial — reinsertamos el estado raíz
+        // para que la próxima vez que presione atrás no salga.
+        // En Android PWA, si history queda vacío, la app se cierra;
+        // reinsertarlo lo evita pero deja que el SO minimice la app.
+        history.pushState({ pwa: 'root', page: 'casual' }, '');
+      }
+      // Si tiene historial real, history.back() (del btn-back) navega normalmente.
+    });
+  })();
+
+  /* ─────────────────────────────────────────
+     ESTADO GENERAL
+  ───────────────────────────────────────── */
+  let todos = [], catActiva = '', busqueda = '';
+  let prodModal = null, tallaModal = null;
+  let tarifasEnvio = [];
+
+  /* ─────────────────────────────────────────
+     INIT
+  ───────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', async () => {
+    Carrito.actualizarContador();
+    await Promise.all([
+      actualizarNavbar(),
+      cargar(),
+      cargarTarifasEnvio()
+    ]);
+    bindEventos();
+  });
+
+  /* ─────────────────────────────────────────
+     NAVBAR — sesión
+  ───────────────────────────────────────── */
+  async function actualizarNavbar() {
+    const user = await getUsuario();
+    const elLogin  = document.getElementById('nav-login');
+    const elCuenta = document.getElementById('nav-cuenta');
+    const elAdmin  = document.getElementById('nav-admin');
+    const elNombre = document.getElementById('nav-nombre-usuario');
+
+    if (!user) {
+      if (elLogin)  elLogin.style.display  = 'flex';
+      if (elCuenta) elCuenta.style.display = 'none';
+      if (elAdmin)  elAdmin.style.display  = 'none';
+      return;
+    }
+
+    const { data: perfil } = await sb.from('perfiles').select('nombre').eq('user_id', user.id).maybeSingle();
+    const nombre = perfil?.nombre || user.email.split('@')[0];
+
+    if (elLogin)  elLogin.style.display  = 'none';
+    if (elCuenta) elCuenta.style.display = 'flex';
+    if (elNombre) elNombre.textContent   = nombre;
+
+    const navChat = document.getElementById('nav-chat');
+    if (navChat && user.email !== ADMIN_EMAIL) {
+      navChat.style.display = 'flex';
+      // Mensajes no leídos
+      const { data: pedidos } = await sb.from('pedidos').select('id').eq('user_id', user.id);
+      if (pedidos?.length) {
+        const { count } = await sb.from('mensajes')
+          .select('*', { count: 'exact', head: true })
+          .in('pedido_id', pedidos.map(p => p.id))
+          .eq('remitente', 'admin').eq('leido', false);
+        const badge = document.getElementById('chat-badge');
+        if (badge && count > 0) { badge.textContent = count; badge.style.display = 'flex'; }
+      }
+    }
+
+    if (elAdmin) {
+      elAdmin.style.display = user.email === ADMIN_EMAIL ? 'flex' : 'none';
+      if (user.email === ADMIN_EMAIL && elCuenta)
+        elCuenta.href = '/pages/admin/panel.html';
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     PRODUCTOS — carga desde Supabase (linea=casual)
+  ───────────────────────────────────────── */
+  async function cargar() {
+    try {
+      const { data, error } = await sb
+        .from('productos')
+        .select('*')
+        .eq('activo', true)
+        .eq('linea', 'casual')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      todos = data || [];
+      render();
+    } catch {
+      document.getElementById('grid').innerHTML =
+        '<div class="empty"><i class="bi bi-exclamation-circle"></i><p>No se pudieron cargar los productos.</p></div>';
+    }
+  }
+
+  function filtrar() {
+    let lista = todos;
+    if (catActiva) lista = lista.filter(p => p.categoria?.toLowerCase() === catActiva);
+    if (busqueda.trim()) {
+      const q = busqueda.toLowerCase();
+      lista = lista.filter(p => p.nombre?.toLowerCase().includes(q) || p.descripcion?.toLowerCase().includes(q));
+    }
+    return lista;
+  }
+
+  function render() {
+    const lista = filtrar();
+    document.getElementById('count-label').textContent =
+      lista.length + ' producto' + (lista.length !== 1 ? 's' : '');
+
+    if (!lista.length) {
+      document.getElementById('grid').innerHTML =
+        '<div class="empty"><i class="bi bi-search"></i><p>Sin resultados para esa búsqueda.</p></div>';
+      return;
+    }
+
+    document.getElementById('grid').innerHTML = lista.map(p => {
+      const img    = p.imagen_url || 'https://placehold.co/400x530/0f1f15/22c55e?text=Casual';
+      const precio = formatearPrecio(p.precio);
+      const orig   = p.precio_original ? formatearPrecio(p.precio_original) : '';
+      const stock  = p.stock ?? 99;
+      const badge  = stock === 0
+        ? '<span class="prod-badge agotado">Agotado</span>'
+        : p.destacado
+          ? '<span class="prod-badge">Destacado</span>'
+          : p.precio_original ? '<span class="prod-badge oferta">Oferta</span>' : '';
+      const pdata  = JSON.stringify(p).replace(/"/g, '&quot;');
+      return `
+        <div class="prod-card" onclick="irA('${p.id}')">
+          <div class="prod-img">
+            <img src="${img}" alt="${p.nombre}" loading="lazy"
+              onerror="this.src='https://placehold.co/400x530/0f1f15/22c55e?text=Casual'">
+            ${badge}
+            ${stock > 0 ? `<button class="btn-add" title="Agregar"
+              onclick="event.stopPropagation();abrirModal(${pdata})">
+              <i class="bi bi-plus"></i></button>` : ''}
+          </div>
+          <p class="prod-nombre">${p.nombre}</p>
+          <p class="prod-cat">${p.categoria || ''}</p>
+          <div class="prod-estrellas" id="estrellas-${p.id}">
+            <span class="stars">☆☆☆☆☆</span>
+            <span class="count">Sin reseñas</span>
+          </div>
+          <p>
+            <span class="prod-precio">${precio}</span>
+            ${orig ? `<span class="prod-precio-orig">${orig}</span>` : ''}
+          </p>
+        </div>`;
+    }).join('');
+  }
+
+  /* Navega al detalle del producto guardando que venimos de casual */
+  function irA(id) {
+    sessionStorage.setItem('referer_seccion', 'casual');
+    location.href = `/pages/tienda/producto.html?id=${id}`;
+  }
+
+  /* ─────────────────────────────────────────
+     MODAL — TALLA
+  ───────────────────────────────────────── */
+  function abrirModal(prod) {
+    prodModal  = prod;
+    tallaModal = null;
+    document.getElementById('modal-titulo-prod').textContent = prod.nombre;
+    document.getElementById('modal-confirm').disabled = true;
+    resetCalcEnvio();
+
+    const tallas   = prod.tallas?.length ? prod.tallas : ['Única'];
+    const spt      = prod.stock_por_talla || {};
+    const getStock = t => Object.keys(spt).length ? (spt[t] ?? 0) : (prod.stock ?? 99);
+
+    document.getElementById('modal-tallas').innerHTML = tallas.map(t => {
+      const st = getStock(t);
+      const ag = st === 0;
+      const lbl = ag
+        ? `${t} <span style="font-size:.6rem;font-weight:700;background:#fee2e2;color:#991b1b;padding:.1rem .3rem;border-radius:3px;margin-left:.2rem">SIN STOCK</span>`
+        : st <= 3
+          ? `${t} <span style="font-size:.6rem;font-weight:700;background:#fef3c7;color:#92400e;padding:.1rem .3rem;border-radius:3px;margin-left:.2rem">×${st}</span>`
+          : t;
+      return `<button class="talla-btn ${ag ? 'sin-stock' : ''}" ${ag ? 'disabled' : ''}
+        onclick="${ag ? '' : `selTalla('${t}',this)`}">${lbl}</button>`;
+    }).join('');
+
+    document.getElementById('modal-talla').classList.add('open');
+  }
+
+  function selTalla(t, btn) {
+    tallaModal = t;
+    document.querySelectorAll('.talla-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    document.getElementById('modal-confirm').disabled = false;
+  }
+
+  document.getElementById('modal-confirm').addEventListener('click', () => {
+    if (!prodModal || !tallaModal) return;
+    Carrito.agregar(prodModal, tallaModal);
+    document.getElementById('modal-talla').classList.remove('open');
+    toast(`${prodModal.nombre} agregado ✓`);
+  });
+
+  document.getElementById('modal-talla').addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+  });
+
+  /* ─────────────────────────────────────────
+     CALCULADORA DE ENVÍO
+  ───────────────────────────────────────── */
+  async function cargarTarifasEnvio() {
+    try {
+      const { data } = await sb.from('tarifas_envio').select('*').order('cp_desde');
+      tarifasEnvio = data || [];
+    } catch { tarifasEnvio = []; }
+  }
+
+  function toggleCalcEnvio() {
+    const wrap   = document.getElementById('envio-calc-wrap');
+    const isOpen = wrap.classList.toggle('open');
+    document.getElementById('envio-header').setAttribute('aria-expanded', isOpen);
+  }
+
+  function resetCalcEnvio() {
+    const wrap = document.getElementById('envio-calc-wrap');
+    wrap.classList.remove('open');
+    document.getElementById('envio-header')?.setAttribute('aria-expanded', 'false');
+    const cp  = document.getElementById('envio-cp');
+    const res = document.getElementById('envio-resultado');
+    const err = document.getElementById('envio-error');
+    if (cp)  cp.value = '';
+    if (res) { res.innerHTML = ''; res.style.display = 'none'; }
+    if (err) { err.textContent = ''; err.style.display = 'none'; }
+  }
+
+  function calcularEnvio() {
+    const cp  = document.getElementById('envio-cp')?.value.trim();
+    const res = document.getElementById('envio-resultado');
+    const err = document.getElementById('envio-error');
+
+    err.textContent = ''; err.style.display = 'none';
+    if (res) res.style.display = 'none';
+
+    if (!cp || cp.length < 4) {
+      err.textContent = 'Ingresá un código postal válido (ej: 5900)';
+      err.style.display = 'block'; return;
+    }
+    if (!tarifasEnvio.length) {
+      err.textContent = 'Las tarifas no están configuradas todavía.';
+      err.style.display = 'block'; return;
+    }
+
+    const n    = parseInt(cp);
+    const zona = tarifasEnvio.find(t => n >= t.cp_desde && n <= t.cp_hasta);
+    if (!zona) {
+      err.textContent = 'Código postal no encontrado. Verificá que sea un CP argentino.';
+      err.style.display = 'block'; return;
+    }
+
+    const opciones = [
+      { key: 'precio_andreani', nombre: 'Andreani',         icono: '🟦' },
+      { key: 'precio_oca',      nombre: 'OCA',              icono: '🟧' },
+      { key: 'precio_correo',   nombre: 'Correo Argentino', icono: '🟨' },
+    ].filter(o => zona[o.key] > 0);
+
+    if (!opciones.length) {
+      err.textContent = 'No hay tarifas configuradas para tu zona todavía.';
+      err.style.display = 'block'; return;
+    }
+
+    res.innerHTML = `
+      <p class="envio-zona">
+        <i class="bi bi-geo-alt-fill" style="color:var(--casual)"></i>
+        ${zona.zona}${zona.descripcion ? ' · ' + zona.descripcion : ''} · CP ${cp}
+      </p>
+      ${opciones.map(o => `
+        <div class="envio-opcion">
+          <span class="envio-opcion-nombre">${o.icono} ${o.nombre}</span>
+          <span class="envio-opcion-precio">${formatearPrecio(zona[o.key])}</span>
+        </div>`).join('')}
+      <p style="font-size:.7rem;color:var(--text-muted);margin-top:.4rem">
+        * Precios estimados, pueden variar según el peso del paquete.
+      </p>`;
+    res.style.display = 'block';
+  }
+
+  /* ─────────────────────────────────────────
+     TOAST
+  ───────────────────────────────────────── */
+  function toast(msg) {
+    const w  = document.getElementById('toasts');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${msg}`;
+    w.appendChild(el);
+    setTimeout(() => el.remove(), 2600);
+  }
+
+  /* ─────────────────────────────────────────
+     EVENTOS — categorías + búsqueda
+  ───────────────────────────────────────── */
+  function bindEventos() {
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        catActiva = btn.dataset.cat;
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        render();
+        document.getElementById('productos').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    let timer;
+    document.getElementById('search-input').addEventListener('input', e => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { busqueda = e.target.value; render(); }, 300);
+    });
+  }
+
+  /* ─────────────────────────────────────────
+     PWA INSTALL PROMPT
+  ───────────────────────────────────────── */
+  let deferredPrompt = null;
+  const yaInstalado  = localStorage.getItem('pwa_dismissed');
+  const enStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+
+  if (!enStandalone && !yaInstalado) {
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('pwa-banner').style.display = 'block';
+    });
+  }
+
+  document.getElementById('pwa-install-btn')?.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('pwa-banner').style.display = 'none';
+    localStorage.setItem('pwa_dismissed', '1');
+  });
+
+  document.getElementById('pwa-dismiss-btn')?.addEventListener('click', () => {
+    document.getElementById('pwa-banner').style.display = 'none';
+    localStorage.setItem('pwa_dismissed', '1');
+  });
+  </script>
+
+</body>
+</html>
