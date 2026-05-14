@@ -918,6 +918,42 @@
     @media (max-width: 520px) {
       .footer-bottom { flex-direction: column; text-align: center; padding: 1rem 1.25rem; }
     }
+
+
+    /* ══ LINEAS NAV ══ */
+.lineas-nav {
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .25rem;
+  padding: .5rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.lineas-nav::-webkit-scrollbar { display: none; }
+.linea-btn {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .35rem .9rem;
+  border-radius: 50px;
+  font-size: .75rem;
+  font-weight: 500;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.5);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: all .18s;
+  text-decoration: none;
+}
+.linea-btn:hover { color: rgba(255,255,255,.85); }
+.linea-btn.active {
+  background: rgba(154,123,46,.15);
+  border-color: rgba(201,168,76,.3);
+  color: var(--gold-light);
+}
   </style>
 </head>
 
@@ -964,6 +1000,14 @@
       </a>
     </div>
   </nav>
+
+
+<!-- ─── LINEAS NAV ─── -->
+<div class="lineas-nav">
+  <a href="/index.html" class="linea-btn active">✝ Cristiana</a>
+  <a href="/pages/tienda/casual.html" class="linea-btn">⚽ Casual</a>
+  <a href="/pages/tienda/empresarial.html" class="linea-btn">🏢 Empresarial</a>
+</div>
 
   <!-- ─── HERO ─── -->
   <section class="hero">
@@ -1025,20 +1069,17 @@
         </div>
       </div>
 
-      <!-- Col 2: Navegación -->
-      <div>
-        <p class="footer-col-title">Tienda</p>
-        <div class="footer-links">
-          <a href="/index.html"><i class="bi bi-chevron-right"></i> Inicio</a>
-          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Remeras</a>
-          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Buzos</a>
-          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Gorras</a>
-          <a href="/index.html#productos"><i class="bi bi-chevron-right"></i> Accesorios</a>
-          <a href="/pages/tienda/carrito.html"><i class="bi bi-chevron-right"></i> Mi carrito</a>
-          <a href="/pages/tienda/cuenta.html"><i class="bi bi-chevron-right"></i> Mi cuenta</a>
-        </div>
-      </div>
-
+<!-- Col 2: Navegación -->
+<div>
+  <p class="footer-col-title">Tienda</p>
+  <div class="footer-links">
+    <a href="/index.html"><i class="bi bi-chevron-right"></i> ✝ Cristiana</a>
+    <a href="/pages/tienda/casual.html"><i class="bi bi-chevron-right"></i> ⚽ Casual</a>
+    <a href="/pages/tienda/empresarial.html"><i class="bi bi-chevron-right"></i> 🏢 Empresarial</a>
+    <a href="/pages/tienda/carrito.html"><i class="bi bi-chevron-right"></i> Mi carrito</a>
+    <a href="/pages/tienda/cuenta.html"><i class="bi bi-chevron-right"></i> Mi cuenta</a>
+  </div>
+</div>
       <!-- Col 3: Info de la tienda -->
       <div>
         <p class="footer-col-title">Local</p>
@@ -1242,7 +1283,12 @@
 
     async function cargar() {
       try {
-        const { data, error } = await sb.from('productos').select('*').eq('activo', true).order('created_at', { ascending: false });
+        const { data, error } = await sb
+  .from('productos')
+  .select('*')
+  .eq('activo', true)
+  .eq('linea', 'cristiana')
+  .order('created_at', { ascending: false });
         if (error) throw error;
         todos = data || [];
         render();
