@@ -1124,12 +1124,12 @@
             <option value="buzos">Buzos</option>
             <option value="musculosas">Musculosas</option>
             <option value="accesorios">Accesorios</option>
-            <select class="field-input" style="flex:0;width:auto;padding:.5rem .8rem;font-size:.8rem" id="filter-linea" onchange="filtrarTablaProductos()">
-  <option value="">Todas las líneas</option>
-  <option value="cristiana">✝ Cristiana</option>
-  <option value="casual">⚽ Casual</option>
-  <option value="empresarial">🏢 Empresarial</option>
-</select>
+          </select>
+          <select class="field-input" style="flex:0;width:auto;padding:.5rem .8rem;font-size:.8rem" id="filter-linea" onchange="filtrarTablaProductos()">
+            <option value="">Todas las líneas</option>
+            <option value="cristiana">✝ Cristiana</option>
+            <option value="casual">⚽ Casual</option>
+            <option value="empresarial">🏢 Empresarial</option>
           </select>
         </div>
         <table>
@@ -1604,12 +1604,12 @@ async function cargarProductos() {
 }
 
 function filtrarTablaProductos() {
-  const q     = document.getElementById('search-productos').value.toLowerCase();
-  const cat   = document.getElementById('filter-cat').value;
+  const q   = document.getElementById('search-productos').value.toLowerCase();
+  const cat = document.getElementById('filter-cat').value;
   const linea = document.getElementById('filter-linea').value;
   let lista = todosProductos;
-  if (q)     lista = lista.filter(p => p.nombre?.toLowerCase().includes(q) || p.categoria?.toLowerCase().includes(q));
-  if (cat)   lista = lista.filter(p => p.categoria === cat);
+  if (q)   lista = lista.filter(p => p.nombre?.toLowerCase().includes(q) || p.categoria?.toLowerCase().includes(q));
+  if (cat) lista = lista.filter(p => p.categoria === cat);
   if (linea) lista = lista.filter(p => p.linea === linea);
   renderTablaProductos(lista);
 }
