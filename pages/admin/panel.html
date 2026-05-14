@@ -1124,6 +1124,12 @@
             <option value="buzos">Buzos</option>
             <option value="musculosas">Musculosas</option>
             <option value="accesorios">Accesorios</option>
+            <select class="field-input" style="flex:0;width:auto;padding:.5rem .8rem;font-size:.8rem" id="filter-linea" onchange="filtrarTablaProductos()">
+  <option value="">Todas las líneas</option>
+  <option value="cristiana">✝ Cristiana</option>
+  <option value="casual">⚽ Casual</option>
+  <option value="empresarial">🏢 Empresarial</option>
+</select>
           </select>
         </div>
         <table>
@@ -1310,18 +1316,26 @@
           <label class="field-label">Nombre del producto *</label>
           <input type="text" class="field-input" id="prod-nombre" placeholder="Ej: Remera Básica Blanca">
         </div>
-        <div class="field">
-          <label class="field-label">Categoría</label>
-          <select class="field-input" id="prod-cat">
-            <option value="">Sin categoría</option>
-            <option value="remeras">Remeras</option>
-           
-            <option value="gorras">Gorras</option>
-            <option value="buzos">Buzos</option>
-            <option value="musculosas">Musculosas</option>
-            <option value="accesorios">Accesorios</option>
-          </select>
-        </div>
+<div class="field">
+  <label class="field-label">Línea</label>
+  <select class="field-input" id="prod-linea">
+    <option value="cristiana">✝ Cristiana</option>
+    <option value="casual">⚽ Casual</option>
+    <option value="empresarial">🏢 Empresarial</option>
+  </select>
+</div>
+<div class="field">
+  <label class="field-label">Categoría</label>
+  <select class="field-input" id="prod-cat">
+    <option value="">Sin categoría</option>
+    <option value="remeras">Remeras</option>
+    <option value="pantalones">Pantalones</option>
+    <option value="gorras">Gorras</option>
+    <option value="buzos">Buzos</option>
+    <option value="musculosas">Musculosas</option>
+    <option value="accesorios">Accesorios</option>
+  </select>
+</div>
         <input type="hidden" id="prod-stock" value="0">
         <div class="field">
           <label class="field-label">Precio de venta *</label>
@@ -1590,11 +1604,13 @@ async function cargarProductos() {
 }
 
 function filtrarTablaProductos() {
-  const q   = document.getElementById('search-productos').value.toLowerCase();
-  const cat = document.getElementById('filter-cat').value;
+  const q     = document.getElementById('search-productos').value.toLowerCase();
+  const cat   = document.getElementById('filter-cat').value;
+  const linea = document.getElementById('filter-linea').value;
   let lista = todosProductos;
-  if (q)   lista = lista.filter(p => p.nombre?.toLowerCase().includes(q) || p.categoria?.toLowerCase().includes(q));
-  if (cat) lista = lista.filter(p => p.categoria === cat);
+  if (q)     lista = lista.filter(p => p.nombre?.toLowerCase().includes(q) || p.categoria?.toLowerCase().includes(q));
+  if (cat)   lista = lista.filter(p => p.categoria === cat);
+  if (linea) lista = lista.filter(p => p.linea === linea);
   renderTablaProductos(lista);
 }
 
@@ -1612,7 +1628,7 @@ function renderTablaProductos(lista) {
             onerror="this.src='https://placehold.co/44x54/22262f/7c8090?text=+'">
           <div>
             <div class="prod-thumb-name">${p.nombre}</div>
-            <div class="prod-thumb-cat">${p.categoria || '—'}</div>
+            <div class="prod-thumb-cat">${p.linea ? `<span style="font-size:.62rem;background:rgba(0,0,0,.07);padding:.1rem .4rem;border-radius:3px;margin-right:.3rem">${p.linea}</span>` : ''}${p.categoria || '—'}</div>
           </div>
         </div>
       </td>
@@ -1702,11 +1718,12 @@ function generarCamposStockTalla(stockPorTalla = {}) {
 }
 
 function limpiarFormProducto() {
-  ['prod-nombre','prod-cat','prod-precio','prod-precio-orig','prod-tallas','prod-descripcion'].forEach(id => {
+  ['prod-nombre','prod-cat','prod-linea','prod-precio','prod-precio-orig','prod-tallas','prod-descripcion'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
   document.getElementById('prod-activo').checked   = true;
+  document.getElementById('prod-linea').value = 'cristiana';
   document.getElementById('prod-destacado').checked = false;
   document.getElementById('prod-stock').value       = '0';
   document.getElementById('img-preview-grid').innerHTML = '';
@@ -1726,6 +1743,7 @@ function editarProducto(id) {
   document.getElementById('modal-prod-titulo').textContent = 'Editar producto';
   document.getElementById('prod-nombre').value       = prod.nombre || '';
   document.getElementById('prod-cat').value          = prod.categoria || '';
+  document.getElementById('prod-linea').value = prod.linea || 'cristiana';
   document.getElementById('prod-stock').value        = prod.stock ?? 0;
   document.getElementById('prod-precio').value       = prod.precio || '';
   document.getElementById('prod-precio-orig').value  = prod.precio_original || '';
@@ -1802,9 +1820,10 @@ async function guardarProducto() {
     });
   }
 
-  const payload = {
-    nombre,
-    categoria:       document.getElementById('prod-cat').value,
+const payload = {
+  nombre,
+  linea:           document.getElementById('prod-linea').value || 'cristiana',
+  categoria:       document.getElementById('prod-cat').value,
     stock:           stockTotal,
     stock_por_talla: stockPorTalla,
     precio,
