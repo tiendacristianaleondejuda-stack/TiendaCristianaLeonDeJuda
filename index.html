@@ -1465,9 +1465,20 @@
         todos = data || [];
         render();
         // Mostrar popup carrusel con todos los productos destacados (una vez por sesión)
+        // Cargar publicidades activas para esta sección y mezclar con destacados
         const destacados = todos.filter(p => p.destacado && (p.stock ?? 1) > 0);
-        if (destacados.length && !sessionStorage.getItem('promo_shown_cristiana')) {
-          setTimeout(() => mostrarPromo(destacados, '✝ Cristiana'), 1500);
+        if (!sessionStorage.getItem('promo_shown_cristiana')) {
+          const { data: pubs } = await sb
+            .from('publicidades')
+            .select('*')
+            .eq('activo', true)
+            .in('seccion', ['cristiana', 'ambas'])
+            .order('orden', { ascending: true });
+          const slides = [...(pubs || []).map(p => ({ ...p, _tipo: 'pub' })),
+                          ...destacados.map(p => ({ ...p, _tipo: 'prod' }))];
+          if (slides.length) {
+            setTimeout(() => mostrarPromo(slides, '✝ Cristiana'), 1500);
+          }
         }
       } catch {
         document.getElementById('grid').innerHTML = '<div class="empty"><i class="bi bi-exclamation-circle"></i><p>No se pudieron cargar los productos.</p></div>';
@@ -1609,14 +1620,46 @@
 
       // Construir slides
       document.getElementById('promo-track').innerHTML = prods.map((p, i) => {
-        const img    = p.imagen_url || 'https://placehold.co/560x315/1c1917/c9a84c?text=Destacado';
-        const precio = formatearPrecio(p.precio);
-        const orig   = p.precio_original ? `<span class="promo-precio-orig">${formatearPrecio(p.precio_original)}</span>` : '';
+      const esPub  = p._tipo === 'pub';
+      const img    = p.imagen_url || (esPub
+        ? 'https://placehold.co/560x315/1c1917/c9a84c?text=Novedad'
+        : 'https://placehold.co/560x315/1c1917/c9a84c?text=Destacado');
+      const fallback = img;
+
+      if (esPub) {
+        // ── Slide de publicidad ──
+        const btnTxt  = p.btn_texto || 'Ver más';
+        const btnLink = p.btn_link  || '#';
         return `
           <div class="promo-slide">
             <div class="promo-img-wrap">
-              <img src="${img}" alt="${p.nombre}" loading="${i === 0 ? 'eager' : 'lazy'}"
-                onerror="this.src='https://placehold.co/560x315/1c1917/c9a84c?text=Destacado'">
+              <img src="${img}" alt="${p.titulo}" loading="${i===0?'eager':'lazy'}" onerror="this.src='${fallback}'">
+              <div class="promo-img-overlay"></div>
+              <div class="promo-img-label">
+                <span class="promo-badge-dest">📢 Novedad</span>
+                <span class="promo-badge-secc">${seccionLabel}</span>
+              </div>
+            </div>
+            <div class="promo-body">
+              <p class="promo-nombre">${p.titulo}</p>
+              ${p.descripcion ? `<p class="promo-cat" style="font-size:.82rem;color:var(--text-muted);white-space:normal;line-height:1.4">${p.descripcion}</p>` : ''}
+              <div class="promo-acciones" style="margin-top:.9rem">
+                <a href="${btnLink}" class="btn-promo-ver" style="text-decoration:none">
+                  <i class="bi bi-arrow-right-circle"></i> ${btnTxt}
+                </a>
+                <button class="btn-promo-cerrar" onclick="cerrarPromo()">Cerrar</button>
+              </div>
+            </div>
+          </div>`;
+      } else {
+        // ── Slide de producto destacado ──
+        const precio = formatearPrecio(p.precio);
+        const orig   = p.precio_original
+          ? `<span class="promo-precio-orig">${formatearPrecio(p.precio_original)}</span>` : '';
+        return `
+          <div class="promo-slide">
+            <div class="promo-img-wrap">
+              <img src="${img}" alt="${p.nombre}" loading="${i===0?'eager':'lazy'}" onerror="this.src='${fallback}'">
               <div class="promo-img-overlay"></div>
               <div class="promo-img-label">
                 <span class="promo-badge-dest">⭐ Destacado</span>
@@ -1641,7 +1684,8 @@
               </p>
             </div>
           </div>`;
-      }).join('');
+      }
+    }).join('');
 
       // Contador y dots (solo si hay más de 1)
       const multi = prods.length > 1;
