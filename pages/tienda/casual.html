@@ -871,8 +871,18 @@
       render();
       // Popup carrusel de destacados — una vez por sesión
       const destacados = todos.filter(p => p.destacado && (p.stock ?? 1) > 0);
-      if (destacados.length && !sessionStorage.getItem('promo_shown_casual')) {
-        setTimeout(() => mostrarPromo(destacados, '⚽ Casual'), 1500);
+      if (!sessionStorage.getItem('promo_shown_casual')) {
+        const { data: pubs } = await sb
+          .from('publicidades')
+          .select('*')
+          .eq('activo', true)
+          .in('seccion', ['casual', 'ambas'])
+          .order('orden', { ascending: true });
+        const slides = [...(pubs || []).map(p => ({ ...p, _tipo: 'pub' })),
+                        ...destacados.map(p => ({ ...p, _tipo: 'prod' }))];
+        if (slides.length) {
+          setTimeout(() => mostrarPromo(slides, '⚽ Casual'), 1500);
+        }
       }
     } catch {
       document.getElementById('grid').innerHTML =
@@ -1112,39 +1122,71 @@
     promoIdx   = 0;
 
     document.getElementById('promo-track').innerHTML = prods.map((p, i) => {
-      const img    = p.imagen_url || 'https://placehold.co/560x315/0f1f15/22c55e?text=Casual';
-      const precio = formatearPrecio(p.precio);
-      const orig   = p.precio_original
-        ? `<span class="promo-precio-orig">${formatearPrecio(p.precio_original)}</span>` : '';
-      return `
-        <div class="promo-slide">
-          <div class="promo-img-wrap">
-            <img src="${img}" alt="${p.nombre}" loading="${i === 0 ? 'eager' : 'lazy'}"
-              onerror="this.src='https://placehold.co/560x315/0f1f15/22c55e?text=Casual'">
-            <div class="promo-img-overlay"></div>
-            <div class="promo-img-label">
-              <span class="promo-badge-dest">⭐ Destacado</span>
-              <span class="promo-badge-secc">${seccionLabel}</span>
+      const esPub  = p._tipo === 'pub';
+      const img    = p.imagen_url || (esPub
+        ? 'https://placehold.co/560x315/0f1f15/22c55e?text=Novedad'
+        : 'https://placehold.co/560x315/1c1917/c9a84c?text=Destacado');
+      const fallback = img;
+
+      if (esPub) {
+        // ── Slide de publicidad ──
+        const btnTxt  = p.btn_texto || 'Ver más';
+        const btnLink = p.btn_link  || '#';
+        return `
+          <div class="promo-slide">
+            <div class="promo-img-wrap">
+              <img src="${img}" alt="${p.titulo}" loading="${i===0?'eager':'lazy'}" onerror="this.src='${fallback}'">
+              <div class="promo-img-overlay"></div>
+              <div class="promo-img-label">
+                <span class="promo-badge-dest">📢 Novedad</span>
+                <span class="promo-badge-secc">${seccionLabel}</span>
+              </div>
             </div>
-          </div>
-          <div class="promo-body">
-            <p class="promo-nombre">${p.nombre}</p>
-            <p class="promo-cat">${p.categoria || ''}</p>
-            <div class="promo-precios">
-              <span class="promo-precio-actual">${precio}</span>${orig}
+            <div class="promo-body">
+              <p class="promo-nombre">${p.titulo}</p>
+              ${p.descripcion ? `<p class="promo-cat" style="font-size:.82rem;color:var(--text-muted);white-space:normal;line-height:1.4">${p.descripcion}</p>` : ''}
+              <div class="promo-acciones" style="margin-top:.9rem">
+                <a href="${btnLink}" class="btn-promo-ver" style="text-decoration:none">
+                  <i class="bi bi-arrow-right-circle"></i> ${btnTxt}
+                </a>
+                <button class="btn-promo-cerrar" onclick="cerrarPromo()">Cerrar</button>
+              </div>
             </div>
-            <div class="promo-acciones">
-              <button class="btn-promo-ver" onclick="irAPromo('${p.id}')">
-                <i class="bi bi-eye"></i> Ver producto
-              </button>
-              <button class="btn-promo-cerrar" onclick="cerrarPromo()">Ahora no</button>
+          </div>`;
+      } else {
+        // ── Slide de producto destacado ──
+        const precio = formatearPrecio(p.precio);
+        const orig   = p.precio_original
+          ? `<span class="promo-precio-orig">${formatearPrecio(p.precio_original)}</span>` : '';
+        return `
+          <div class="promo-slide">
+            <div class="promo-img-wrap">
+              <img src="${img}" alt="${p.nombre}" loading="${i===0?'eager':'lazy'}" onerror="this.src='${fallback}'">
+              <div class="promo-img-overlay"></div>
+              <div class="promo-img-label">
+                <span class="promo-badge-dest">⭐ Destacado</span>
+                <span class="promo-badge-secc">${seccionLabel}</span>
+              </div>
             </div>
-            <p class="promo-nota">
-              <i class="bi bi-clock" style="font-size:.75rem"></i>
-              Oferta por tiempo limitado · Stock disponible
-            </p>
-          </div>
-        </div>`;
+            <div class="promo-body">
+              <p class="promo-nombre">${p.nombre}</p>
+              <p class="promo-cat">${p.categoria || ''}</p>
+              <div class="promo-precios">
+                <span class="promo-precio-actual">${precio}</span>${orig}
+              </div>
+              <div class="promo-acciones">
+                <button class="btn-promo-ver" onclick="irAPromo('${p.id}')">
+                  <i class="bi bi-eye"></i> Ver producto
+                </button>
+                <button class="btn-promo-cerrar" onclick="cerrarPromo()">Ahora no</button>
+              </div>
+              <p class="promo-nota">
+                <i class="bi bi-clock" style="font-size:.75rem"></i>
+                Oferta por tiempo limitado · Stock disponible
+              </p>
+            </div>
+          </div>`;
+      }
     }).join('');
 
     const multi   = prods.length > 1;
