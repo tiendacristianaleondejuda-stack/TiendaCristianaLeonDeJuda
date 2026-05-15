@@ -644,6 +644,177 @@
     .btn-confirm:hover    { background: #2c2520; }
     .btn-confirm:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
 
+
+
+    /* ══ POPUP PUBLICIDAD DESTACADA ══ */
+    .promo-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      z-index: 1100;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+      opacity: 0; pointer-events: none; transition: opacity .3s ease;
+    }
+    .promo-overlay.open { opacity: 1; pointer-events: all; }
+    .promo-box {
+      background: var(--card-bg);
+      border-radius: 18px;
+      width: 100%; max-width: 480px;
+      max-height: calc(100vh - 2rem);
+      overflow: hidden; position: relative;
+      transform: scale(.92) translateY(12px);
+      opacity: 0;
+      transition: transform .4s cubic-bezier(.16,1,.3,1), opacity .35s;
+      box-shadow: 0 24px 64px rgba(0,0,0,.4);
+    }
+    .promo-overlay.open .promo-box {
+      transform: scale(1) translateY(0); opacity: 1;
+    }
+    @media (min-width: 600px) {
+      .promo-box { max-width: 560px; }
+    }
+
+    /* Header del popup */
+    .promo-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .85rem 1rem .85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--card-bg);
+    }
+    .promo-header-titulo {
+      font-size: .75rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text-muted);
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .promo-header-titulo i { color: var(--gold-light); }
+    .promo-header-counter {
+      font-size: .72rem; color: var(--text-muted);
+      background: var(--bg2); border-radius: 50px;
+      padding: .15rem .55rem; font-weight: 600;
+    }
+    .promo-close {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--bg2); border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; color: var(--text-muted);
+      transition: background .15s, color .15s; flex-shrink: 0;
+    }
+    .promo-close:hover { background: var(--bg3); color: var(--text); }
+
+    /* Carrusel */
+    .promo-track-wrap {
+      overflow: hidden; position: relative; width: 100%;
+    }
+    .promo-track {
+      display: flex; width: 100%;
+      transition: transform .38s cubic-bezier(.4,0,.2,1);
+      will-change: transform;
+    }
+    .promo-slide {
+      width: 100%; min-width: 100%; flex-shrink: 0;
+    }
+    .promo-img-wrap {
+      width: 100%; aspect-ratio: 16/9; overflow: hidden;
+      background: #1c1917; position: relative;
+    }
+    .promo-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      object-position: center top; filter: brightness(.85);
+    }
+    .promo-img-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.55) 0%, transparent 55%);
+    }
+    .promo-img-label {
+      position: absolute; bottom: .75rem; left: .9rem;
+      display: flex; align-items: center; gap: .45rem;
+    }
+    .promo-badge-dest {
+      background: var(--gold-light); color: #1c1917;
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+      padding: .2rem .55rem; border-radius: 50px;
+    }
+    .promo-badge-secc {
+      background: rgba(255,255,255,.15); color: rgba(255,255,255,.9);
+      font-size: .6rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      padding: .2rem .55rem; border-radius: 50px; backdrop-filter: blur(4px);
+    }
+    .promo-body { padding: 1rem 1.25rem 1.25rem; }
+    .promo-nombre {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 500;
+      line-height: 1.15; margin-bottom: .25rem;
+    }
+    .promo-cat { font-size: .72rem; color: var(--text-muted); text-transform: capitalize; margin-bottom: .6rem; }
+    .promo-precios { display: flex; align-items: baseline; gap: .5rem; margin-bottom: .9rem; }
+    .promo-precio-actual { font-size: 1.4rem; font-weight: 800; color: var(--gold); }
+    .promo-precio-orig { font-size: .88rem; color: var(--text-muted); text-decoration: line-through; }
+    .promo-acciones { display: flex; gap: .6rem; }
+    .btn-promo-ver {
+      flex: 1; padding: .8rem; background: var(--text); color: white;
+      border: none; border-radius: 10px; font-family: 'Jost', sans-serif;
+      font-size: .85rem; font-weight: 700; letter-spacing: .04em;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      transition: background .2s, transform .2s;
+    }
+    .btn-promo-ver:hover { background: #2c2520; transform: translateY(-1px); }
+    .btn-promo-cerrar {
+      padding: .8rem 1rem; background: var(--bg2); color: var(--text-muted);
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'Jost', sans-serif; font-size: .82rem; font-weight: 600; transition: background .15s;
+    }
+    .btn-promo-cerrar:hover { background: var(--bg3); color: var(--text); }
+    .promo-nota {
+      text-align: center; font-size: .68rem; color: var(--text-muted); margin-top: .65rem;
+      display: flex; align-items: center; justify-content: center; gap: .3rem;
+    }
+
+    /* Dots y flechas del carrusel */
+    .promo-dots {
+      display: flex; align-items: center; justify-content: center; gap: .4rem;
+      padding: .6rem 1rem .75rem;
+    }
+    .promo-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--border); border: none; padding: 0;
+      transition: background .2s, transform .2s; cursor: pointer;
+    }
+    .promo-dot.active { background: var(--gold); transform: scale(1.3); }
+    .promo-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,.9); border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; color: var(--text);
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+      transition: background .15s, transform .15s; z-index: 3;
+    }
+    .promo-nav:hover { background: white; transform: translateY(-50%) scale(1.08); }
+    .promo-prev { left: .6rem; }
+    .promo-next { right: .6rem; }
+
+    /* ── Lineas Nav ── */
+    .lineas-nav {
+      background: #111;
+      display: flex; align-items: center; justify-content: center;
+      gap: .25rem; padding: .5rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .lineas-nav::-webkit-scrollbar { display: none; }
+    .linea-btn {
+      display: flex; align-items: center; gap: .4rem;
+      padding: .35rem .9rem; border-radius: 50px;
+      font-size: .75rem; font-weight: 500; letter-spacing: .04em;
+      color: rgba(255,255,255,.5); border: 1px solid transparent;
+      white-space: nowrap; transition: all .18s;
+    }
+    .linea-btn:hover { color: rgba(255,255,255,.85); }
+    .linea-btn.active {
+      background: rgba(154,123,46,.15);
+      border-color: rgba(201,168,76,.3);
+      color: var(--gold-light);
+    }
+
+
     /* ══════════════════════════════════
        TOAST
     ══════════════════════════════════ */
@@ -920,40 +1091,7 @@
     }
 
 
-    /* ══ LINEAS NAV ══ */
-.lineas-nav {
-  background: #111;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: .25rem;
-  padding: .5rem 1rem;
-  border-bottom: 1px solid rgba(255,255,255,.06);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.lineas-nav::-webkit-scrollbar { display: none; }
-.linea-btn {
-  display: flex;
-  align-items: center;
-  gap: .4rem;
-  padding: .35rem .9rem;
-  border-radius: 50px;
-  font-size: .75rem;
-  font-weight: 500;
-  letter-spacing: .04em;
-  color: rgba(255,255,255,.5);
-  border: 1px solid transparent;
-  white-space: nowrap;
-  transition: all .18s;
-  text-decoration: none;
-}
-.linea-btn:hover { color: rgba(255,255,255,.85); }
-.linea-btn.active {
-  background: rgba(154,123,46,.15);
-  border-color: rgba(201,168,76,.3);
-  color: var(--gold-light);
-}
+
   </style>
 </head>
 
@@ -1002,12 +1140,13 @@
   </nav>
 
 
+
 <!-- ─── LINEAS NAV ─── -->
-<div class="lineas-nav">
-  <a href="/index.html" class="linea-btn active">✝ Cristiana</a>
-  <a href="/pages/tienda/casual.html" class="linea-btn">⚽ Casual</a>
-  <a href="/pages/tienda/empresarial.html" class="linea-btn">🏢 Empresarial</a>
-</div>
+  <div class="lineas-nav">
+    <a href="/index.html"                    class="linea-btn active">✝ Cristiana</a>
+    <a href="/pages/tienda/casual.html"      class="linea-btn">⚽ Casual</a>
+    <a href="/pages/tienda/empresarial.html" class="linea-btn">🏢 Empresarial</a>
+  </div>
 
   <!-- ─── HERO ─── -->
   <section class="hero">
@@ -1074,10 +1213,10 @@
   <p class="footer-col-title">Tienda</p>
   <div class="footer-links">
     <a href="/index.html"><i class="bi bi-chevron-right"></i> ✝ Cristiana</a>
-    <a href="/pages/tienda/casual.html"><i class="bi bi-chevron-right"></i> ⚽ Casual</a>
-    <a href="/pages/tienda/empresarial.html"><i class="bi bi-chevron-right"></i> 🏢 Empresarial</a>
-    <a href="/pages/tienda/carrito.html"><i class="bi bi-chevron-right"></i> Mi carrito</a>
-    <a href="/pages/tienda/cuenta.html"><i class="bi bi-chevron-right"></i> Mi cuenta</a>
+          <a href="/pages/tienda/casual.html"><i class="bi bi-chevron-right"></i> ⚽ Casual</a>
+          <a href="/pages/tienda/empresarial.html"><i class="bi bi-chevron-right"></i> 🏢 Empresarial</a>
+          <a href="/pages/tienda/carrito.html"><i class="bi bi-chevron-right"></i> Mi carrito</a>
+          <a href="/pages/tienda/cuenta.html"><i class="bi bi-chevron-right"></i> Mi cuenta</a>
   </div>
 </div>
       <!-- Col 3: Info de la tienda -->
@@ -1137,6 +1276,39 @@
       <p class="modal-titulo" id="modal-titulo-prod">Seleccioná una talla</p>
       <div class="tallas-grid" id="modal-tallas"></div>
       <button class="btn-confirm" id="modal-confirm" disabled>Agregar al carrito</button>
+    </div>
+  </div>
+
+  <!-- ─── POPUP PUBLICIDAD DESTACADA ─── -->
+  <div class="promo-overlay" id="promo-overlay" onclick="cerrarPromo(event)">
+    <div class="promo-box" id="promo-box">
+
+      <!-- Header -->
+      <div class="promo-header">
+        <p class="promo-header-titulo">
+          <i class="bi bi-star-fill"></i> Productos Destacados
+          <span class="promo-header-counter" id="promo-counter" style="display:none"></span>
+        </p>
+        <button class="promo-close" onclick="cerrarPromo()" title="Cerrar">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Carrusel de slides -->
+      <div class="promo-track-wrap">
+        <div class="promo-track" id="promo-track"></div>
+        <!-- Flechas (se ocultan si hay 1 solo producto) -->
+        <button class="promo-nav promo-prev" id="promo-prev" onclick="navPromo(-1)" style="display:none">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button class="promo-nav promo-next" id="promo-next" onclick="navPromo(1)" style="display:none">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+
+      <!-- Dots (se ocultan si hay 1 solo producto) -->
+      <div class="promo-dots" id="promo-dots" style="display:none"></div>
+
     </div>
   </div>
 
@@ -1292,6 +1464,11 @@
         if (error) throw error;
         todos = data || [];
         render();
+        // Mostrar popup carrusel con todos los productos destacados (una vez por sesión)
+        const destacados = todos.filter(p => p.destacado && (p.stock ?? 1) > 0);
+        if (destacados.length && !sessionStorage.getItem('promo_shown_cristiana')) {
+          setTimeout(() => mostrarPromo(destacados, '✝ Cristiana'), 1500);
+        }
       } catch {
         document.getElementById('grid').innerHTML = '<div class="empty"><i class="bi bi-exclamation-circle"></i><p>No se pudieron cargar los productos.</p></div>';
       }
@@ -1419,6 +1596,106 @@
         timer = setTimeout(() => { busqueda = e.target.value; render(); }, 300);
       });
     }
+
+
+    /* ─── Popup carrusel de productos destacados ─── */
+    let promoIdx   = 0;
+    let promoTimer = null;
+    let promoProds = [];
+
+    function mostrarPromo(prods, seccionLabel) {
+      promoProds = prods;
+      promoIdx   = 0;
+
+      // Construir slides
+      document.getElementById('promo-track').innerHTML = prods.map((p, i) => {
+        const img    = p.imagen_url || 'https://placehold.co/560x315/1c1917/c9a84c?text=Destacado';
+        const precio = formatearPrecio(p.precio);
+        const orig   = p.precio_original ? `<span class="promo-precio-orig">${formatearPrecio(p.precio_original)}</span>` : '';
+        return `
+          <div class="promo-slide">
+            <div class="promo-img-wrap">
+              <img src="${img}" alt="${p.nombre}" loading="${i === 0 ? 'eager' : 'lazy'}"
+                onerror="this.src='https://placehold.co/560x315/1c1917/c9a84c?text=Destacado'">
+              <div class="promo-img-overlay"></div>
+              <div class="promo-img-label">
+                <span class="promo-badge-dest">⭐ Destacado</span>
+                <span class="promo-badge-secc">${seccionLabel}</span>
+              </div>
+            </div>
+            <div class="promo-body">
+              <p class="promo-nombre">${p.nombre}</p>
+              <p class="promo-cat">${p.categoria || ''}</p>
+              <div class="promo-precios">
+                <span class="promo-precio-actual">${precio}</span>${orig}
+              </div>
+              <div class="promo-acciones">
+                <button class="btn-promo-ver" onclick="irAPromo('${p.id}')">
+                  <i class="bi bi-eye"></i> Ver producto
+                </button>
+                <button class="btn-promo-cerrar" onclick="cerrarPromo()">Ahora no</button>
+              </div>
+              <p class="promo-nota">
+                <i class="bi bi-clock" style="font-size:.75rem"></i>
+                Oferta por tiempo limitado · Stock disponible
+              </p>
+            </div>
+          </div>`;
+      }).join('');
+
+      // Contador y dots (solo si hay más de 1)
+      const multi = prods.length > 1;
+      const counter = document.getElementById('promo-counter');
+      if (counter) { counter.textContent = `1 / ${prods.length}`; counter.style.display = multi ? 'inline' : 'none'; }
+
+      const dotsEl = document.getElementById('promo-dots');
+      if (multi) {
+        dotsEl.innerHTML = prods.map((_, i) =>
+          `<button class="promo-dot ${i === 0 ? 'active' : ''}" onclick="irSlide(${i})"></button>`
+        ).join('');
+        dotsEl.style.display = 'flex';
+        document.getElementById('promo-prev').style.display = 'flex';
+        document.getElementById('promo-next').style.display = 'flex';
+        iniciarAutoPlay();
+      } else {
+        dotsEl.style.display = 'none';
+        document.getElementById('promo-prev').style.display = 'none';
+        document.getElementById('promo-next').style.display = 'none';
+      }
+
+      document.getElementById('promo-overlay').classList.add('open');
+      sessionStorage.setItem('promo_shown_cristiana', '1');
+    }
+
+    function irSlide(idx) {
+      promoIdx = (idx + promoProds.length) % promoProds.length;
+      document.getElementById('promo-track').style.transform = `translateX(-${promoIdx * 100}%)`;
+      document.querySelectorAll('.promo-dot').forEach((d, i) => d.classList.toggle('active', i === promoIdx));
+      const counter = document.getElementById('promo-counter');
+      if (counter) counter.textContent = `${promoIdx + 1} / ${promoProds.length}`;
+      reiniciarAutoPlay();
+    }
+
+    function navPromo(dir) { irSlide(promoIdx + dir); }
+
+    function iniciarAutoPlay() {
+      clearInterval(promoTimer);
+      promoTimer = setInterval(() => navPromo(1), 3500);
+    }
+    function reiniciarAutoPlay() {
+      clearInterval(promoTimer);
+      if (promoProds.length > 1) iniciarAutoPlay();
+    }
+    function irAPromo(id) {
+      cerrarPromo();
+      location.href = `/pages/tienda/producto.html?id=${id}`;
+    }
+    function cerrarPromo(e) {
+      if (e && e.target !== document.getElementById('promo-overlay')) return;
+      clearInterval(promoTimer);
+      document.getElementById('promo-overlay').classList.remove('open');
+    }
+
   </script>
 
   <!-- ─── PWA INSTALL BANNER ─── -->
@@ -1477,6 +1754,26 @@
   <script>
     // ─── PWA Install prompt ───
     let deferredPrompt = null;
+
+
+  
+    /* ── PWA back handler — raíz de la app ──
+       index.html es la pantalla de inicio de la PWA.
+       replaceState sin pushState extra: al presionar "atrás"
+       desde aquí el SO minimiza la app correctamente. */
+    (function() {
+      const esStandalone = window.matchMedia('(display-mode: standalone)').matches
+                           || navigator.standalone === true;
+      if (!esStandalone) return;
+      // Marcamos esta página como el root del historial PWA
+      history.replaceState({ pwa: 'root', page: 'index' }, '');
+      // Si el usuario vuelve al root desde otra página interna, quedamos aquí
+      window.addEventListener('popstate', function(e) {
+        if (e.state && e.state.pwa === 'root') {
+          // Estamos en la raíz — no hacemos nada: el SO maneja el minimize
+        }
+      });
+    })();
 
     const yaInstalado = localStorage.getItem('pwa_dismissed');
     const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
