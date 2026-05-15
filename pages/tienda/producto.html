@@ -710,8 +710,9 @@
 <body>
   <!-- NAVBAR -->
   <nav class="navbar">
-    <a href="/index.html" class="nav-back">
-      <i class="bi bi-arrow-left"></i> Tienda
+    <a href="/index.html" class="nav-back" id="nav-back">
+      <i class="bi bi-arrow-left"></i>
+      <span id="nav-back-label">Tienda</span>
     </a>
     <span class="nav-spacer"></span>
     <a href="/pages/tienda/carrito.html" class="nav-icon-btn">
@@ -728,7 +729,7 @@
 
   <!-- BREADCRUMB -->
   <div class="breadcrumb">
-    <a href="/index.html">Inicio</a>
+    <a href="/index.html" id="bread-inicio">Inicio</a>
     <i class="bi bi-chevron-right"></i>
     <span id="bread-cat">—</span>
     <i class="bi bi-chevron-right"></i>
@@ -832,6 +833,27 @@ function calcularEnvio() {
 document.addEventListener('DOMContentLoaded', async () => {
   Carrito.actualizarContador();
   await actualizarNavbarAuth();
+
+  // ── Detectar desde qué sección vino el usuario y ajustar el botón "Volver" ──
+  const seccion = sessionStorage.getItem('referer_seccion'); // 'casual' | null
+  const SECCIONES = {
+    casual: {
+      href:  '/pages/tienda/casual.html',
+      label: '⚽ Casual',
+      bread: 'Casual',
+    },
+    // podés agregar más secciones acá en el futuro
+  };
+  const ref = SECCIONES[seccion];
+  if (ref) {
+    const btnBack   = document.getElementById('nav-back');
+    const lblBack   = document.getElementById('nav-back-label');
+    const breadInicio = document.getElementById('bread-inicio');
+    if (btnBack)     btnBack.href        = ref.href;
+    if (lblBack)     lblBack.textContent = ref.label;
+    if (breadInicio) { breadInicio.href  = ref.href; breadInicio.textContent = ref.bread; }
+  }
+  
   await cargarTarifasEnvio();
   const id = new URLSearchParams(location.search).get('id');
   if (!id) { location.href = '/index.html'; return; }
