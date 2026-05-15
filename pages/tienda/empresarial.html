@@ -452,6 +452,93 @@
       flex-wrap: wrap; gap: .5rem; font-size: .75rem; color: rgba(255,255,255,.25);
     }
     @media (max-width: 520px) { .footer-bottom { flex-direction: column; text-align: center; padding: 1rem 1.25rem; } }
+
+
+
+   /* ══ VIDEOS EMPRESARIALES ══ */
+    .videos-section {
+      padding: 3rem 1.25rem 2rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .videos-header { text-align: center; margin-bottom: 2rem; }
+    .videos-eyebrow {
+      font-size: .72rem; font-weight: 600; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--emp-light); margin-bottom: .5rem;
+    }
+    .videos-titulo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 600; color: var(--text); line-height: 1.15;
+    }
+    .videos-titulo em { font-style: italic; color: var(--emp); }
+    .videos-sub { font-size: .9rem; color: var(--text-muted); margin-top: .5rem; }
+
+    .videos-grid {
+      display: grid; grid-template-columns: 1fr; gap: 1.5rem;
+    }
+    @media (min-width: 640px)  { .videos-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .videos-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .video-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .video-card:hover { box-shadow: 0 8px 32px rgba(30,58,95,.12); transform: translateY(-3px); }
+
+    /* Contenedor 16:9 que nunca se rompe */
+    .video-embed {
+      position: relative; width: 100%; padding-bottom: 56.25%;
+      background: #000; overflow: hidden;
+    }
+    .video-embed iframe {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; border: none;
+    }
+
+    /* ── Pantalla completa nativa ── */
+    .video-embed:fullscreen,
+    .video-embed:-webkit-full-screen,
+    .video-embed:-moz-full-screen {
+      padding-bottom: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+    .video-embed:fullscreen iframe,
+    .video-embed:-webkit-full-screen iframe,
+    .video-embed:-moz-full-screen iframe {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+    }
+
+    /* ── Aviso "girá el teléfono" ── */
+    .rotate-hint {
+      display: none;
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,.88);
+      flex-direction: column; align-items: center; justify-content: center;
+      color: white; text-align: center; gap: 1rem;
+      padding: 2rem;
+    }
+    .rotate-hint.show { display: flex; }
+    .rotate-icon {
+      font-size: 3.5rem;
+      animation: girar 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes girar {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(90deg); }
+    }
+    .rotate-hint p { font-size: 1rem; font-weight: 500; opacity: .9; }
+    .rotate-hint small { font-size: .78rem; opacity: .6; }
+
+    .video-info { padding: 1rem 1.1rem; }
+    .video-nombre { font-weight: 600; font-size: .9rem; color: var(--text); margin-bottom: .25rem; }
+    .video-desc { font-size: .8rem; color: var(--text-muted); line-height: 1.5; }
+    .videos-empty { text-align: center; padding: 2rem; color: var(--text-muted); font-size: .875rem; }
+    .videos-divider { height: 1px; background: var(--border); margin: 0 1.25rem; }
+
+
   </style>
 </head>
 
@@ -529,6 +616,28 @@
       </div>
     </div>
   </div>
+
+<!-- Aviso girá el teléfono -->
+  <div class="rotate-hint" id="rotate-hint">
+    <div class="rotate-icon">📱</div>
+    <p>Girá el teléfono para mejor experiencia</p>
+    <small>Tocá fuera para cerrar</small>
+  </div>
+
+<!-- ─── VIDEOS TRABAJOS REALIZADOS ─── -->
+  <div class="videos-divider"></div>
+  <section class="videos-section" id="trabajos">
+    <div class="videos-header">
+      <p class="videos-eyebrow">Nuestro trabajo</p>
+      <h2 class="videos-titulo">Trabajos <em>realizados</em></h2>
+      <p class="videos-sub">Mirá cómo quedaron los uniformes de nuestros clientes</p>
+    </div>
+    <div class="videos-grid" id="videos-grid">
+      <!-- Cargando... -->
+      <div class="videos-empty"><i class="bi bi-hourglass"></i> Cargando videos…</div>
+    </div>
+  </section>
+  <div class="videos-divider"></div>
 
   <!-- ─── CATÁLOGO EMPRESARIAL ─── -->
   <section class="productos-section" id="productos">
@@ -797,6 +906,52 @@
       window.open(url, '_blank');
     });
 
+
+
+    // ─── Cargar videos de trabajos realizados ───
+    (async () => {
+      const grid = document.getElementById('videos-grid');
+      try {
+        const { data, error } = await sb
+          .from('videos_empresarial')
+          .select('*')
+          .eq('activo', true)
+          .order('orden', { ascending: true });
+        if (error) throw error;
+        const lista = data || [];
+        if (!lista.length) {
+          grid.innerHTML = '<div class="videos-empty"><i class="bi bi-camera-video"></i><p>Próximamente...</p></div>';
+          return;
+        }
+        grid.innerHTML = lista.map(v => {
+          // Extraer el ID del video de YouTube desde la URL
+          const match = v.youtube_url.match(/(?:youtu\.be\/|v=|embed\/)([a-zA-Z0-9_-]{11})/);
+          const videoId = match ? match[1] : null;
+          if (!videoId) return '';
+          return `
+            <div class="video-card">
+              <div class="video-embed">
+                <iframe
+                  src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1"
+                  title="${v.titulo}"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  loading="lazy"
+                  onmouseenter="void(0)">
+                </iframe>
+              </div>
+              <div class="video-info">
+                <p class="video-nombre">${v.titulo}</p>
+                ${v.descripcion ? `<p class="video-desc">${v.descripcion}</p>` : ''}
+              </div>
+            </div>`;
+        }).join('');
+      } catch(e) {
+        grid.innerHTML = '<div class="videos-empty"><i class="bi bi-exclamation-circle"></i><p>No se pudieron cargar los videos.</p></div>';
+      }
+    })();
+
+
     // ─── Cargar productos empresariales desde Supabase ───
     (async () => {
       try {
@@ -868,6 +1023,31 @@
       w.appendChild(el);
       setTimeout(() => el.remove(), 2600);
     }
+
+    // ── Aviso rotación al entrar en pantalla completa ──
+    document.addEventListener('fullscreenchange', manejarFS);
+    document.addEventListener('webkitfullscreenchange', manejarFS);
+    function manejarFS() {
+      const hint = document.getElementById('rotate-hint');
+      const enFS  = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      const esVertical = window.screen.height > window.screen.width;
+      if (enFS && esVertical) {
+        hint.classList.add('show');
+        // Se oculta solo cuando gira o después de 4 segundos
+        const quitar = () => { hint.classList.remove('show'); };
+        window.addEventListener('orientationchange', quitar, { once: true });
+        setTimeout(quitar, 4000);
+      } else {
+        hint.classList.remove('show');
+      }
+    }
+    document.getElementById('rotate-hint').addEventListener('click', function() {
+      this.classList.remove('show');
+    });
+
+
+
+
   </script>
 
 </body>
