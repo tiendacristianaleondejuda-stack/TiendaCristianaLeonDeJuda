@@ -957,6 +957,10 @@
       <span class="badge-count" id="badge-resenas" style="display:none">0</span>
     </button>
 
+    <button class="nav-item" data-section="publicidades" onclick="irA('publicidades')">
+      <i class="bi bi-megaphone"></i> Publicidades
+    </button>
+
       <span class="nav-label">Configuración</span>
      <button class="nav-item" data-section="tarifas" onclick="irA('tarifas')">
       <i class="bi bi-calculator"></i> Tarifas de envío
@@ -1353,6 +1357,119 @@
       </div>
     </div>
 
+
+    <!-- ══════════ PUBLICIDADES ══════════ -->
+    <div class="section" id="section-publicidades">
+      <div class="section-header">
+        <h2>Publicidades del popup</h2>
+        <button class="btn btn-primary" onclick="abrirModalPublicidad()">
+          <i class="bi bi-plus-lg"></i> Nueva publicidad
+        </button>
+      </div>
+
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;margin-bottom:1.25rem;font-size:.82rem;color:var(--text-muted);display:flex;align-items:flex-start;gap:.6rem">
+        <i class="bi bi-info-circle-fill" style="color:var(--accent);margin-top:.1rem;flex-shrink:0"></i>
+        <span>
+          Los slides activos aparecen <strong style="color:var(--text)">primero</strong> en el popup de destacados, antes de los productos.
+          Podés asignarlos a <strong style="color:var(--text)">Cristiana</strong>, <strong style="color:var(--text)">Casual</strong> o <strong style="color:var(--text)">Ambas</strong> secciones.
+          Máximo recomendado: <strong style="color:var(--text)">3 activos por sección</strong>.
+        </span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Vista previa</th>
+              <th>Título</th>
+              <th>Sección</th>
+              <th>Orden</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="publicidades-tbody">
+            <tr><td colspan="6"><div class="empty-state"><i class="bi bi-hourglass"></i><p>Cargando...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal publicidad -->
+    <div class="modal-overlay" id="modal-publicidad" onclick="if(event.target===this)cerrarModalPublicidad()">
+      <div class="modal-box" style="max-width:540px">
+        <div class="modal-header">
+          <h3 id="modal-pub-titulo">Nueva publicidad</h3>
+          <button class="modal-close" onclick="cerrarModalPublicidad()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body">
+
+          <!-- Preview -->
+          <div id="pub-preview" style="display:none;margin-bottom:1rem;border-radius:10px;overflow:hidden;border:1px solid var(--border)">
+            <div style="aspect-ratio:16/9;background:#1c1917;position:relative;overflow:hidden">
+              <img id="pub-preview-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.8)">
+              <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 55%)"></div>
+              <div style="position:absolute;bottom:.75rem;left:.9rem;display:flex;gap:.4rem;align-items:center">
+                <span style="background:#c9a84c;color:#1c1917;font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .55rem;border-radius:50px">📢 Novedad</span>
+                <span id="pub-preview-secc" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .55rem;border-radius:50px;backdrop-filter:blur(4px)"></span>
+              </div>
+            </div>
+            <div style="padding:.85rem 1rem;background:var(--card-bg)">
+              <p id="pub-preview-nombre" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:.25rem"></p>
+              <p id="pub-preview-desc" style="font-size:.78rem;color:var(--text-muted);margin-bottom:.6rem;line-height:1.4"></p>
+              <span id="pub-preview-btn" style="display:inline-block;background:var(--text);color:white;font-size:.75rem;font-weight:700;padding:.4rem .9rem;border-radius:6px"></span>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field" style="grid-column:1/-1">
+              <label class="field-label">Título *</label>
+              <input type="text" class="field-input" id="pub-titulo" placeholder="Ej: ¡Nueva colección Mundial 2026!" oninput="actualizarPreviewPub()">
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label class="field-label">Descripción <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+              <textarea class="field-input" id="pub-descripcion" rows="2" placeholder="Texto corto que aparece debajo del título…" oninput="actualizarPreviewPub()"></textarea>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label class="field-label">URL de imagen <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+              <input type="text" class="field-input" id="pub-imagen" placeholder="https://... (16:9 recomendado)" oninput="actualizarPreviewPub()">
+            </div>
+            <div class="field">
+              <label class="field-label">Texto del botón</label>
+              <input type="text" class="field-input" id="pub-btn-texto" placeholder="Ver más" oninput="actualizarPreviewPub()">
+            </div>
+            <div class="field">
+              <label class="field-label">Link del botón</label>
+              <input type="text" class="field-input" id="pub-btn-link" placeholder="/pages/tienda/casual.html">
+            </div>
+            <div class="field">
+              <label class="field-label">Sección</label>
+              <select class="field-input" id="pub-seccion" onchange="actualizarPreviewPub()">
+                <option value="ambas">Ambas (Cristiana + Casual)</option>
+                <option value="cristiana">✝ Solo Cristiana</option>
+                <option value="casual">⚽ Solo Casual</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label">Orden (menor = primero)</label>
+              <input type="number" class="field-input" id="pub-orden" value="0" min="0">
+            </div>
+            <div class="field" style="grid-column:1/-1;display:flex;align-items:center;gap:.6rem">
+              <input type="checkbox" id="pub-activo" checked style="width:16px;height:16px;accent-color:var(--accent)">
+              <label for="pub-activo" class="field-label" style="margin:0;cursor:pointer">Activo (visible en el popup)</label>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:.75rem;padding:1rem 1.5rem;border-top:1px solid var(--border)">
+          <button class="btn btn-ghost" onclick="cerrarModalPublicidad()">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardarPublicidad()">
+            <i class="bi bi-check-lg"></i> Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- ══════════ MENSAJES ══════════ -->
     <div class="section" id="section-mensajes">
       <div class="section-header">
@@ -1421,15 +1538,6 @@
     <option value="empresarial">🏢 Empresarial</option>
   </select>
 </div>
-
-<div class="field">
-            <label class="field-label">Línea</label>
-            <select class="field-input" id="prod-linea">
-              <option value="cristiana">✝ Cristiana</option>
-              <option value="casual">⚽ Casual</option>
-              <option value="empresarial">🏢 Empresarial</option>
-            </select>
-          </div>
 
 
 <div class="field">
@@ -1612,7 +1720,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ═══════════════════════════════════════════════════════════
 //  NAVEGACIÓN
 // ═══════════════════════════════════════════════════════════
-const TITULOS = { dashboard:'Dashboard', productos:'Productos', pedidos:'Pedidos', despacho:'Despacho', archivados:'Archivados', tarifas:'Tarifas de envío', resenas:'Reseñas', videos:'Videos empresarial' };
+const TITULOS = { dashboard:'Dashboard', productos:'Productos', pedidos:'Pedidos', despacho:'Despacho', archivados:'Archivados', tarifas:'Tarifas de envío', resenas:'Reseñas', publicidades:'Publicidades del popup' };
 
 function irA(seccion) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1628,7 +1736,8 @@ function irA(seccion) {
   if (seccion === 'despacho')  cargarDespacho();
   if (seccion === 'tarifas')    cargarTarifas();
   if (seccion === 'archivados') cargarArchivados();
-  if (seccion === 'resenas') cargarResenas();
+  if (seccion === 'resenas')       cargarResenas();
+  if (seccion === 'publicidades')  cargarPublicidades();
   if (seccion === 'videos')   cargarVideosAdmin();
 }
 
@@ -3796,9 +3905,191 @@ function copiarLinkCorto(n) {
   toast('Link copiado ✓', 'ok');
 }
 
+
 // Cerrar modales al hacer clic fuera
 document.getElementById('modal-producto').addEventListener('click', e => { if (e.target === e.currentTarget) cerrarModalProducto(); });
 document.getElementById('modal-pedido').addEventListener('click', e => { if (e.target === e.currentTarget) cerrarModalPedido(); });
+
+
+/* ══════════════════════════════════
+   PUBLICIDADES
+══════════════════════════════════ */
+let todasPublicidades = [];
+let pubEditandoId = null;
+
+async function cargarPublicidades() {
+  try {
+    const { data, error } = await sb
+      .from('publicidades')
+      .select('*')
+      .order('orden', { ascending: true })
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    todasPublicidades = data || [];
+    renderTablaPublicidades(todasPublicidades);
+  } catch (e) {
+    document.getElementById('publicidades-tbody').innerHTML =
+      `<tr><td colspan="6"><div class="empty-state"><i class="bi bi-exclamation-circle"></i><p>Error al cargar: ${e.message}</p></div></td></tr>`;
+  }
+}
+
+function renderTablaPublicidades(lista) {
+  const tbody = document.getElementById('publicidades-tbody');
+  if (!lista.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="bi bi-megaphone"></i><p>Todavía no hay publicidades. Creá la primera.</p></div></td></tr>`;
+    return;
+  }
+  const SECC = { cristiana: '✝ Cristiana', casual: '⚽ Casual', ambas: '🔁 Ambas' };
+  tbody.innerHTML = lista.map(p => `
+    <tr>
+      <td style="width:80px">
+        ${p.imagen_url
+          ? `<img src="${p.imagen_url}" style="width:72px;height:40px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">`
+          : `<div style="width:72px;height:40px;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.2rem">📢</div>`}
+      </td>
+      <td>
+        <p style="font-weight:600;font-size:.88rem;margin-bottom:.15rem">${p.titulo}</p>
+        ${p.descripcion ? `<p style="font-size:.75rem;color:var(--text-muted)">${p.descripcion.substring(0,60)}${p.descripcion.length>60?'…':''}</p>` : ''}
+      </td>
+      <td><span style="font-size:.78rem">${SECC[p.seccion] || p.seccion}</span></td>
+      <td style="text-align:center;font-weight:700">${p.orden}</td>
+      <td>
+        <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer">
+          <input type="checkbox" ${p.activo ? 'checked' : ''}
+            onchange="togglePublicidad('${p.id}', this.checked)"
+            style="width:15px;height:15px;accent-color:var(--accent)">
+          <span style="font-size:.78rem;color:${p.activo ? 'var(--success)' : 'var(--text-muted)'}">${p.activo ? 'Activo' : 'Inactivo'}</span>
+        </label>
+      </td>
+      <td>
+        <div style="display:flex;gap:.4rem">
+          <button class="btn btn-ghost btn-sm" title="Editar" onclick="editarPublicidad('${p.id}')">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-danger btn-sm" title="Eliminar" onclick="eliminarPublicidad('${p.id}')">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function abrirModalPublicidad(id = null) {
+  limpiarFormPublicidad();
+  pubEditandoId = id;
+  document.getElementById('modal-pub-titulo').textContent = id ? 'Editar publicidad' : 'Nueva publicidad';
+  if (id) {
+    const p = todasPublicidades.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('pub-titulo').value     = p.titulo     || '';
+    document.getElementById('pub-descripcion').value= p.descripcion|| '';
+    document.getElementById('pub-imagen').value     = p.imagen_url || '';
+    document.getElementById('pub-btn-texto').value  = p.btn_texto  || 'Ver más';
+    document.getElementById('pub-btn-link').value   = p.btn_link   || '';
+    document.getElementById('pub-seccion').value    = p.seccion    || 'ambas';
+    document.getElementById('pub-orden').value      = p.orden      ?? 0;
+    document.getElementById('pub-activo').checked   = p.activo     ?? true;
+    actualizarPreviewPub();
+  }
+  document.getElementById('modal-publicidad').classList.add('open');
+}
+
+function editarPublicidad(id) { abrirModalPublicidad(id); }
+
+function cerrarModalPublicidad() {
+  document.getElementById('modal-publicidad').classList.remove('open');
+  limpiarFormPublicidad();
+}
+
+function limpiarFormPublicidad() {
+  ['pub-titulo','pub-descripcion','pub-imagen','pub-btn-texto','pub-btn-link'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('pub-btn-texto').value = 'Ver más';
+  document.getElementById('pub-seccion').value   = 'ambas';
+  document.getElementById('pub-orden').value     = '0';
+  document.getElementById('pub-activo').checked  = true;
+  document.getElementById('pub-preview').style.display = 'none';
+  pubEditandoId = null;
+}
+
+function actualizarPreviewPub() {
+  const titulo  = document.getElementById('pub-titulo').value.trim();
+  const desc    = document.getElementById('pub-descripcion').value.trim();
+  const img     = document.getElementById('pub-imagen').value.trim();
+  const btnTxt  = document.getElementById('pub-btn-texto').value.trim() || 'Ver más';
+  const seccion = document.getElementById('pub-seccion').value;
+  const SECC_LABEL = { cristiana: '✝ Cristiana', casual: '⚽ Casual', ambas: '🔁 Ambas' };
+
+  const preview = document.getElementById('pub-preview');
+  if (!titulo && !img) { preview.style.display = 'none'; return; }
+
+  preview.style.display = 'block';
+  const previewImg = document.getElementById('pub-preview-img');
+  if (img) { previewImg.src = img; previewImg.style.display = 'block'; }
+  else { previewImg.style.display = 'none'; }
+
+  document.getElementById('pub-preview-nombre').textContent = titulo || '—';
+  document.getElementById('pub-preview-desc').textContent   = desc   || '';
+  document.getElementById('pub-preview-btn').textContent    = btnTxt;
+  document.getElementById('pub-preview-secc').textContent   = SECC_LABEL[seccion] || seccion;
+}
+
+async function guardarPublicidad() {
+  const titulo = document.getElementById('pub-titulo').value.trim();
+  if (!titulo) { alert('El título es obligatorio.'); return; }
+
+  const payload = {
+    titulo,
+    descripcion: document.getElementById('pub-descripcion').value.trim() || null,
+    imagen_url:  document.getElementById('pub-imagen').value.trim()      || null,
+    btn_texto:   document.getElementById('pub-btn-texto').value.trim()   || 'Ver más',
+    btn_link:    document.getElementById('pub-btn-link').value.trim()    || null,
+    seccion:     document.getElementById('pub-seccion').value,
+    orden:       parseInt(document.getElementById('pub-orden').value)    || 0,
+    activo:      document.getElementById('pub-activo').checked,
+  };
+
+  try {
+    if (pubEditandoId) {
+      const { error } = await sb.from('publicidades').update(payload).eq('id', pubEditandoId);
+      if (error) throw error;
+    } else {
+      const { error } = await sb.from('publicidades').insert(payload);
+      if (error) throw error;
+    }
+    cerrarModalPublicidad();
+    await cargarPublicidades();
+    toast(pubEditandoId ? 'Publicidad actualizada ✓' : 'Publicidad creada ✓', 'ok');
+  } catch (e) {
+    alert('Error al guardar: ' + e.message);
+  }
+}
+
+async function togglePublicidad(id, activo) {
+  try {
+    const { error } = await sb.from('publicidades').update({ activo }).eq('id', id);
+    if (error) throw error;
+    const pub = todasPublicidades.find(p => p.id === id);
+    if (pub) pub.activo = activo;
+    toast(activo ? 'Publicidad activada ✓' : 'Publicidad desactivada', 'ok');
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function eliminarPublicidad(id) {
+  if (!confirm('¿Eliminar esta publicidad? No se puede deshacer.')) return;
+  try {
+    const { error } = await sb.from('publicidades').delete().eq('id', id);
+    if (error) throw error;
+    await cargarPublicidades();
+    toast('Publicidad eliminada ✓', 'ok');
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
 </script>
 </body>
 </html>
