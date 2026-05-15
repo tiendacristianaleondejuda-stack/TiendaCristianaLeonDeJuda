@@ -960,7 +960,12 @@
       <span class="nav-label">Configuración</span>
      <button class="nav-item" data-section="tarifas" onclick="irA('tarifas')">
       <i class="bi bi-calculator"></i> Tarifas de envío
-</button>
+    </button>
+
+    <button class="nav-item" data-section="videos" onclick="irA('videos')">
+      <i class="bi bi-camera-video"></i> Videos empresarial
+    </button>
+
 <!-- Mensajes integrados dentro de cada pedido -->
     <!-- Mensajes integrados dentro de cada pedido -->
     <span id="badge-mensajes" style="display:none">0</span>
@@ -1116,6 +1121,12 @@
             <i class="bi bi-search"></i>
             <input type="text" id="search-productos" placeholder="Buscar productos…" oninput="filtrarTablaProductos()">
           </div>
+          <select class="field-input" style="flex:0;width:auto;padding:.5rem .8rem;font-size:.8rem" id="filter-linea" onchange="filtrarTablaProductos()">
+              <option value="">Todas las líneas</option>
+              <option value="cristiana">✝ Cristiana</option>
+              <option value="casual">⚽ Casual</option>
+              <option value="empresarial">🏢 Empresarial</option>
+            </select>
           <select class="field-input" style="flex:0;width:auto;padding:.5rem .8rem;font-size:.8rem" id="filter-cat" onchange="filtrarTablaProductos()">
             <option value="">Todas las categorías</option>
             <option value="remeras">Remeras</option>
@@ -1228,6 +1239,92 @@
 </div>
 
 
+
+<!-- ══════════ VIDEOS EMPRESARIAL ══════════ -->
+    <div class="section" id="section-videos">
+      <div class="section-header">
+        <h2>Videos — Trabajos realizados</h2>
+        <button class="btn btn-primary" onclick="abrirModalVideo()">
+          <i class="bi bi-plus-lg"></i> Nuevo video
+        </button>
+      </div>
+      <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:1.5rem">
+        Agregá los videos de YouTube (no listados) que van a aparecer en la sección empresarial.
+      </p>
+      <div id="videos-admin-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">
+        <p style="color:var(--text-muted);font-size:.875rem">Cargando…</p>
+      </div>
+    </div>
+
+    <!-- Modal nuevo/editar video -->
+    <div class="modal-overlay" id="modal-video">
+      <div class="modal-box" style="max-width:480px">
+        <div class="modal-header">
+          <h2 class="modal-titulo" id="modal-video-titulo">Nuevo video</h2>
+          <button class="modal-close" onclick="cerrarModalVideo()"><i class="bi bi-x"></i></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="video-edit-id">
+
+          <div class="field" style="margin-bottom:1rem">
+            <label class="field-label">Título del video *</label>
+            <input type="text" class="field-input" id="video-titulo"
+              placeholder="Ej: Uniformes para Ferretería García">
+          </div>
+
+          <div class="field" style="margin-bottom:1rem">
+            <label class="field-label">Descripción <span style="color:var(--text-muted);font-weight:400">(opcional)</span></label>
+            <input type="text" class="field-input" id="video-descripcion"
+              placeholder="Ej: 50 remeras con logo bordado, color azul marino">
+          </div>
+
+          <div class="field" style="margin-bottom:1rem">
+            <label class="field-label">Link de YouTube *</label>
+            <input type="text" class="field-input" id="video-url"
+              placeholder="Ej: https://youtu.be/abc123XYZ">
+            <p style="font-size:.75rem;color:var(--text-muted);margin-top:.35rem">
+              <i class="bi bi-info-circle"></i>
+              Pegá el link del video de YouTube (tiene que estar en modo "No listado")
+            </p>
+          </div>
+
+          <div class="field" style="margin-bottom:1rem">
+            <label class="field-label">Orden de aparición</label>
+            <input type="number" class="field-input" id="video-orden" value="0" min="0"
+              placeholder="0 = primero, 1 = segundo, etc.">
+            <p style="font-size:.75rem;color:var(--text-muted);margin-top:.35rem">
+              El número más bajo aparece primero en la página.
+            </p>
+          </div>
+
+          <div class="toggle-row" style="margin-bottom:1.5rem">
+            <label for="video-activo">Visible en la página</label>
+            <label class="toggle">
+              <input type="checkbox" id="video-activo" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <!-- Preview del video -->
+          <div id="video-preview-wrap" style="display:none;margin-bottom:1.25rem">
+            <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.5rem">Vista previa:</p>
+            <div style="position:relative;width:100%;padding-bottom:56.25%;background:#000;border-radius:8px;overflow:hidden">
+              <iframe id="video-preview-frame" style="position:absolute;inset:0;width:100%;height:100%;border:none"
+                allowfullscreen></iframe>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:.75rem">
+            <button class="btn btn-ghost" style="flex:1" onclick="cerrarModalVideo()">Cancelar</button>
+            <button class="btn btn-primary" style="flex:2" onclick="guardarVideo()">
+              <i class="bi bi-check-circle"></i> Guardar video
+            </button>
+          </div>
+          <div style="margin-top:.75rem;font-size:.8rem;color:var(--red);display:none" id="video-error"></div>
+        </div>
+      </div>
+    </div>
+
 <!-- ══════════ RESEÑAS ══════════ -->
     <div class="section" id="section-resenas">
       <div class="section-header">
@@ -1324,6 +1421,17 @@
     <option value="empresarial">🏢 Empresarial</option>
   </select>
 </div>
+
+<div class="field">
+            <label class="field-label">Línea</label>
+            <select class="field-input" id="prod-linea">
+              <option value="cristiana">✝ Cristiana</option>
+              <option value="casual">⚽ Casual</option>
+              <option value="empresarial">🏢 Empresarial</option>
+            </select>
+          </div>
+
+
 <div class="field">
   <label class="field-label">Categoría</label>
   <select class="field-input" id="prod-cat">
@@ -1504,7 +1612,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ═══════════════════════════════════════════════════════════
 //  NAVEGACIÓN
 // ═══════════════════════════════════════════════════════════
-const TITULOS = { dashboard:'Dashboard', productos:'Productos', pedidos:'Pedidos', despacho:'Despacho', archivados:'Archivados', tarifas:'Tarifas de envío', resenas:'Reseñas' };
+const TITULOS = { dashboard:'Dashboard', productos:'Productos', pedidos:'Pedidos', despacho:'Despacho', archivados:'Archivados', tarifas:'Tarifas de envío', resenas:'Reseñas', videos:'Videos empresarial' };
 
 function irA(seccion) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1521,6 +1629,7 @@ function irA(seccion) {
   if (seccion === 'tarifas')    cargarTarifas();
   if (seccion === 'archivados') cargarArchivados();
   if (seccion === 'resenas') cargarResenas();
+  if (seccion === 'videos')   cargarVideosAdmin();
 }
 
 function abrirSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('open'); }
@@ -1604,15 +1713,15 @@ async function cargarProductos() {
 }
 
 function filtrarTablaProductos() {
-  const q   = document.getElementById('search-productos').value.toLowerCase();
-  const cat = document.getElementById('filter-cat').value;
-  const linea = document.getElementById('filter-linea').value;
-  let lista = todosProductos;
-  if (q)   lista = lista.filter(p => p.nombre?.toLowerCase().includes(q) || p.categoria?.toLowerCase().includes(q));
-  if (cat) lista = lista.filter(p => p.categoria === cat);
-  if (linea) lista = lista.filter(p => p.linea === linea);
-  renderTablaProductos(lista);
-}
+    const q     = document.getElementById('search-productos').value.toLowerCase();
+    const cat   = document.getElementById('filter-cat').value;
+    const linea = document.getElementById('filter-linea').value;
+    let lista = todosProductos;
+    if (q)     lista = lista.filter(p => p.nombre?.toLowerCase().includes(q) || p.categoria?.toLowerCase().includes(q));
+    if (cat)   lista = lista.filter(p => p.categoria === cat);
+    if (linea) lista = lista.filter(p => p.linea === linea);
+    renderTablaProductos(lista);
+  }
 
 function renderTablaProductos(lista) {
   const tbody = document.getElementById('productos-tbody');
@@ -1628,7 +1737,10 @@ function renderTablaProductos(lista) {
             onerror="this.src='https://placehold.co/44x54/22262f/7c8090?text=+'">
           <div>
             <div class="prod-thumb-name">${p.nombre}</div>
-            <div class="prod-thumb-cat">${p.linea ? `<span style="font-size:.62rem;background:rgba(0,0,0,.07);padding:.1rem .4rem;border-radius:3px;margin-right:.3rem">${p.linea}</span>` : ''}${p.categoria || '—'}</div>
+            <div class="prod-thumb-cat">
+              ${p.linea ? `<span style="font-size:.6rem;background:rgba(0,0,0,.07);padding:.1rem .35rem;border-radius:3px;margin-right:.3rem;font-weight:600">${p.linea}</span>` : ''}
+              ${p.categoria || '—'}
+            </div>
           </div>
         </div>
       </td>
@@ -1743,7 +1855,7 @@ function editarProducto(id) {
   document.getElementById('modal-prod-titulo').textContent = 'Editar producto';
   document.getElementById('prod-nombre').value       = prod.nombre || '';
   document.getElementById('prod-cat').value          = prod.categoria || '';
-  document.getElementById('prod-linea').value = prod.linea || 'cristiana';
+  document.getElementById('prod-linea').value        = prod.linea     || 'cristiana';
   document.getElementById('prod-stock').value        = prod.stock ?? 0;
   document.getElementById('prod-precio').value       = prod.precio || '';
   document.getElementById('prod-precio-orig').value  = prod.precio_original || '';
@@ -3314,6 +3426,165 @@ async function gestionarResena(resenaId, nuevoEstado) {
   if (error) { toast('Error al actualizar reseña', 'err'); return; }
   toast(nuevoEstado === 'aprobada' ? 'Reseña aprobada ✓' : 'Reseña rechazada', nuevoEstado === 'aprobada' ? 'ok' : 'err');
   cargarResenas();
+}
+
+
+
+// ═══════════════════════════════════════════════════════════
+//  VIDEOS EMPRESARIAL
+// ═══════════════════════════════════════════════════════════
+
+let videoEditId = null;
+
+async function cargarVideosAdmin() {
+  const grid = document.getElementById('videos-admin-grid');
+  if (!grid) return;
+  grid.innerHTML = '<p style="color:var(--text-muted);font-size:.875rem">Cargando…</p>';
+
+  const { data, error } = await sb
+    .from('videos_empresarial')
+    .select('*')
+    .order('orden', { ascending: true });
+
+  if (error) { toast('Error al cargar videos', 'err'); return; }
+  const lista = data || [];
+
+  if (!lista.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <i class="bi bi-camera-video"></i>
+        <p>No hay videos cargados todavía.<br>Hacé clic en "Nuevo video" para agregar el primero.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = lista.map(v => {
+    const match   = v.youtube_url.match(/(?:youtu\.be\/|v=|embed\/)([a-zA-Z0-9_-]{11})/);
+    const videoId = match ? match[1] : null;
+    const thumb   = videoId
+      ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+      : 'https://placehold.co/320x180/22262f/7c8090?text=Video';
+
+    return `
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        <div style="position:relative">
+          <img src="${thumb}" alt="${v.titulo}"
+            style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block">
+          ${!v.activo ? `<span style="position:absolute;top:.5rem;right:.5rem;background:var(--red-dim);color:var(--red);font-size:.65rem;font-weight:700;padding:.2rem .5rem;border-radius:4px;border:1px solid var(--red)">OCULTO</span>` : ''}
+          <span style="position:absolute;top:.5rem;left:.5rem;background:rgba(0,0,0,.7);color:white;font-size:.65rem;font-weight:700;padding:.2rem .5rem;border-radius:4px">#${v.orden}</span>
+        </div>
+        <div style="padding:.85rem 1rem">
+          <p style="font-weight:600;font-size:.875rem;margin-bottom:.25rem">${v.titulo}</p>
+          ${v.descripcion ? `<p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.65rem">${v.descripcion}</p>` : ''}
+          <div style="display:flex;gap:.5rem;margin-top:.65rem">
+            <button class="btn btn-ghost btn-sm" style="flex:1" onclick="editarVideo('${v.id}')">
+              <i class="bi bi-pencil"></i> Editar
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="eliminarVideo('${v.id}','${v.titulo.replace(/'/g,'')}')">
+              <i class="bi bi-trash3"></i>
+            </button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function abrirModalVideo() {
+  videoEditId = null;
+  document.getElementById('modal-video-titulo').textContent = 'Nuevo video';
+  document.getElementById('video-edit-id').value    = '';
+  document.getElementById('video-titulo').value     = '';
+  document.getElementById('video-descripcion').value = '';
+  document.getElementById('video-url').value        = '';
+  document.getElementById('video-orden').value      = '0';
+  document.getElementById('video-activo').checked   = true;
+  document.getElementById('video-error').style.display = 'none';
+  document.getElementById('video-preview-wrap').style.display = 'none';
+  document.getElementById('modal-video').classList.add('open');
+
+  // Preview automático al pegar URL
+  document.getElementById('video-url').oninput = mostrarPreviewVideo;
+}
+
+function mostrarPreviewVideo() {
+  const url   = document.getElementById('video-url').value.trim();
+  const match = url.match(/(?:youtu\.be\/|v=|embed\/)([a-zA-Z0-9_-]{11})/);
+  const wrap  = document.getElementById('video-preview-wrap');
+  const frame = document.getElementById('video-preview-frame');
+  if (match) {
+    frame.src = `https://www.youtube.com/embed/${match[1]}?rel=0`;
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+    frame.src = '';
+  }
+}
+
+function cerrarModalVideo() {
+  document.getElementById('modal-video').classList.remove('open');
+  const frame = document.getElementById('video-preview-frame');
+  if (frame) frame.src = '';
+}
+
+async function editarVideo(id) {
+  const v = await sb.from('videos_empresarial').select('*').eq('id', id).maybeSingle();
+  if (v.error || !v.data) { toast('No se pudo cargar el video', 'err'); return; }
+  const vid = v.data;
+  videoEditId = id;
+  document.getElementById('modal-video-titulo').textContent = 'Editar video';
+  document.getElementById('video-edit-id').value    = id;
+  document.getElementById('video-titulo').value     = vid.titulo || '';
+  document.getElementById('video-descripcion').value = vid.descripcion || '';
+  document.getElementById('video-url').value        = vid.youtube_url || '';
+  document.getElementById('video-orden').value      = vid.orden ?? 0;
+  document.getElementById('video-activo').checked   = vid.activo !== false;
+  document.getElementById('video-error').style.display = 'none';
+  document.getElementById('video-url').oninput = mostrarPreviewVideo;
+  mostrarPreviewVideo();
+  document.getElementById('modal-video').classList.add('open');
+}
+
+async function guardarVideo() {
+  const errEl = document.getElementById('video-error');
+  errEl.style.display = 'none';
+
+  const titulo = document.getElementById('video-titulo').value.trim();
+  const url    = document.getElementById('video-url').value.trim();
+
+  if (!titulo) { errEl.textContent = 'El título es obligatorio.'; errEl.style.display = 'block'; return; }
+  if (!url)    { errEl.textContent = 'El link de YouTube es obligatorio.'; errEl.style.display = 'block'; return; }
+
+  const match = url.match(/(?:youtu\.be\/|v=|embed\/)([a-zA-Z0-9_-]{11})/);
+  if (!match)  { errEl.textContent = 'El link no parece ser un video de YouTube válido.'; errEl.style.display = 'block'; return; }
+
+  const payload = {
+    titulo:       titulo,
+    descripcion:  document.getElementById('video-descripcion').value.trim() || null,
+    youtube_url:  url,
+    orden:        parseInt(document.getElementById('video-orden').value) || 0,
+    activo:       document.getElementById('video-activo').checked,
+  };
+
+  let error;
+  if (videoEditId) {
+    ({ error } = await sb.from('videos_empresarial').update(payload).eq('id', videoEditId));
+  } else {
+    ({ error } = await sb.from('videos_empresarial').insert(payload));
+  }
+
+  if (error) { errEl.textContent = 'Error: ' + error.message; errEl.style.display = 'block'; return; }
+
+  toast(videoEditId ? '✅ Video actualizado' : '✅ Video agregado', 'ok');
+  cerrarModalVideo();
+  cargarVideosAdmin();
+}
+
+async function eliminarVideo(id, nombre) {
+  if (!confirm(`¿Eliminás el video "${nombre}"? Esta acción no se puede deshacer.`)) return;
+  const { error } = await sb.from('videos_empresarial').delete().eq('id', id);
+  if (error) { toast('Error al eliminar', 'err'); return; }
+  toast('Video eliminado', 'ok');
+  cargarVideosAdmin();
 }
 
 async function restaurarPedido(pedidoId) {
