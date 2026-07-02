@@ -25,9 +25,17 @@ const APP_SHELL = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
-      .catch((err) => console.warn('[SW] No se pudo precachear todo el app shell:', err))
+    caches.open(CACHE_NAME).then((cache) => {
+      // Cacheamos cada recurso por separado: si uno falla (404, red, etc.)
+      // no tira abajo el precacheo de los demás.
+      return Promise.all(
+        APP_SHELL.map((url) =>
+          cache.add(url).catch((err) =>
+            console.warn(`[SW] No se pudo precachear "${url}":`, err)
+          )
+        )
+      );
+    })
   );
   self.skipWaiting();
 });
