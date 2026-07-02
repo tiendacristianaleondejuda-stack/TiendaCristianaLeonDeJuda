@@ -1819,11 +1819,36 @@
       });
     })();
 
-    const yaInstalado = localStorage.getItem('pwa_dismissed');
+    // "instalada" = estado REAL (verificable) → PWA corriendo en standalone
+    //               o confirmado por el evento appinstalled.
+    // "descartado" = el usuario cerró el banner (no significa que instaló).
     const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const enStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 
-    if (!enStandalone && !yaInstalado) {
+    function estaInstalada() {
+      return window.matchMedia('(display-mode: standalone)').matches
+             || window.navigator.standalone === true
+             || localStorage.getItem('pwa_installed') === '1';
+    }
+
+    function fueDescartadoRecientemente() {
+      const ts = Number(localStorage.getItem('pwa_dismissed_at') || 0);
+      const SIETE_DIAS = 7 * 24 * 60 * 60 * 1000;
+      return Date.now() - ts < SIETE_DIAS;
+    }
+
+    function ocultarBanners() {
+      document.getElementById('pwa-banner')?.style.setProperty('display', 'none');
+      document.getElementById('ios-banner')?.style.setProperty('display', 'none');
+    }
+
+    // Evento confiable: se dispara cuando la instalación se completó de verdad,
+    // sin importar si fue vía nuestro botón, el menú del navegador, etc.
+    window.addEventListener('appinstalled', () => {
+      localStorage.setItem('pwa_installed', '1');
+      ocultarBanners();
+    });
+
+    if (!estaInstalada() && !fueDescartadoRecientemente()) {
       // Android / Chrome Desktop
       window.addEventListener('beforeinstallprompt', e => {
         e.preventDefault();
@@ -1831,10 +1856,12 @@
         document.getElementById('pwa-banner').style.display = 'block';
       });
 
-      // iOS Safari
+      // iOS Safari (no dispara beforeinstallprompt, hay que mostrar instrucciones)
       if (esIOS) {
         setTimeout(() => {
-          document.getElementById('ios-banner').style.display = 'block';
+          if (!estaInstalada()) {
+            document.getElementById('ios-banner').style.display = 'block';
+          }
         }, 2500);
       }
     }
@@ -1843,19 +1870,24 @@
       if (!deferredPrompt) return;
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        // Respaldo por si el navegador tarda en disparar 'appinstalled'
+        localStorage.setItem('pwa_installed', '1');
+      } else {
+        localStorage.setItem('pwa_dismissed_at', String(Date.now()));
+      }
       deferredPrompt = null;
       document.getElementById('pwa-banner').style.display = 'none';
-      localStorage.setItem('pwa_dismissed', '1');
     });
 
     document.getElementById('pwa-dismiss-btn')?.addEventListener('click', () => {
       document.getElementById('pwa-banner').style.display = 'none';
-      localStorage.setItem('pwa_dismissed', '1');
+      localStorage.setItem('pwa_dismissed_at', String(Date.now()));
     });
 
     document.getElementById('ios-dismiss-btn')?.addEventListener('click', () => {
       document.getElementById('ios-banner').style.display = 'none';
-      localStorage.setItem('pwa_dismissed', '1');
+      localStorage.setItem('pwa_dismissed_at', String(Date.now()));
     });
   </script>
 
