@@ -1796,6 +1796,15 @@
   </div>
 
   <script>
+    // ─── Registro del Service Worker (requisito para que Chrome
+    //     considere la app instalable) ───
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/OneSignalSDKWorker.js', { scope: '/' })
+          .catch(err => console.warn('SW registration falló:', err));
+      });
+    }
+
     // ─── PWA Install prompt ───
     let deferredPrompt = null;
 
